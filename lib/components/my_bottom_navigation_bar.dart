@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:locainfo/constants/app_colors.dart';
 
 class MyBottomNavigationBar extends StatefulWidget {
   const MyBottomNavigationBar({super.key});
@@ -13,23 +14,42 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
     return BottomAppBar(
       height: 60,
       shape: const CircularNotchedRectangle(),
-      color: Colors.blue,
+      color: AppColors.background,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           IconButton(
-            tooltip: 'Open navigation menu',
-            icon: const Icon(Icons.menu),
+            tooltip: 'Home',
+            icon: const Icon(
+              Icons.home_outlined,
+              size: 26,
+            ),
             onPressed: () {},
           ),
-          const Spacer(),
           IconButton(
-            tooltip: 'Search',
-            icon: const Icon(Icons.search),
+            tooltip: 'News',
+            icon: const Icon(
+              Icons.article_outlined,
+              size: 26,
+            ),
+            onPressed: () {},
+          ),
+          const SizedBox(width: 60),
+          IconButton(
+            tooltip: 'Bookmark',
+            icon: const Icon(
+              Icons.bookmarks_outlined,
+              size: 26,
+            ),
             onPressed: () {},
           ),
           IconButton(
             tooltip: 'Favorite',
-            icon: const Icon(Icons.favorite),
+            icon: const Icon(
+              Icons.person_outline,
+              size: 26,
+            ),
             onPressed: () {},
           ),
         ],

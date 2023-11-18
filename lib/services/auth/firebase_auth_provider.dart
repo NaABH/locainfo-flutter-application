@@ -76,12 +76,22 @@ class FirebaseAuthProvider implements AuthProvider {
         throw UserNotLoggedInAuthException();
       }
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        throw UserNotFoundAuthException();
-      } else if (e.code == 'wrong-password') {
-        throw WrongPasswordAuthException();
-      } else {
-        throw GenericAuthException();
+      switch (e.code) {
+        case 'user-not-found':
+          throw UserNotFoundAuthException();
+          break;
+        case 'wrong-password':
+          throw WrongPasswordAuthException();
+          break;
+        case 'invalid-email':
+          throw InvalidEmailAuthException();
+          break;
+        case 'user-disabled':
+          throw AccountDisabledAuthException();
+          break;
+        default:
+          print(e.code);
+          throw GenericAuthException();
       }
     } catch (_) {
       throw GenericAuthException();

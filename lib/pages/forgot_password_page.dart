@@ -15,6 +15,20 @@ class ForgotPasswordPage extends StatefulWidget {
 }
 
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
+  late final TextEditingController _email;
+
+  @override
+  void initState() {
+    _email = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _email.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,6 +54,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 height: 10,
               ),
               TextField(
+                controller: _email,
                 obscureText: false,
                 enableSuggestions: false,
                 autocorrect: false,
@@ -61,7 +76,24 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 ),
               ),
               const SizedBox(height: 25),
-              MyButton(onPressed: () {}, text: 'Send Reset Link'),
+              MyButton(
+                  onPressed: () {
+                    final email = _email.text;
+                    context.read<AuthBloc>().add(
+                          AuthEventForgotPassword(email: email),
+                        );
+                  },
+                  text: 'Send Reset Link'),
+              const SizedBox(
+                height: 20,
+              ),
+              MyButton(
+                  onPressed: () {
+                    context.read<AuthBloc>().add(
+                          const AuthEventShouldLogIn(), // go to login page
+                        );
+                  },
+                  text: 'Login'),
             ],
           ),
         ),

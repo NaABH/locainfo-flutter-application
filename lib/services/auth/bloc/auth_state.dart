@@ -50,6 +50,7 @@ class AuthStateLoggingIn extends AuthState {
   const AuthStateLoggingIn({
     required this.exception,
     required isLoading,
+    String? loadingText,
   }) : super(isLoading: isLoading);
 }
 

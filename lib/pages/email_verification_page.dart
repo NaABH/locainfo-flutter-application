@@ -40,14 +40,20 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
             const SizedBox(
               height: 20,
             ),
-            MyButton(onPressed: () {}, text: 'Resend Email'),
+            MyButton(
+                onPressed: () {
+                  context.read<AuthBloc>().add(
+                        const AuthEventSendEmailVerification(), // resend email verification
+                      );
+                },
+                text: 'Resend Email'),
             const SizedBox(
               height: 20,
             ),
             MyButton(
                 onPressed: () {
                   context.read<AuthBloc>().add(
-                        const AuthEventShouldLogIn(),
+                        const AuthEventShouldLogIn(), // go to login page
                       );
                 },
                 text: 'Login'),

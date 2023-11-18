@@ -80,6 +80,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                   height: 10,
                 ),
                 TextField(
+                  controller: _username,
                   obscureText: false,
                   enableSuggestions: false,
                   autocorrect: false,
@@ -113,6 +114,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                   height: 10,
                 ),
                 TextField(
+                  controller: _email,
                   obscureText: false,
                   decoration: InputDecoration(
                     enabledBorder: const OutlineInputBorder(
@@ -143,6 +145,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                   height: 10,
                 ),
                 TextField(
+                  controller: _password,
                   obscureText: false,
                   decoration: InputDecoration(
                     enabledBorder: const OutlineInputBorder(
@@ -162,7 +165,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 ),
                 const SizedBox(height: 25),
                 MyButton(
-                    onPressed: () {
+                    onPressed: () async {
                       final username = _username.text; // havent in used
                       final email = _email.text;
                       final password = _password.text;

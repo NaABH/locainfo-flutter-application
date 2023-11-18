@@ -30,7 +30,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     });
 
-    // user to register event
+    // direct user to register page
     on<AuthEventShouldRegister>((event, emit) {
       emit(const AuthStateRegistering(
         exception: null,
@@ -38,6 +38,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ));
     });
 
+    // direct user to login page
     on<AuthEventShouldLogIn>((event, emit) async {
       emit(const AuthStateLoggingIn(
         exception: null,
@@ -45,7 +46,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ));
     });
 
-    // forgot password event
+    // user forgot password
     on<AuthEventForgotPassword>((event, emit) async {
       emit(const AuthStateForgotPassword(
         exception: null,
@@ -94,6 +95,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(const AuthStateNeedsVerification(isLoading: false));
       } on Exception catch (e) {
         emit(AuthStateRegistering(
+          // same state but with exception
           exception: e,
           isLoading: false,
         ));
@@ -109,7 +111,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     // log in event
     on<AuthEventLogIn>((event, emit) async {
       emit(
-        const AuthStateLoggedOut(
+        const AuthStateLoggingIn(
             exception: null, isLoading: true, loadingText: 'Logging in...'),
       );
       final email = event.email;
@@ -121,8 +123,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
 
         if (!user.isEmailVerified) {
+          // user  have not verify email
           emit(
-            const AuthStateLoggedOut(
+            const AuthStateLoggingIn(
               exception: null,
               isLoading: false,
             ),
@@ -130,7 +133,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           emit(const AuthStateNeedsVerification(isLoading: false));
         } else {
           emit(
-            const AuthStateLoggedOut(
+            const AuthStateLoggingIn(
               exception: null,
               isLoading: false,
             ),
@@ -142,7 +145,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         }
       } on Exception catch (e) {
         emit(
-          AuthStateLoggedOut(
+          AuthStateLoggingIn(
             exception: e,
             isLoading: false,
           ),

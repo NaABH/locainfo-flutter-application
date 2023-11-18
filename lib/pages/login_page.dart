@@ -5,9 +5,11 @@ import 'package:locainfo/components/my_button.dart';
 import 'package:locainfo/components/my_pressableText.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
+import 'package:locainfo/services/auth/auth_exceptions.dart';
 import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
 import 'package:locainfo/services/auth/bloc/auth_event.dart';
 import 'package:locainfo/services/auth/bloc/auth_state.dart';
+import 'package:locainfo/utilities/error_dialog.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -38,16 +40,20 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) async {
-        // if (state is AuthStateLoggedOut) {
-        //   if (state.exception is UserNotFoundAuthException) {
-        //     await showErrorDialog(
-        //         context, 'Cannot find a user with teh entered credentials');
-        //   } else if (state.exception is WrongPasswordAuthException) {
-        //     await showErrorDialog(context, 'Wrong credentials');
-        //   } else if (state.exception is GenericAuthException) {
-        //     await showErrorDialog(context, 'Authentication error');
-        //   }
-        // }
+        if (state is AuthStateLoggingIn) {
+          if (state.exception is UserNotFoundAuthException) {
+            await showErrorDialog(
+                context, 'Cannot find a user with the entered credentials');
+          } else if (state.exception is WrongPasswordAuthException) {
+            await showErrorDialog(context, 'Wrong credentials');
+          } else if (state.exception is InvalidEmailAuthException) {
+            await showErrorDialog(context, 'The email entered is invalid');
+          } else if (state.exception is AccountDisabledAuthException) {
+            await showErrorDialog(context, 'Your account is blocked');
+          } else if (state.exception is GenericAuthException) {
+            await showErrorDialog(context, 'Authentication error');
+          }
+        }
       },
       child: Scaffold(
         appBar: AppBar(
