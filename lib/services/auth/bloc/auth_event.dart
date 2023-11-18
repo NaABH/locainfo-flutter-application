@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+// abstract class AuthEvent
 @immutable
 abstract class AuthEvent {
   const AuthEvent();

@@ -4,11 +4,11 @@ import 'package:locainfo/services/auth/auth_user.dart';
 
 @immutable
 abstract class AuthState {
-  final bool isLoading;
-  final String? loadingText;
+  final bool isLoading; // isLoading
+  final String? loadingText; // to display loading text
   const AuthState({
     required this.isLoading,
-    this.loadingText = 'Loading...',
+    this.loadingText = 'Loading...', // default message
   });
 }
 
@@ -18,19 +18,36 @@ class AuthStateUninitialized extends AuthState {
       : super(isLoading: isLoading);
 }
 
-// user logging in
-class AuthStateLoggingIn extends AuthState {
-  final Exception? exception; // prepare to hold an exception if occur
-  const AuthStateLoggingIn({
+// user is logged out
+// this class is comparable
+class AuthStateLoggedOut extends AuthState with EquatableMixin {
+  final Exception? exception; // hold exception
+  const AuthStateLoggedOut({
     required this.exception,
-    required isLoading,
-  }) : super(isLoading: isLoading);
+    required bool isLoading,
+    String? loadingText,
+  }) : super(
+          isLoading: isLoading,
+          loadingText: loadingText,
+        );
+
+  @override
+  List<Object?> get props => [exception, isLoading];
 }
 
 // user registering
 class AuthStateRegistering extends AuthState {
   final Exception? exception; // prepare to hold an exception if occur
   const AuthStateRegistering({
+    required this.exception,
+    required isLoading,
+  }) : super(isLoading: isLoading);
+}
+
+// user logging in
+class AuthStateLoggingIn extends AuthState {
+  final Exception? exception; // prepare to hold an exception if occur
+  const AuthStateLoggingIn({
     required this.exception,
     required isLoading,
   }) : super(isLoading: isLoading);
@@ -60,21 +77,4 @@ class AuthStateLoggedIn extends AuthState {
 class AuthStateNeedsVerification extends AuthState {
   const AuthStateNeedsVerification({required bool isLoading})
       : super(isLoading: isLoading);
-}
-
-// user want to log out
-// this class is comparable
-class AuthStateLoggedOut extends AuthState with EquatableMixin {
-  final Exception? exception; // hold exception
-  const AuthStateLoggedOut({
-    required this.exception,
-    required bool isLoading,
-    String? loadingText,
-  }) : super(
-          isLoading: isLoading,
-          loadingText: loadingText,
-        );
-
-  @override
-  List<Object?> get props => [exception, isLoading];
 }

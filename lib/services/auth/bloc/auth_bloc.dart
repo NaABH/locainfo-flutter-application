@@ -11,15 +11,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await provider.initialize();
       final user = provider.currentUser;
       if (user == null) {
+        // user not logged in
         emit(
           const AuthStateLoggedOut(
             exception: null,
             isLoading: false,
           ),
         );
+        // user registered but have not verified email
       } else if (!user.isEmailVerified) {
         emit(const AuthStateNeedsVerification(isLoading: false));
       } else {
+        // user logged in
         emit(AuthStateLoggedIn(
           user: user,
           isLoading: false,
@@ -78,12 +81,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ));
     });
 
-    // send email verification
-    on<AuthEventSendEmailVerification>((event, emit) async {
-      await provider.sendEmailVerification();
-      emit(state);
-    });
-
     // register event
     on<AuthEventRegister>((event, emit) async {
       final email = event.email;
@@ -101,6 +98,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           isLoading: false,
         ));
       }
+    });
+
+    // send email verification
+    on<AuthEventSendEmailVerification>((event, emit) async {
+      await provider.sendEmailVerification();
+      emit(state);
     });
 
     // log in event
