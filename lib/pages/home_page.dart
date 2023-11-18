@@ -14,6 +14,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  var _bottomNavIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
