@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:locainfo/components/my_bottom_navigation_bar.dart';
 import 'package:locainfo/components/my_google_map.dart';
-import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/services/location/rubbish.dart';
 
 class HomePage extends StatefulWidget {
@@ -128,24 +126,6 @@ class _HomePageState extends State<HomePage> {
       //     ),
       //   ],
       // ),
-      floatingActionButton: SizedBox(
-        height: 60,
-        width: 60,
-        child: FloatingActionButton(
-          onPressed: () {},
-          tooltip: 'Create',
-          backgroundColor: AppColors.main_blue,
-          shape: const CircleBorder(),
-          child: const Icon(
-            Icons.add,
-            color: Colors.white,
-          ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: const MyBottomNavigationBar(
-        bottomNavIndex: 0,
-      ),
     );
   }
 }

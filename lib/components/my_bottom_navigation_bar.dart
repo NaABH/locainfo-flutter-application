@@ -2,33 +2,27 @@ import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.da
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/constants/app_colors.dart';
+import 'package:locainfo/constants/icons.dart';
 import 'package:locainfo/services/main_bloc.dart';
 import 'package:locainfo/services/main_event.dart';
+import 'package:locainfo/services/main_state.dart';
 
 class MyBottomNavigationBar extends StatefulWidget {
-  final int bottomNavIndex;
-  const MyBottomNavigationBar({super.key, required this.bottomNavIndex});
+  const MyBottomNavigationBar({super.key});
 
   @override
   State<MyBottomNavigationBar> createState() => _MyBottomNavigationBarState();
 }
 
 class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
-  final iconList = <IconData>[
-    Icons.home_outlined,
-    Icons.article_outlined,
-    Icons.bookmark_outline,
-    Icons.person_outline,
-  ];
+  late int _bottomNavIndex;
 
-  final iconListSelected = <IconData>[
-    Icons.home,
-    Icons.article,
-    Icons.bookmark,
-    Icons.person
-  ];
-
-  final iconTextList = ['Home', 'News', 'Saved', 'Profile'];
+  @override
+  void initState() {
+    final state = context.read<MainBloc>().state;
+    _bottomNavIndex = _mapStateToIndex(state);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,15 +53,31 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
       },
       backgroundColor: Colors.grey.shade100,
       borderColor: Colors.grey.shade300,
-      activeIndex: widget.bottomNavIndex,
+      activeIndex: _bottomNavIndex,
       height: 60,
       gapLocation: GapLocation.center,
       notchSmoothness: NotchSmoothness.softEdge,
       leftCornerRadius: 26,
       rightCornerRadius: 26,
       onTap: (index) {
+        setState(() => _bottomNavIndex = index);
         context.read<MainBloc>().add(MainEventNavigationChanged(index: index));
       },
     );
+  }
+
+  // Helper method to map MainState to the corresponding index
+  int _mapStateToIndex(MainState state) {
+    if (state is MainStateHome) {
+      return 0;
+    } else if (state is MainStateNews) {
+      return 1;
+    } else if (state is MainStateBookmark) {
+      return 2;
+    } else if (state is MainStateProfile) {
+      return 3;
+    } else {
+      return 0; // Default to home page
+    }
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:locainfo/components/my_bottom_navigation_bar.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
@@ -47,24 +46,6 @@ class _NewsPageState extends State<NewsPage> {
             child: (Text('asdas')),
           )
         ],
-      ),
-      floatingActionButton: SizedBox(
-        height: 60,
-        width: 60,
-        child: FloatingActionButton(
-          onPressed: () {},
-          tooltip: 'Create',
-          backgroundColor: AppColors.main_blue,
-          shape: const CircleBorder(),
-          child: const Icon(
-            Icons.add,
-            color: Colors.white,
-          ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: const MyBottomNavigationBar(
-        bottomNavIndex: 1,
       ),
     );
   }

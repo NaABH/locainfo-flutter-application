@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:locainfo/components/my_bottom_navigation_bar.dart';
 
 class BookMarkPage extends StatefulWidget {
   const BookMarkPage({super.key});
@@ -11,10 +10,6 @@ class BookMarkPage extends StatefulWidget {
 class _BookMarkPageState extends State<BookMarkPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: MyBottomNavigationBar(
-        bottomNavIndex: 2,
-      ),
-    );
+    return Scaffold();
   }
 }

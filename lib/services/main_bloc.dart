@@ -6,8 +6,7 @@ class MainBloc extends Bloc<MainEvent, MainState> {
   MainBloc() : super(const MainStateHome()) {
     on<MainEventInitialise>((event, emit) => emit(const MainStateHome()));
     on<MainEventNavigationChanged>((event, emit) {
-      final index = event.index;
-      switch (index) {
+      switch (event.index) {
         case 0:
           emit(const MainStateHome());
           break;

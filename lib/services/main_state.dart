@@ -20,7 +20,3 @@ class MainStateBookmark extends MainState {
 class MainStateProfile extends MainState {
   const MainStateProfile();
 }
-
-class MainStateNavigateToPage extends MainState {
-  const MainStateNavigateToPage();
-}
