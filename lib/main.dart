@@ -2,19 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/routes.dart';
-import 'package:locainfo/pages/create_account_page.dart';
-import 'package:locainfo/pages/email_verification_page.dart';
-import 'package:locainfo/pages/forgot_password_page.dart';
+import 'package:locainfo/pages/auth/create_account_page.dart';
+import 'package:locainfo/pages/auth/email_verification_page.dart';
+import 'package:locainfo/pages/auth/forgot_password_page.dart';
+import 'package:locainfo/pages/auth/login_page.dart';
+import 'package:locainfo/pages/auth/onBoarding_page.dart';
+import 'package:locainfo/pages/bookmark_page.dart';
 import 'package:locainfo/pages/home_page.dart';
-import 'package:locainfo/pages/login_page.dart';
-import 'package:locainfo/pages/onBoarding_page.dart';
+import 'package:locainfo/pages/news_page.dart';
+import 'package:locainfo/pages/profile_page.dart';
 import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
 import 'package:locainfo/services/auth/bloc/auth_event.dart';
 import 'package:locainfo/services/auth/bloc/auth_state.dart';
 import 'package:locainfo/services/auth/firebase_auth_provider.dart';
+import 'package:locainfo/services/location/bloc/location_bloc.dart';
+import 'package:locainfo/services/location/location_provider.dart';
+import 'package:locainfo/services/main_bloc.dart';
+import 'package:locainfo/services/main_event.dart';
+import 'package:locainfo/services/main_state.dart';
+
+// void main() {
+//   runApp(const MyApp());
+// }
 
 void main() {
-  runApp(const MyApp());
+  runApp(MultiBlocProvider(providers: [
+    BlocProvider<AuthBloc>(
+      create: (BuildContext context) => AuthBloc(FirebaseAuthProvider()),
+    ),
+    BlocProvider<MainBloc>(
+      create: (BuildContext context) => MainBloc(),
+    ),
+    BlocProvider<LocationBloc>(
+      create: (BuildContext context) => LocationBloc(LocationProvider()),
+    ),
+  ], child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -28,10 +50,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.main_blue),
         useMaterial3: true,
       ),
-      home: BlocProvider<AuthBloc>(
-        create: (context) => AuthBloc(FirebaseAuthProvider()),
-        child: const MainPage(),
-      ),
+      home: const LoginInterface(),
       routes: {
         onBoardingPageRoute: (context) => const OnBoardingPage(),
       },
@@ -39,8 +58,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MainPage extends StatelessWidget {
-  const MainPage({super.key});
+class LoginInterface extends StatelessWidget {
+  const LoginInterface({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +77,7 @@ class MainPage extends StatelessWidget {
       },
       builder: (context, state) {
         if (state is AuthStateLoggedIn) {
-          return const HomePage();
+          return const MainInterface();
         } else if (state is AuthStateLoggedOut) {
           // logout
           return const OnBoardingPage();
@@ -81,5 +100,31 @@ class MainPage extends StatelessWidget {
         }
       },
     );
+  }
+}
+
+class MainInterface extends StatelessWidget {
+  const MainInterface({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    context.read<MainBloc>().add(const MainEventInitialise());
+    return BlocConsumer<MainBloc, MainState>(
+        listener: (context, state) {},
+        builder: (context, state) {
+          if (state is MainStateHome) {
+            return const HomePage();
+          } else if (state is MainStateNews) {
+            return const NewsPage();
+          } else if (state is MainStateBookmark) {
+            return const BookMarkPage();
+          } else if (state is MainStateProfile) {
+            return const ProfilePage();
+          } else {
+            return const Scaffold(
+              body: CircularProgressIndicator(),
+            );
+          }
+        });
   }
 }

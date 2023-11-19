@@ -1,8 +1,13 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:locainfo/constants/app_colors.dart';
+import 'package:locainfo/services/main_bloc.dart';
+import 'package:locainfo/services/main_event.dart';
 
 class MyBottomNavigationBar extends StatefulWidget {
-  const MyBottomNavigationBar({super.key});
+  final int bottomNavIndex;
+  const MyBottomNavigationBar({super.key, required this.bottomNavIndex});
 
   @override
   State<MyBottomNavigationBar> createState() => _MyBottomNavigationBarState();
@@ -25,8 +30,6 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
 
   final iconTextList = ['Home', 'News', 'Saved', 'Profile'];
 
-  var _bottomNavIndex = 0;
-
   @override
   Widget build(BuildContext context) {
     return AnimatedBottomNavigationBar.builder(
@@ -40,6 +43,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
             Icon(
               icon,
               size: 30,
+              color: AppColors.main_blue,
             ),
             const SizedBox(height: 2),
             Padding(
@@ -47,19 +51,23 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
               child: Text(
                 iconTextList[index],
                 style:
-                    const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                    const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
               ),
             )
           ],
         );
       },
-      activeIndex: _bottomNavIndex,
+      backgroundColor: Colors.grey.shade100,
+      borderColor: Colors.grey.shade300,
+      activeIndex: widget.bottomNavIndex,
       height: 60,
       gapLocation: GapLocation.center,
       notchSmoothness: NotchSmoothness.softEdge,
       leftCornerRadius: 26,
       rightCornerRadius: 26,
-      onTap: (index) => setState(() => _bottomNavIndex = index),
+      onTap: (index) {
+        context.read<MainBloc>().add(MainEventNavigationChanged(index: index));
+      },
     );
   }
 }
