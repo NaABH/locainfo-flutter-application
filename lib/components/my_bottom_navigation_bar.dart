@@ -54,7 +54,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
       backgroundColor: Colors.grey.shade100,
       borderColor: Colors.grey.shade300,
       activeIndex: _bottomNavIndex,
-      height: 60,
+      height: 55,
       gapLocation: GapLocation.center,
       notchSmoothness: NotchSmoothness.softEdge,
       leftCornerRadius: 26,

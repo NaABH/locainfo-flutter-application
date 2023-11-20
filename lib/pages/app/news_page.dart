@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
-import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
-import 'package:locainfo/services/auth/bloc/auth_event.dart';
 
 class NewsPage extends StatefulWidget {
   const NewsPage({super.key});
@@ -26,11 +23,7 @@ class _NewsPageState extends State<NewsPage> {
         ),
         actions: [
           IconButton(
-              onPressed: () {
-                context.read<AuthBloc>().add(
-                      const AuthEventLogOut(),
-                    );
-              },
+              onPressed: () {},
               icon: const Icon(
                 Icons.notifications,
                 color: AppColors.main_blue,
