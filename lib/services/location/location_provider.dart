@@ -1,9 +1,28 @@
+import 'dart:async';
+
 import 'package:geolocator/geolocator.dart';
 import 'package:locainfo/services/location/geolocation_provider.dart';
 
 class LocationProvider implements GeoLocationProvider {
   LocationProvider();
+  late StreamSubscription<Position> _locationStream;
 
+  // start location stream
+  Future<void> startLocationStream(Function(Position position) handler) async {
+    _locationStream = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 15, //update once every 20m
+      ),
+    ).listen(handler);
+  }
+
+  // stop location stream
+  Future<void> stopLocationStream() async {
+    await _locationStream.cancel();
+  }
+
+  // get current location
   @override
   Future<Position> getCurrentLocation() async {
     bool serviceEnabled;
@@ -32,23 +51,9 @@ class LocationProvider implements GeoLocationProvider {
         desiredAccuracy: LocationAccuracy.high);
   }
 
-  // value can be null
+  // get last known location (value can be null)
   @override
   Future<Position?> getLastKnownLocation() async {
     return await Geolocator.getLastKnownPosition();
-  }
-
-  void liveLocation() {
-    LocationSettings locationSettings = const LocationSettings(
-      accuracy: LocationAccuracy.high,
-      distanceFilter: 20, //update once every 20m
-    );
-
-    Geolocator.getPositionStream(locationSettings: locationSettings)
-        .listen((Position? position) {
-      print(position == null
-          ? 'Unknown'
-          : '${position.latitude.toString()}, ${position.longitude.toString()}');
-    });
   }
 }
