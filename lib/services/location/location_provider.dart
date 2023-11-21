@@ -5,21 +5,15 @@ import 'package:locainfo/services/location/geolocation_provider.dart';
 
 class LocationProvider implements GeoLocationProvider {
   LocationProvider();
-  late StreamSubscription<Position> _locationStream;
 
   // start location stream
-  Future<void> startLocationStream(Function(Position position) handler) async {
-    _locationStream = Geolocator.getPositionStream(
+  Stream<Position> getLocationStream() {
+    return Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,
-        distanceFilter: 15, //update once every 20m
+        distanceFilter: 15,
       ),
-    ).listen(handler);
-  }
-
-  // stop location stream
-  Future<void> stopLocationStream() async {
-    await _locationStream.cancel();
+    );
   }
 
   // get current location

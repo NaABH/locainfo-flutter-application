@@ -55,119 +55,16 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     _locationService = LocationProvider();
-    _locationService.startLocationStream(_handleLocationStream);
     super.initState();
   }
 
   @override
-  void dispose() {
-    _locationService.stopLocationStream();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    Widget child;
-    if (currentLocation == null) {
-      child = const Center(child: CircularProgressIndicator());
-    } else {
-      child = CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 500,
-            floating: false,
-            pinned: false,
-            flexibleSpace: GoogleMap(
-              initialCameraPosition: CameraPosition(
-                  target: LatLng(
-                      currentLocation!.latitude, currentLocation!.longitude)),
-              markers: markers,
-              zoomControlsEnabled: false,
-              mapType: MapType.terrain,
-              onMapCreated: _onMapCreated,
-              myLocationEnabled: true,
-              myLocationButtonEnabled: false,
-              padding: const EdgeInsets.only(bottom: 10),
-            ),
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(0.0),
-              child: Container(
-                height: 15,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(50),
-                    topRight: Radius.circular(50),
-                  ),
-                ),
-                child: Container(
-                  height: 5,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child: Container(
-                  height: 200,
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.all(10),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child: Container(
-                  height: 200,
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.all(10),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child: Container(
-                  height: 200,
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.all(10),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child: Container(
-                  height: 200,
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-          )
-        ],
-      );
-    }
-
     return SafeArea(
       child: Scaffold(
           floatingActionButton: FloatingActionButton(
             onPressed: () async {
+              currentLocation = await _locationService.getCurrentLocation();
               _mapController.animateCamera(CameraUpdate.newCameraPosition(
                   CameraPosition(
                       target: LatLng(currentLocation!.latitude,
@@ -175,7 +72,117 @@ class _HomePageState extends State<HomePage> {
                       zoom: 16)));
             },
           ),
-          body: child),
+          body: CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                expandedHeight: 500,
+                floating: false,
+                pinned: false,
+                flexibleSpace: StreamBuilder<Position>(
+                  stream: _locationService.getLocationStream(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      currentLocation = snapshot.data;
+                      _mapController.animateCamera(
+                        CameraUpdate.newCameraPosition(
+                          CameraPosition(
+                            target: LatLng(currentLocation!.latitude,
+                                currentLocation!.longitude),
+                            zoom: 16,
+                          ),
+                        ),
+                      );
+
+                      return GoogleMap(
+                        initialCameraPosition: CameraPosition(
+                            target: LatLng(currentLocation!.latitude,
+                                currentLocation!.longitude),
+                            zoom: 16),
+                        markers: markers,
+                        zoomControlsEnabled: false,
+                        mapType: MapType.normal,
+                        onMapCreated: _onMapCreated,
+                        myLocationEnabled: true,
+                        myLocationButtonEnabled: false,
+                        padding: const EdgeInsets.only(bottom: 10),
+                      );
+                    }
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                ),
+                bottom: PreferredSize(
+                  preferredSize: const Size.fromHeight(0.0),
+                  child: Container(
+                    height: 15,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(50),
+                        topRight: Radius.circular(50),
+                      ),
+                    ),
+                    child: Container(
+                      height: 5,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Container(
+                      height: 200,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Container(
+                      height: 200,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Container(
+                      height: 200,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Container(
+                      height: 200,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+              )
+            ],
+          )),
     );
   }
 }
