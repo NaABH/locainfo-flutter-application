@@ -13,7 +13,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late final GoogleMapController _mapController; // google map controller
+  GoogleMapController? _mapController; // google map controller
   late final LocationProvider _locationService; // location provider
   Position? currentLocation; // current location
   Set<Marker> markers = {}; // market on map
@@ -21,7 +21,6 @@ class _HomePageState extends State<HomePage> {
   // assign controller to map
   Future<void> _onMapCreated(GoogleMapController controller) async {
     _mapController = controller;
-    currentLocation = await _locationService.getCurrentLocation();
   }
 
   void _updateMarkers() {
@@ -35,7 +34,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _animateToLocation() {
-    _mapController.animateCamera(
+    _mapController?.animateCamera(
       CameraUpdate.newCameraPosition(
         CameraPosition(
           target: LatLng(currentLocation!.latitude, currentLocation!.longitude),
@@ -65,11 +64,7 @@ class _HomePageState extends State<HomePage> {
           floatingActionButton: FloatingActionButton(
             onPressed: () async {
               currentLocation = await _locationService.getCurrentLocation();
-              _mapController.animateCamera(CameraUpdate.newCameraPosition(
-                  CameraPosition(
-                      target: LatLng(currentLocation!.latitude,
-                          currentLocation!.longitude),
-                      zoom: 16)));
+              _animateToLocation();
             },
           ),
           body: CustomScrollView(
@@ -83,16 +78,7 @@ class _HomePageState extends State<HomePage> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       currentLocation = snapshot.data;
-                      _mapController.animateCamera(
-                        CameraUpdate.newCameraPosition(
-                          CameraPosition(
-                            target: LatLng(currentLocation!.latitude,
-                                currentLocation!.longitude),
-                            zoom: 16,
-                          ),
-                        ),
-                      );
-
+                      _animateToLocation();
                       return GoogleMap(
                         initialCameraPosition: CameraPosition(
                             target: LatLng(currentLocation!.latitude,
