@@ -43,13 +43,14 @@ class LocationProviderr {
   void _liveLocation() {
     LocationSettings locationSettings = const LocationSettings(
       accuracy: LocationAccuracy.high,
-      distanceFilter: 100, //update once every 100m
+      distanceFilter: 20, //update once every 20m
     );
 
     Geolocator.getPositionStream(locationSettings: locationSettings)
-        .listen((Position position) {
-      var lat = position.latitude.toDouble();
-      var lon = position.longitude.toDouble();
+        .listen((Position? position) {
+      print(position == null
+          ? 'Unknown'
+          : '${position.latitude.toString()}, ${position.longitude.toString()}');
     });
   }
 }

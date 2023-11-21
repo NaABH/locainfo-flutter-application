@@ -1,1 +1,1 @@
-const onBoardingPageRoute = '/on_boarding';
+const createPostRoute = '/create_post';

@@ -12,6 +12,7 @@ class MyGoogleMap extends StatelessWidget {
     return GoogleMap(
       zoomControlsEnabled: false,
       myLocationEnabled: true,
+      myLocationButtonEnabled: true,
       padding: const EdgeInsets.only(bottom: 10),
       initialCameraPosition: CameraPosition(
         target: LatLng(lat, lon),

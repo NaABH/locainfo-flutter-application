@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/components/my_bottom_navigation_bar.dart';
 import 'package:locainfo/constants/app_colors.dart';
+import 'package:locainfo/constants/routes.dart';
 import 'package:locainfo/pages/app/bookmark_page.dart';
 import 'package:locainfo/pages/app/news_page.dart';
 import 'package:locainfo/pages/app/profile_page.dart';
@@ -46,8 +47,10 @@ class MainAppPage extends StatelessWidget {
         height: 60,
         width: 60,
         child: FloatingActionButton(
-          onPressed: () {},
-          tooltip: 'Create',
+          onPressed: () {
+            Navigator.of(context).pushNamed(createPostRoute);
+          },
+          tooltip: 'Create Post',
           backgroundColor: AppColors.main_blue,
           shape: const CircleBorder(),
           child: const Icon(
