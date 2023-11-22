@@ -2,7 +2,10 @@ import 'package:locainfo/services/firestore/post.dart';
 
 abstract class DatabaseProvider {
   // create new post
-  Future<Post> createNewPost({required String ownerUserId});
+  Future<Post> createNewPost(
+      {required String ownerUserId,
+      required String title,
+      required String body});
 
   // get posts
   Future<Iterable<Post>> getPosts({required String ownerUserId});

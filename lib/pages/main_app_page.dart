@@ -4,13 +4,12 @@ import 'package:locainfo/components/my_bottom_navigation_bar.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/routes.dart';
 import 'package:locainfo/pages/app/bookmark_page.dart';
+import 'package:locainfo/pages/app/home_page.dart';
 import 'package:locainfo/pages/app/news_page.dart';
 import 'package:locainfo/pages/app/profile_page.dart';
 import 'package:locainfo/services/main_bloc.dart';
 import 'package:locainfo/services/main_event.dart';
 import 'package:locainfo/services/main_state.dart';
-
-import 'app/home_page.dart';
 
 class MainAppPage extends StatelessWidget {
   const MainAppPage({super.key});

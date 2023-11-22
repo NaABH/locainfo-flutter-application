@@ -3,6 +3,9 @@ import 'package:locainfo/components/my_back_button.dart';
 import 'package:locainfo/components/my_button.dart';
 import 'package:locainfo/components/my_dropdown_menu.dart';
 import 'package:locainfo/constants/font_styles.dart';
+import 'package:locainfo/services/auth/firebase_auth_provider.dart';
+import 'package:locainfo/services/firestore/firestore_provider.dart';
+import 'package:locainfo/services/firestore/post.dart';
 
 class CreatePostPage extends StatefulWidget {
   const CreatePostPage({super.key});
@@ -12,6 +15,26 @@ class CreatePostPage extends StatefulWidget {
 }
 
 class _CreatePostPageState extends State<CreatePostPage> {
+  Post? _post;
+  late final FireStoreProvider _databaseProvider;
+  late final TextEditingController _textControllerTitle;
+  late final TextEditingController _textControllerBody;
+
+  @override
+  void initState() {
+    _databaseProvider = FireStoreProvider();
+    _textControllerTitle = TextEditingController();
+    _textControllerBody = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _textControllerTitle.dispose();
+    _textControllerBody.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,6 +60,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 child: Column(
                   children: [
                     TextField(
+                      controller: _textControllerTitle,
                       obscureText: false,
                       enableSuggestions: true,
                       autocorrect: true,
@@ -54,6 +78,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       ),
                     ),
                     TextField(
+                      controller: _textControllerBody,
                       obscureText: false,
                       enableSuggestions: true,
                       autocorrect: true,
@@ -103,7 +128,15 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 ),
               ),
               const SizedBox(height: 20),
-              MyButton(onPressed: () async {}, text: 'Submit'),
+              MyButton(
+                  onPressed: () async {
+                    _databaseProvider.createNewPost(
+                        ownerUserId: FirebaseAuthProvider().currentUser!.id,
+                        title: _textControllerTitle.text,
+                        body: _textControllerBody.text);
+                    Navigator.of(context).pop();
+                  },
+                  text: 'Submit'),
             ],
           ),
         ),

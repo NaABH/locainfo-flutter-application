@@ -89,7 +89,7 @@ class _HomePageState extends State<HomePage> {
                         mapType: MapType.normal,
                         onMapCreated: _onMapCreated,
                         myLocationEnabled: true,
-                        myLocationButtonEnabled: false,
+                        myLocationButtonEnabled: true,
                         padding: const EdgeInsets.only(bottom: 10),
                       );
                     }

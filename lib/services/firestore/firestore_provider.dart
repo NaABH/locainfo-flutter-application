@@ -23,11 +23,14 @@ class FireStoreProvider implements DatabaseProvider {
               post.ownerUserId == ownerUserId)); // posts created by the user
 
   @override
-  Future<Post> createNewPost({required String ownerUserId}) async {
+  Future<Post> createNewPost(
+      {required String ownerUserId,
+      required String title,
+      required String body}) async {
     final document = await posts.add({
       ownerUserIdFieldName: ownerUserId,
-      titleFieldName: '',
-      textFieldName: '',
+      titleFieldName: title,
+      textFieldName: body,
       categoryFieldName: '',
       sourceFieldName: '',
       latitudeFieldName: '', // to be completed
@@ -38,8 +41,8 @@ class FireStoreProvider implements DatabaseProvider {
     return Post(
       documentId: fetchedNote.id,
       ownerUserId: ownerUserId,
-      title: '',
-      text: '',
+      title: title,
+      text: body,
       category: '',
       source: '',
       latitude: '',
