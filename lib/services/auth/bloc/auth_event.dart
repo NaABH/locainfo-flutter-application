@@ -24,7 +24,7 @@ class AuthEventRegister extends AuthEvent {
   final String username;
   final String email;
   final String password;
-  const AuthEventRegister(this.email, this.password, this.username);
+  const AuthEventRegister(this.username, this.email, this.password);
 }
 
 class AuthEventShouldLogIn extends AuthEvent {

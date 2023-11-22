@@ -29,6 +29,7 @@ class FireStoreProvider implements DatabaseProvider {
       required String body}) async {
     final document = await posts.add({
       ownerUserIdFieldName: ownerUserId,
+      ownerUserNameFieldName: '',
       titleFieldName: title,
       textFieldName: body,
       categoryFieldName: '',
@@ -41,6 +42,7 @@ class FireStoreProvider implements DatabaseProvider {
     return Post(
       documentId: fetchedNote.id,
       ownerUserId: ownerUserId,
+      ownerUserName: '',
       title: title,
       text: body,
       category: '',

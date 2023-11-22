@@ -29,9 +29,9 @@ class FirebaseAuthProvider implements AuthProvider {
         email: email,
         password: password,
       );
-      await userCredential.user!.updateDisplayName(username);
       final user = currentUser;
       if (user != null) {
+        await userCredential.user!.updateDisplayName(username);
         return user;
       } else {
         throw UserNotLoggedInAuthException();
@@ -56,6 +56,15 @@ class FirebaseAuthProvider implements AuthProvider {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       return AuthUser.fromFirebase(user);
+    } else {
+      return null;
+    }
+  }
+
+  String? get currentUserName {
+    final username = FirebaseAuth.instance.currentUser?.displayName;
+    if (username != null) {
+      return username;
     } else {
       return null;
     }

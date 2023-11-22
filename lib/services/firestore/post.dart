@@ -6,6 +6,7 @@ import 'package:locainfo/services/firestore/database_constants.dart';
 class Post {
   final String documentId;
   final String ownerUserId;
+  final String ownerUserName;
   final String title;
   final String text;
   final String category;
@@ -16,6 +17,7 @@ class Post {
   const Post(
       {required this.documentId,
       required this.ownerUserId,
+      required this.ownerUserName,
       required this.title,
       required this.text,
       required this.category,
@@ -26,6 +28,7 @@ class Post {
   Post.fromSnapshot(QueryDocumentSnapshot<Map<String, dynamic>> snapshot)
       : documentId = snapshot.id,
         ownerUserId = snapshot.data()[ownerUserIdFieldName],
+        ownerUserName = snapshot.data()[ownerUserNameFieldName],
         title = snapshot.data()[titleFieldName] as String,
         text = snapshot.data()[textFieldName] as String,
         category = snapshot.data()[categoryFieldName] as String,
