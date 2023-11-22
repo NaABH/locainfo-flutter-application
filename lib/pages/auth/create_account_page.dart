@@ -166,11 +166,11 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 const SizedBox(height: 25),
                 MyButton(
                     onPressed: () async {
-                      final username = _username.text; // havent in used
+                      final username = _username.text;
                       final email = _email.text;
                       final password = _password.text;
                       context.read<AuthBloc>().add(
-                            AuthEventRegister(email, password),
+                            AuthEventRegister(username, email, password),
                           );
                     },
                     text: 'Create Account'),
