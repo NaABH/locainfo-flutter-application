@@ -18,18 +18,16 @@ class MyHomePostList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: posts.length,
       itemBuilder: (context, index) {
         final post = posts.elementAt(index); // get current note
-        return SliverToBoxAdapter(
-          child: MyPost(
-            author: post.ownerUserId,
-            title: post.title,
-            content: post.text,
+        return MyPost(
+            author: post.ownerUserName,
             locationName: post.locationName,
-            date: 'sdasd',
-          ),
-        );
+            date: post.timeAgo,
+            title: post.title,
+            content: post.text);
       },
     );
   }

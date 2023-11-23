@@ -16,7 +16,7 @@ class NewsPage extends StatefulWidget {
 
 class _NewsPageState extends State<NewsPage> {
   late final FireStoreProvider _databaseService;
-  late Position _currentLocation;
+  Position? _currentLocation;
   String get userId =>
       FirebaseAuthProvider().currentUser!.id; // get current user id
 
@@ -71,9 +71,11 @@ class _NewsPageState extends State<NewsPage> {
           onRefresh: _refreshData,
           child: StreamBuilder(
             // stream: _databaseService.allPosts(ownerUserId: userId),
-            stream: _databaseService.getNearbyPosts(
-                userLat: _currentLocation!.latitude,
-                userLng: _currentLocation!.longitude),
+            stream: _currentLocation != null
+                ? _databaseService.getNearbyPosts(
+                    userLat: _currentLocation!.latitude,
+                    userLng: _currentLocation!.longitude)
+                : null,
             builder: (context, snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.waiting:
@@ -81,9 +83,20 @@ class _NewsPageState extends State<NewsPage> {
                   if (snapshot.hasData) {
                     final allPosts = snapshot.data as Iterable<Post>;
                     if (allPosts.isEmpty) {
-                      return const Center(
-                        child: Text(
-                            'Sorry. There is not post available for your current location.'),
+                      return RefreshIndicator(
+                        onRefresh: _refreshData,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                  'Sorry. There is not post available for your current location.'),
+                              IconButton(
+                                  onPressed: _refreshData,
+                                  icon: const Icon(Icons.refresh)),
+                            ],
+                          ),
+                        ),
                       );
                     }
                     return MyPostList(

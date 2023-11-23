@@ -42,6 +42,7 @@ class MainAppPage extends StatelessWidget {
           }
         },
       ),
+      resizeToAvoidBottomInset: false,
       floatingActionButton: SizedBox(
         height: 60,
         width: 60,

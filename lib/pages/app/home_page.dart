@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:locainfo/components/my_home_post_list.dart';
 import 'package:locainfo/services/auth/firebase_auth_provider.dart';
 import 'package:locainfo/services/firestore/firestore_provider.dart';
+import 'package:locainfo/services/firestore/post.dart';
 import 'package:locainfo/services/location/location_provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -56,9 +58,22 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  _getCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        currentLocation = position;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   void initState() {
     _locationService = LocationProvider();
+    _getCurrentLocation();
     _databaseService = FireStoreProvider();
     super.initState();
   }
@@ -80,10 +95,14 @@ class _HomePageState extends State<HomePage> {
                 floating: false,
                 pinned: false,
                 title: Container(
+                  margin: const EdgeInsets.all(10),
                   color: Colors.transparent,
-                  height: 40,
+                  height: 45,
                   width: 350,
-                  child: SearchBar(),
+                  child: const SearchBar(
+                    leading: Icon(Icons.search),
+                    hintText: 'Search',
+                  ),
                 ),
                 flexibleSpace: StreamBuilder<Position>(
                   stream: _locationService.getLocationStream(),
@@ -91,6 +110,7 @@ class _HomePageState extends State<HomePage> {
                     if (snapshot.hasData) {
                       currentLocation = snapshot.data;
                       _animateToLocation();
+                      _getCurrentLocation();
                       return GoogleMap(
                         initialCameraPosition: CameraPosition(
                             target: LatLng(currentLocation!.latitude,
@@ -131,45 +151,44 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-              // SliverFillRemaining(
-              //   child: StreamBuilder(
-              //     stream: _databaseService.allPosts(ownerUserId: userId),
-              //     builder: (context, snapshot) {
-              //       switch (snapshot.connectionState) {
-              //         case ConnectionState.waiting:
-              //         case ConnectionState.active:
-              //           if (snapshot.hasData) {
-              //             final allPosts = snapshot.data as Iterable<Post>;
-              //             if (allPosts.isEmpty) {
-              //               return const SliverFillRemaining(
-              //                 child: Center(
-              //                   child: Text(
-              //                     'Sorry. There is not post available for your current location.',
-              //                   ),
-              //                 ),
-              //               );
-              //             }
-              //             return MyPostList(
-              //               posts: allPosts,
-              //               onTap: (post) {},
-              //             );
-              //           } else {
-              //             return const SliverFillRemaining(
-              //               child: Center(
-              //                 child: CircularProgressIndicator(),
-              //               ),
-              //             );
-              //           }
-              //         default:
-              //           return const SliverFillRemaining(
-              //             child: Center(
-              //               child: CircularProgressIndicator(),
-              //             ),
-              //           );
-              //       }
-              //     },
-              //   ),
-              // ),
+              SliverFillRemaining(
+                child: StreamBuilder(
+                  stream: currentLocation != null
+                      ? _databaseService.getNearbyPosts(
+                          userLat: currentLocation!.latitude,
+                          userLng: currentLocation!.longitude)
+                      : null,
+                  builder: (context, snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                      case ConnectionState.active:
+                        if (snapshot.hasData) {
+                          final allPosts = snapshot.data as Iterable<Post>;
+                          if (allPosts.isEmpty) {
+                            return const Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                      'Sorry. There is not post available for your current location.'),
+                                ],
+                              ),
+                            );
+                          }
+                          return MyHomePostList(
+                            posts: allPosts,
+                            onTap: (post) {},
+                          );
+                        } else {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+                      default:
+                        return const Center(child: CircularProgressIndicator());
+                    }
+                  },
+                ),
+              ),
             ],
           )),
     );
