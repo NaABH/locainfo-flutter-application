@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:locainfo/services/firestore/database_exceptions.dart';
 import 'package:locainfo/services/firestore/database_provider.dart';
 import 'package:locainfo/services/firestore/post.dart';
+import 'package:locainfo/utilities/address_converter.dart';
+import 'package:locainfo/utilities/distance_calculator.dart';
 
 import 'database_constants.dart';
 
@@ -23,32 +25,44 @@ class FireStoreProvider implements DatabaseProvider {
               post.ownerUserId == ownerUserId)); // posts created by the user
 
   @override
-  Future<Post> createNewPost(
-      {required String ownerUserId,
-      required String title,
-      required String body}) async {
+  Future<Post> createNewPost({
+    required String ownerUserId,
+    required String ownerUserName,
+    required String title,
+    required String body,
+    required String category,
+    required double latitude,
+    required double longitude,
+    required Timestamp postedDate,
+  }) async {
+    final locationName = await getLocationName(latitude, longitude);
     final document = await posts.add({
       ownerUserIdFieldName: ownerUserId,
-      ownerUserNameFieldName: '',
+      ownerUserNameFieldName: ownerUserName,
       titleFieldName: title,
       textFieldName: body,
-      categoryFieldName: '',
+      categoryFieldName: category,
       sourceFieldName: '',
-      latitudeFieldName: '', // to be completed
-      longitudeFieldName: '', // to be completed
+      latitudeFieldName: latitude,
+      longitudeFieldName: longitude,
+      locationNameFieldName: locationName,
+      postedDateFieldName: postedDate,
     });
     final fetchedNote =
         await document.get(); // immediately fetch back from the FireStore
+    DateTime postedTime = postedDate.toDate();
     return Post(
       documentId: fetchedNote.id,
       ownerUserId: ownerUserId,
-      ownerUserName: '',
+      ownerUserName: ownerUserName,
       title: title,
       text: body,
-      category: '',
+      category: category,
       source: '',
-      latitude: '',
-      longitude: '',
+      latitude: latitude,
+      longitude: longitude,
+      locationName: locationName,
+      postedDate: postedTime,
     );
   }
 
@@ -88,4 +102,16 @@ class FireStoreProvider implements DatabaseProvider {
       throw CouldNotUpdatePostException();
     }
   }
+
+  Stream<Iterable<Post>> getNearbyPosts(
+          {required double userLat, required double userLng}) =>
+      posts.snapshots().map((event) {
+        return event.docs.map((doc) => Post.fromSnapshot(doc)).where((post) {
+          // Calculate the distance between the post location and the user location
+          var distance = calculateDistance(
+              post.latitude, post.longitude, userLat, userLng);
+          // Keep only the posts that are within 300 meters of the user location
+          return distance <= 0.3;
+        });
+      });
 }

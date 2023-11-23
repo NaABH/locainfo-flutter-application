@@ -1,11 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:locainfo/components/my_back_button.dart';
 import 'package:locainfo/components/my_button.dart';
 import 'package:locainfo/components/my_dropdown_menu.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/services/auth/firebase_auth_provider.dart';
 import 'package:locainfo/services/firestore/firestore_provider.dart';
-import 'package:locainfo/services/firestore/post.dart';
+import 'package:locainfo/services/location/location_provider.dart';
 
 class CreatePostPage extends StatefulWidget {
   const CreatePostPage({super.key});
@@ -15,16 +18,20 @@ class CreatePostPage extends StatefulWidget {
 }
 
 class _CreatePostPageState extends State<CreatePostPage> {
-  Post? _post;
   late final FireStoreProvider _databaseProvider;
+  late final LocationProvider _locationProvider;
   late final TextEditingController _textControllerTitle;
   late final TextEditingController _textControllerBody;
+  Position? _currentLocation;
+  String? selectedValue;
 
   @override
   void initState() {
     _databaseProvider = FireStoreProvider();
+    _locationProvider = LocationProvider();
     _textControllerTitle = TextEditingController();
     _textControllerBody = TextEditingController();
+    _getCurrentLocation();
     super.initState();
   }
 
@@ -35,8 +42,29 @@ class _CreatePostPageState extends State<CreatePostPage> {
     super.dispose();
   }
 
+  void handleValueChange(String value) {
+    setState(() {
+      selectedValue = value;
+    });
+  }
+
+  _getCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        _currentLocation = position;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final User? user = FirebaseAuth.instance.currentUser;
+    DateTime postedTime = DateTime.now();
+    Timestamp postedTimestamp = Timestamp.fromDate(postedTime);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -100,7 +128,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 ),
               ),
               const SizedBox(height: 20),
-              const MyDropdownMenu(),
+              MyDropdownMenu(onValueChange: handleValueChange),
               const SizedBox(height: 20),
               TextField(
                 obscureText: false,
@@ -121,7 +149,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
               ),
               const SizedBox(height: 5),
               Text(
-                'Current Location: latitude, longitude',
+                'Current Location: ${_currentLocation!.latitude}, ${_currentLocation!.longitude}',
                 style: TextStyle(
                   fontStyle: FontStyle.italic,
                   color: Colors.grey.shade500,
@@ -131,9 +159,15 @@ class _CreatePostPageState extends State<CreatePostPage> {
               MyButton(
                   onPressed: () async {
                     _databaseProvider.createNewPost(
-                        ownerUserId: FirebaseAuthProvider().currentUser!.id,
-                        title: _textControllerTitle.text,
-                        body: _textControllerBody.text);
+                      ownerUserId: FirebaseAuthProvider().currentUser!.id,
+                      ownerUserName: user?.displayName ?? 'Anonymous',
+                      title: _textControllerTitle.text,
+                      body: _textControllerBody.text,
+                      category: selectedValue!,
+                      latitude: _currentLocation!.latitude,
+                      longitude: _currentLocation!.longitude,
+                      postedDate: postedTimestamp,
+                    );
                     Navigator.of(context).pop();
                   },
                   text: 'Submit'),

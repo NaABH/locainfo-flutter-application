@@ -3,10 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:locainfo/components/my_post_list.dart';
 import 'package:locainfo/services/auth/firebase_auth_provider.dart';
 import 'package:locainfo/services/firestore/firestore_provider.dart';
-import 'package:locainfo/services/firestore/post.dart';
 import 'package:locainfo/services/location/location_provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -133,45 +131,45 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-              SliverFillRemaining(
-                child: StreamBuilder(
-                  stream: _databaseService.allPosts(ownerUserId: userId),
-                  builder: (context, snapshot) {
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.waiting:
-                      case ConnectionState.active:
-                        if (snapshot.hasData) {
-                          final allPosts = snapshot.data as Iterable<Post>;
-                          if (allPosts.isEmpty) {
-                            return const SliverFillRemaining(
-                              child: Center(
-                                child: Text(
-                                  'Sorry. There is not post available for your current location.',
-                                ),
-                              ),
-                            );
-                          }
-                          return MyPostList(
-                            posts: allPosts,
-                            onTap: (post) {},
-                          );
-                        } else {
-                          return const SliverFillRemaining(
-                            child: Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
-                        }
-                      default:
-                        return const SliverFillRemaining(
-                          child: Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
-                    }
-                  },
-                ),
-              ),
+              // SliverFillRemaining(
+              //   child: StreamBuilder(
+              //     stream: _databaseService.allPosts(ownerUserId: userId),
+              //     builder: (context, snapshot) {
+              //       switch (snapshot.connectionState) {
+              //         case ConnectionState.waiting:
+              //         case ConnectionState.active:
+              //           if (snapshot.hasData) {
+              //             final allPosts = snapshot.data as Iterable<Post>;
+              //             if (allPosts.isEmpty) {
+              //               return const SliverFillRemaining(
+              //                 child: Center(
+              //                   child: Text(
+              //                     'Sorry. There is not post available for your current location.',
+              //                   ),
+              //                 ),
+              //               );
+              //             }
+              //             return MyPostList(
+              //               posts: allPosts,
+              //               onTap: (post) {},
+              //             );
+              //           } else {
+              //             return const SliverFillRemaining(
+              //               child: Center(
+              //                 child: CircularProgressIndicator(),
+              //               ),
+              //             );
+              //           }
+              //         default:
+              //           return const SliverFillRemaining(
+              //             child: Center(
+              //               child: CircularProgressIndicator(),
+              //             ),
+              //           );
+              //       }
+              //     },
+              //   ),
+              // ),
             ],
           )),
     );

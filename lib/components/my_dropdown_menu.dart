@@ -9,7 +9,9 @@ const List<String> list = <String>[
 ];
 
 class MyDropdownMenu extends StatefulWidget {
-  const MyDropdownMenu({Key? key}) : super(key: key);
+  final Function(String) onValueChange;
+  const MyDropdownMenu({Key? key, required this.onValueChange})
+      : super(key: key);
 
   @override
   State<MyDropdownMenu> createState() => _MyDropdownMenuState();
@@ -37,6 +39,7 @@ class _MyDropdownMenuState extends State<MyDropdownMenu> {
           setState(() {
             dropdownValue = value!;
           });
+          widget.onValueChange(dropdownValue!);
         },
         borderRadius: BorderRadius.circular(12),
         items: list.map<DropdownMenuItem<String>>((String value) {

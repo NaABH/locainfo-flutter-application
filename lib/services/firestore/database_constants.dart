@@ -6,3 +6,5 @@ const categoryFieldName = 'category';
 const sourceFieldName = 'source';
 const latitudeFieldName = 'latitude';
 const longitudeFieldName = 'longitude';
+const locationNameFieldName = 'locationName';
+const postedDateFieldName = 'posted_date';

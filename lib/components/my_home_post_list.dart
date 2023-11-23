@@ -23,7 +23,12 @@ class MyHomePostList extends StatelessWidget {
         final post = posts.elementAt(index); // get current note
         return SliverToBoxAdapter(
           child: MyPost(
-              author: post.ownerUserId, title: post.title, content: post.text),
+            author: post.ownerUserId,
+            title: post.title,
+            content: post.text,
+            locationName: post.locationName,
+            date: 'sdasd',
+          ),
         );
       },
     );
