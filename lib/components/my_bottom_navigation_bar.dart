@@ -37,7 +37,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
             Icon(
               icon,
               size: 30,
-              color: AppColors.main_blue,
+              color: AppColors.darkerBlue,
             ),
             const SizedBox(height: 2),
             Padding(

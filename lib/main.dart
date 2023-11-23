@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'LocaInfo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.main_blue),
+        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.darkerBlue),
         useMaterial3: true,
       ),
       home: const MainLoginPage(),

@@ -31,7 +31,10 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: Colors.white,
         title: Row(
           children: [
-            AppBarHeading(text: 'Profile'),
+            Text(
+              'Profile',
+              style: CustomFontStyles.appBarTitle,
+            ),
           ],
         ),
         actions: [
@@ -46,7 +49,7 @@ class _ProfilePageState extends State<ProfilePage> {
               },
               icon: const Icon(
                 Icons.logout,
-                color: AppColors.main_blue,
+                color: AppColors.darkerBlue,
                 size: 26,
               )),
         ],

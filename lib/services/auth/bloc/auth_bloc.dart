@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:locainfo/services/auth/auth_exceptions.dart';
 import 'package:locainfo/services/auth/auth_provider.dart';
 import 'package:locainfo/services/auth/bloc/auth_event.dart';
 import 'package:locainfo/services/auth/bloc/auth_state.dart';
@@ -30,7 +31,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     });
 
-    // direct user to register page
+    // direct user to create account page
     on<AuthEventShouldRegister>((event, emit) {
       emit(const AuthStateRegistering(
         exception: null,
@@ -71,7 +72,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         didSendEmail = true;
         exception = null;
       } on Exception catch (e) {
-        didSendEmail = true;
+        didSendEmail = false;
         exception = e;
       }
 
@@ -88,13 +89,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final email = event.email;
       final password = event.password;
       try {
-        await provider.createUser(
-          username: username,
-          email: email,
-          password: password,
-        );
-        await provider.sendEmailVerification();
-        emit(const AuthStateNeedsVerification(isLoading: false));
+        if (username.trim().isEmpty ||
+            RegExp(r'^[0-9\W_]').hasMatch(username)) {
+          emit(AuthStateRegistering(
+            exception: InvalidUsernameAuthException(),
+            isLoading: false,
+          ));
+        } else {
+          await provider.createUser(
+            username: username,
+            email: email,
+            password: password,
+          );
+          await provider.sendEmailVerification();
+          emit(const AuthStateNeedsVerification(isLoading: false));
+        }
       } on Exception catch (e) {
         emit(AuthStateRegistering(
           // same state but with exception

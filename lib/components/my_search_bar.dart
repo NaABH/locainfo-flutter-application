@@ -19,7 +19,7 @@ class MySearchBar extends StatelessWidget {
         ),
         focusedBorder: const OutlineInputBorder(
           borderSide: BorderSide(
-            color: AppColors.secondary_blue,
+            color: AppColors.lighterBlue,
             width: 2,
           ),
         ),

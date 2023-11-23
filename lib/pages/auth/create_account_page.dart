@@ -43,7 +43,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) async {
         if (state is AuthStateRegistering) {
-          if (state.exception is WeakPasswordAuthException) {
+          if (state.exception is InvalidUsernameAuthException) {
+            await showErrorDialog(context,
+                'Invalid Username. Username should not be empty or start with a number or symbol.');
+          } else if (state.exception is WeakPasswordAuthException) {
             await showErrorDialog(context, 'Weak Password');
           } else if (state.exception is EmailAlreadyInUseAuthException) {
             await showErrorDialog(
@@ -65,8 +68,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                   );
             },
           ),
-          title: AppBarHeading(
-            text: 'Create Account',
+          title: const Text(
+            'Create Account',
+            style: CustomFontStyles.appBarTitle,
           ),
         ),
         body: Container(
@@ -75,7 +79,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextFieldLabel(text: 'Username'),
+                const Text(
+                  'Username',
+                  style: CustomFontStyles.textFieldLabel,
+                ),
                 const SizedBox(
                   height: 10,
                 ),
@@ -84,21 +91,21 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                   obscureText: false,
                   enableSuggestions: false,
                   autocorrect: false,
-                  keyboardType: TextInputType.emailAddress,
+                  keyboardType: TextInputType.text,
                   decoration: InputDecoration(
                     enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
+                      borderSide: BorderSide(color: AppColors.white),
                     ),
                     focusedBorder: const OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: AppColors.secondary_blue,
+                        color: AppColors.lighterBlue,
                         width: 2,
                       ),
                     ),
-                    fillColor: Colors.grey.shade200,
+                    fillColor: AppColors.grey2,
                     filled: true,
                     hintText: "Enter your name",
-                    hintStyle: TextStyle(color: Colors.grey.shade500),
+                    hintStyle: CustomFontStyles.hintText,
                   ),
                 ),
                 const SizedBox(
@@ -106,9 +113,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 ),
                 const Text(
                   'Email Address',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: CustomFontStyles.textFieldLabel,
                 ),
                 const SizedBox(
                   height: 10,
@@ -116,20 +121,22 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 TextField(
                   controller: _email,
                   obscureText: false,
+                  enableSuggestions: false,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
+                      borderSide: BorderSide(color: AppColors.white),
                     ),
                     focusedBorder: const OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: AppColors.secondary_blue,
+                        color: AppColors.lighterBlue,
                         width: 2,
                       ),
                     ),
-                    fillColor: Colors.grey.shade200,
+                    fillColor: AppColors.grey2,
                     filled: true,
                     hintText: "Enter your email",
-                    hintStyle: TextStyle(color: Colors.grey.shade500),
+                    hintStyle: CustomFontStyles.hintText,
                   ),
                 ),
                 const SizedBox(
@@ -137,33 +144,33 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 ),
                 const Text(
                   'Password',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: CustomFontStyles.textFieldLabel,
                 ),
                 const SizedBox(
                   height: 10,
                 ),
                 TextField(
                   controller: _password,
-                  obscureText: false,
+                  obscureText: true,
+                  enableSuggestions: false,
+                  autocorrect: false,
                   decoration: InputDecoration(
                     enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
+                      borderSide: BorderSide(color: AppColors.white),
                     ),
                     focusedBorder: const OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: AppColors.secondary_blue,
+                        color: AppColors.lighterBlue,
                         width: 2,
                       ),
                     ),
-                    fillColor: Colors.grey.shade200,
+                    fillColor: AppColors.grey2,
                     filled: true,
                     hintText: "Enter your password",
-                    hintStyle: TextStyle(color: Colors.grey.shade500),
+                    hintStyle: CustomFontStyles.hintText,
                   ),
                 ),
-                const SizedBox(height: 25),
+                const SizedBox(height: 30),
                 MyButton(
                     onPressed: () async {
                       final username = _username.text;

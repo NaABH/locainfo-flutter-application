@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:locainfo/constants/font_styles.dart';
 
+// custom text with onTap function
 class MyPressableText extends StatelessWidget {
   final String text;
   final Function()? onPressed;
@@ -13,10 +15,7 @@ class MyPressableText extends StatelessWidget {
       onTap: onPressed,
       child: Text(
         'Forgot Password?',
-        style: TextStyle(
-          color: Colors.grey.shade600,
-          // decoration: TextDecoration.underline,
-        ),
+        style: CustomFontStyles.pressableText,
       ),
     );
   }

@@ -73,7 +73,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
               Navigator.of(context).pop();
             },
           ),
-          title: AppBarHeading(text: 'Create Post')),
+          title: const Text(
+            'Create Post',
+            style: CustomFontStyles.appBarTitle,
+          )),
       body: Container(
         color: Colors.white,
         padding: const EdgeInsets.all(20),

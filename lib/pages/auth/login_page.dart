@@ -57,24 +57,28 @@ class _LoginPageState extends State<LoginPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-            leading: MyBackButton(
-              onPressed: () {
-                context.read<AuthBloc>().add(
-                      const AuthEventLogOut(),
-                    );
-              },
-            ),
-            title: AppBarHeading(text: 'Log In')),
+          leading: MyBackButton(
+            onPressed: () {
+              context.read<AuthBloc>().add(
+                    const AuthEventLogOut(),
+                  );
+            },
+          ),
+          title: const Text(
+            'Log In',
+            style: CustomFontStyles.appBarTitle,
+          ),
+        ),
         body: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           child: Center(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(
-                  height: 10,
+                const Text(
+                  'Email Address',
+                  style: CustomFontStyles.textFieldLabel,
                 ),
-                TextFieldLabel(text: 'Email Address'),
                 const SizedBox(
                   height: 10,
                 ),
@@ -86,24 +90,29 @@ class _LoginPageState extends State<LoginPage> {
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
+                      borderSide: BorderSide(
+                        color: AppColors.white,
+                      ),
                     ),
                     focusedBorder: const OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: AppColors.secondary_blue,
+                        color: AppColors.lighterBlue,
                         width: 2,
                       ),
                     ),
-                    fillColor: Colors.grey.shade200,
+                    fillColor: AppColors.grey2,
                     filled: true,
                     hintText: "Enter your email",
-                    hintStyle: TextStyle(color: Colors.grey.shade500),
+                    hintStyle: CustomFontStyles.hintText,
                   ),
                 ),
                 const SizedBox(
                   height: 30,
                 ),
-                TextFieldLabel(text: 'Password'),
+                const Text(
+                  'Password',
+                  style: CustomFontStyles.textFieldLabel,
+                ),
                 const SizedBox(
                   height: 10,
                 ),
@@ -114,18 +123,18 @@ class _LoginPageState extends State<LoginPage> {
                   autocorrect: false,
                   decoration: InputDecoration(
                     enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
+                      borderSide: BorderSide(color: AppColors.white),
                     ),
                     focusedBorder: const OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: AppColors.secondary_blue,
+                        color: AppColors.lighterBlue,
                         width: 2,
                       ),
                     ),
-                    fillColor: Colors.grey.shade200,
+                    fillColor: AppColors.grey2,
                     filled: true,
                     hintText: "Enter your password",
-                    hintStyle: TextStyle(color: Colors.grey.shade500),
+                    hintStyle: CustomFontStyles.hintText,
                   ),
                 ),
                 Padding(

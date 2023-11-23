@@ -52,9 +52,12 @@ class _NewsPageState extends State<NewsPage> {
         appBar: AppBar(
           elevation: 0,
           backgroundColor: Colors.white,
-          title: Row(
+          title: const Row(
             children: [
-              AppBarHeading(text: 'News'),
+              Text(
+                'News',
+                style: CustomFontStyles.appBarTitle,
+              ),
             ],
           ),
           actions: [
@@ -62,7 +65,7 @@ class _NewsPageState extends State<NewsPage> {
                 onPressed: () {},
                 icon: const Icon(
                   Icons.notifications,
-                  color: AppColors.main_blue,
+                  color: AppColors.darkerBlue,
                   size: 26,
                 )),
           ],

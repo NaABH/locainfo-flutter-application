@@ -25,17 +25,19 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                 );
           },
         ),
-        title: AppBarHeading(
-          text: 'Email Verification',
+        title: const Text(
+          'Email Verification',
+          style: CustomFontStyles.appBarTitle,
         ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            FontParagraph(
-              text:
-                  'Welcome to LocaInfo! Please check your inbox for a verification email from us. Click the link inside to confirm your email and activate your account. If you did not received any email press the button below.',
+            const Text(
+              'Welcome to LocaInfo! Please check your inbox for a verification email from us. Click the link inside to confirm your email and activate your account. If you did not received any email press the button below.',
+              style: CustomFontStyles.instruction,
+              textAlign: TextAlign.justify,
             ),
             const SizedBox(
               height: 20,
@@ -56,7 +58,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                         const AuthEventShouldLogIn(), // go to login page
                       );
                 },
-                text: 'Login'),
+                text: 'Go Login'),
           ],
         ),
       ),

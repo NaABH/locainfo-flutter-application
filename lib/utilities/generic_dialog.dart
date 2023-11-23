@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:locainfo/constants/font_styles.dart';
 
 typedef DialogOptionBuilder<T> = Map<String, T?> Function();
 
@@ -15,8 +16,14 @@ Future<T?> showGenericDialog<T>({
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(title),
-          content: Text(content),
+          title: Text(
+            title,
+            style: CustomFontStyles.dialogHeading,
+          ),
+          content: Text(
+            content,
+            style: CustomFontStyles.defaultFont,
+          ),
           actions: options.keys.map((optionTitle) {
             final T value = options[optionTitle];
             return TextButton(

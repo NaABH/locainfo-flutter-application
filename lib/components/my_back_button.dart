@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:locainfo/constants/app_colors.dart';
 
+// custom back button
 class MyBackButton extends StatelessWidget {
   final Function()? onPressed;
 
@@ -11,7 +12,7 @@ class MyBackButton extends StatelessWidget {
     return IconButton(
       icon: const Icon(
         Icons.arrow_back_outlined,
-        color: AppColors.main_blue,
+        color: AppColors.darkerBlue,
       ),
       onPressed: onPressed,
     );

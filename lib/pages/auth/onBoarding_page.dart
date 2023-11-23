@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/components/my_button.dart';
+import 'package:locainfo/components/my_divider.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
@@ -18,41 +19,44 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.white,
       body: SafeArea(
         child: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               // Logo
               SizedBox(
                 height: 450,
                 child: Image.asset('assets/icon/icon_transparent.png'),
               ),
+
+              // Padding
               const SizedBox(height: 10),
 
               // Logo Name
-              FontHeading1(text: 'Welcome to LocaInfo'),
-
-              // Get started
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: FontLabel(text: 'Get Started'),
+              const Text(
+                'Welcome to LocaInfo',
+                style: CustomFontStyles.headingOne,
               ),
 
-              // divider
-              Container(
-                height: 5,
-                width: 40,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(10),
+              // Get started
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: Text(
+                  'Get Started',
+                  style: CustomFontStyles.label,
                 ),
               ),
 
+              // divider
+              const MyDivider(),
+
               // Login Button
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10.0),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10.0, horizontal: 25),
                 child: MyButton(
                     onPressed: () {
                       context.read<AuthBloc>().add(
@@ -63,13 +67,16 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
               ),
 
               // Signup Button
-              MyButton(
-                  onPressed: () {
-                    context.read<AuthBloc>().add(
-                          const AuthEventShouldRegister(),
-                        );
-                  },
-                  text: 'Create Account'),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                child: MyButton(
+                    onPressed: () {
+                      context.read<AuthBloc>().add(
+                            const AuthEventShouldRegister(),
+                          );
+                    },
+                    text: 'Create Account'),
+              ),
             ],
           ),
         ),

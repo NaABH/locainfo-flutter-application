@@ -51,7 +51,7 @@ class MainAppPage extends StatelessWidget {
             Navigator.of(context).pushNamed(createPostRoute);
           },
           tooltip: 'Create Post',
-          backgroundColor: AppColors.main_blue,
+          backgroundColor: AppColors.darkerBlue,
           shape: const CircleBorder(),
           child: const Icon(
             Icons.add,

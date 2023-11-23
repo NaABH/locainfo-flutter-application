@@ -16,9 +16,12 @@ class _BookMarkPageState extends State<BookMarkPage> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        title: Row(
+        title: const Row(
           children: [
-            AppBarHeading(text: 'Bookmark'),
+            Text(
+              'Bookmark',
+              style: CustomFontStyles.appBarTitle,
+            ),
           ],
         ),
         actions: [
@@ -26,7 +29,7 @@ class _BookMarkPageState extends State<BookMarkPage> {
               onPressed: () {},
               icon: const Icon(
                 Icons.notifications,
-                color: AppColors.main_blue,
+                color: AppColors.darkerBlue,
                 size: 26,
               )),
         ],

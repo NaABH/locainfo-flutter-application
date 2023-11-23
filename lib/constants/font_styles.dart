@@ -1,32 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:locainfo/constants/app_colors.dart';
 
-class CustomTextStyles {
+class CustomFontStyles {
+  // used for appbar title
   static const TextStyle appBarTitle = TextStyle(
     fontWeight: FontWeight.bold,
-    color: AppColors.main_blue,
+    color: AppColors.darkerBlue,
     fontSize: 24.0,
   );
 
-  static const TextStyle heading1 = TextStyle(
-    fontSize: 24.0,
-    fontWeight: FontWeight.w600,
-    color: AppColors.font_black,
-  );
-
-  static const TextStyle heading2 = TextStyle(
-    fontSize: 20.0,
-    fontWeight: FontWeight.bold,
-  );
-
-  static const TextStyle paragraph = TextStyle(
-    fontSize: 16.0,
-  );
-
+  // used for onBoarding page (Get Started)
   static const TextStyle label = TextStyle(
     fontWeight: FontWeight.w300,
     fontSize: 18,
     color: Colors.black,
+  );
+
+  // used for general dialog
+  static const TextStyle defaultFont = TextStyle(
+    fontWeight: FontWeight.w400,
+  );
+
+  // used for general dialog
+  static const TextStyle dialogHeading = TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.w500,
+    color: AppColors.black,
+  );
+
+  // used for
+  static const TextStyle headingOne = TextStyle(
+    fontSize: 24.0,
+    fontWeight: FontWeight.w600,
+    color: AppColors.black,
+  );
+
+  // used for
+  static const TextStyle headingTwo = TextStyle(
+    fontSize: 20.0,
+    fontWeight: FontWeight.bold,
+  );
+
+  // used for forgot password
+  static const TextStyle instruction = TextStyle(
+    fontSize: 16.0,
+    fontWeight: FontWeight.w400,
   );
 
   static const TextStyle buttonLabel = TextStyle(
@@ -36,106 +54,19 @@ class CustomTextStyles {
   );
 
   static const TextStyle textFieldLabel = TextStyle(
-    color: AppColors.main_blue,
+    color: AppColors.darkerBlue,
     fontWeight: FontWeight.bold,
     fontSize: 16,
   );
-}
 
-class AppBarHeading extends StatelessWidget {
-  final String text;
+  // used for hintText
+  static TextStyle hintText = TextStyle(
+    color: AppColors.grey5,
+  );
 
-  AppBarHeading({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: CustomTextStyles.appBarTitle,
-    );
-  }
-}
-
-class FontHeading1 extends StatelessWidget {
-  final String text;
-
-  FontHeading1({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: CustomTextStyles.heading1,
-    );
-  }
-}
-
-class FontHeading2 extends StatelessWidget {
-  final String text;
-
-  FontHeading2({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: CustomTextStyles.heading2,
-    );
-  }
-}
-
-class FontParagraph extends StatelessWidget {
-  final String text;
-
-  FontParagraph({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: CustomTextStyles.paragraph,
-    );
-  }
-}
-
-class FontLabel extends StatelessWidget {
-  final String text;
-
-  FontLabel({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: CustomTextStyles.label,
-    );
-  }
-}
-
-class ButtonLabel extends StatelessWidget {
-  final String text;
-
-  ButtonLabel({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: CustomTextStyles.buttonLabel,
-    );
-  }
-}
-
-class TextFieldLabel extends StatelessWidget {
-  final String text;
-
-  TextFieldLabel({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: CustomTextStyles.textFieldLabel,
-    );
-  }
+  // used for pressableText
+  static TextStyle pressableText = TextStyle(
+      color: AppColors.grey6,
+      fontWeight: FontWeight.w500,
+      decoration: TextDecoration.underline);
 }

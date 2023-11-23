@@ -21,3 +21,6 @@ class WeakPasswordAuthException implements Exception {}
 
 // signup: email already registered
 class EmailAlreadyInUseAuthException implements Exception {}
+
+// signup: username is empty
+class InvalidUsernameAuthException implements Exception {}
