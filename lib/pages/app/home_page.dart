@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:locainfo/components/my_home_post_list.dart';
+import 'package:locainfo/constants/routes.dart';
 import 'package:locainfo/services/auth/firebase_auth_provider.dart';
 import 'package:locainfo/services/firestore/firestore_provider.dart';
 import 'package:locainfo/services/firestore/post.dart';
@@ -94,14 +95,24 @@ class _HomePageState extends State<HomePage> {
                 expandedHeight: 500,
                 floating: false,
                 pinned: false,
-                title: Container(
-                  margin: const EdgeInsets.all(10),
-                  color: Colors.transparent,
-                  height: 45,
-                  width: 350,
-                  child: const SearchBar(
-                    leading: Icon(Icons.search),
-                    hintText: 'Search',
+                title: Align(
+                  alignment: Alignment.topRight,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.of(context).pushNamed(searchPostRoute);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(36),
+                        color: Colors.blue.shade100,
+                      ),
+                      padding: const EdgeInsets.all(7),
+                      child: const Icon(
+                        Icons.search,
+                        size: 36,
+                        color: Colors.black54,
+                      ),
+                    ),
                   ),
                 ),
                 flexibleSpace: StreamBuilder<Position>(

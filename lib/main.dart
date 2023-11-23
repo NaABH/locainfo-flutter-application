@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/routes.dart';
 import 'package:locainfo/pages/app/create_post_page.dart';
+import 'package:locainfo/pages/app/post_list_page.dart';
 import 'package:locainfo/pages/main_login_page.dart';
 import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
 import 'package:locainfo/services/auth/firebase_auth_provider.dart';
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
       home: const MainLoginPage(),
       routes: {
         createPostRoute: (context) => const CreatePostPage(),
+        searchPostRoute: (context) => PostListPage(),
       },
     );
   }
