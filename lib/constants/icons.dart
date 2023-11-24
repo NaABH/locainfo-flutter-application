@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// icons to be used for bottom navigation bar
 final iconList = <IconData>[
   Icons.home_outlined,
   Icons.article_outlined,
