@@ -1,119 +1,77 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/components/my_post_list.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
-import 'package:locainfo/services/auth/firebase_auth_provider.dart';
-import 'package:locainfo/services/firestore/firestore_provider.dart';
-import 'package:locainfo/services/firestore/post.dart';
+import 'package:locainfo/services/post_bloc/post_bloc.dart';
+import 'package:locainfo/services/post_bloc/post_event.dart';
+import 'package:locainfo/services/post_bloc/post_state.dart';
 
-class NewsPage extends StatefulWidget {
+class NewsPage extends StatelessWidget {
   const NewsPage({super.key});
 
   @override
-  State<NewsPage> createState() => _NewsPageState();
-}
-
-class _NewsPageState extends State<NewsPage> {
-  late final FireStoreProvider _databaseService;
-  Position? _currentLocation;
-  String get userId =>
-      FirebaseAuthProvider().currentUser!.id; // get current user id
-
-  Future<void> _refreshData() async {
-    setState(() {
-      // This will trigger the StreamBuilder to rebuild and re-fetch the posts
-      _getCurrentLocation();
-    });
-  }
-
-  @override
-  void initState() {
-    _databaseService = FireStoreProvider();
-    _getCurrentLocation();
-    super.initState();
-  }
-
-  _getCurrentLocation() async {
-    try {
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-      setState(() {
-        _currentLocation = position;
-      });
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
+    context.read<PostBloc>().add(const PostEventLoadNearbyPosts());
     return Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.white,
-          title: const Row(
-            children: [
-              Text(
-                'News',
-                style: CustomFontStyles.appBarTitle,
-              ),
-            ],
-          ),
-          actions: [
-            IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.notifications,
-                  color: AppColors.darkerBlue,
-                  size: 26,
-                )),
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: AppColors.white,
+        title: const Row(
+          children: [
+            Text(
+              'News',
+              style: CustomFontStyles.appBarTitle,
+            ),
           ],
         ),
-        body: RefreshIndicator(
-          onRefresh: _refreshData,
-          child: StreamBuilder(
-            // stream: _databaseService.allPosts(ownerUserId: userId),
-            stream: _currentLocation != null
-                ? _databaseService.getNearbyPosts(
-                    userLat: _currentLocation!.latitude,
-                    userLng: _currentLocation!.longitude)
-                : null,
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.waiting:
-                case ConnectionState.active:
-                  if (snapshot.hasData) {
-                    final allPosts = snapshot.data as Iterable<Post>;
-                    if (allPosts.isEmpty) {
-                      return RefreshIndicator(
-                        onRefresh: _refreshData,
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text(
-                                  'Sorry. There is not post available for your current location.'),
-                              IconButton(
-                                  onPressed: _refreshData,
-                                  icon: const Icon(Icons.refresh)),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-                    return MyPostList(
-                      posts: allPosts,
-                      onTap: (post) {},
-                    );
-                  } else {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                default:
-                  return const Center(child: CircularProgressIndicator());
-              }
-            },
-          ),
-        ));
+        actions: [
+          IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                Icons.notifications,
+                color: AppColors.darkerBlue,
+                size: 26,
+              )),
+        ],
+      ),
+      body: BlocBuilder<PostBloc, PostState>(
+        builder: (context, state) {
+          if (state is PostStateLoadingPosts) {
+            return const Center(child: Text('Loading'));
+          } else if (state is PostStateLoaded) {
+            final allNearbyPosts = state.posts;
+            return RefreshIndicator(
+              onRefresh: () async {
+                context.read<PostBloc>().add(const PostEventLoadNearbyPosts());
+              },
+              child: MyPostList(
+                posts: allNearbyPosts,
+                onTap: (post) {},
+              ),
+            );
+          } else if (state is PostStateNoAvailablePost) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                      'Sorry. There is no post available for your current location'),
+                  IconButton(
+                      onPressed: () async {
+                        context
+                            .read<PostBloc>()
+                            .add(const PostEventLoadNearbyPosts());
+                      },
+                      icon: const Icon(Icons.refresh)),
+                ],
+              ),
+            );
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
+    );
   }
 }

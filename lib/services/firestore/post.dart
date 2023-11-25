@@ -11,7 +11,6 @@ class Post {
   final String title;
   final String text;
   final String category;
-  final String source;
   final double latitude;
   final double longitude;
   final String locationName;
@@ -24,7 +23,6 @@ class Post {
       required this.title,
       required this.text,
       required this.category,
-      required this.source,
       required this.latitude,
       required this.longitude,
       required this.locationName,
@@ -37,7 +35,6 @@ class Post {
         title = snapshot.data()[titleFieldName] as String,
         text = snapshot.data()[textFieldName] as String,
         category = snapshot.data()[categoryFieldName] as String,
-        source = snapshot.data()[sourceFieldName] as String,
         latitude = snapshot.data()[latitudeFieldName] as double,
         longitude = snapshot.data()[longitudeFieldName] as double,
         locationName = snapshot.data()[locationNameFieldName] as String,

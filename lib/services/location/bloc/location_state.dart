@@ -7,11 +7,12 @@ abstract class LocationState {
   const LocationState();
 }
 
-class LocationLoadingState extends LocationState {}
+class LocationStateInitialise extends LocationState {}
 
-class LocationLoadedState extends LocationState with EquatableMixin {
+// loaded the location
+class LocationStateLoaded extends LocationState with EquatableMixin {
   final Position position;
-  LocationLoadedState({required this.position});
+  LocationStateLoaded({required this.position});
 
   @override
   List<Object?> get props => [position];

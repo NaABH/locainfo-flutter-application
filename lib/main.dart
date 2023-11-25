@@ -7,9 +7,12 @@ import 'package:locainfo/pages/app/post_list_page.dart';
 import 'package:locainfo/pages/main_login_page.dart';
 import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
 import 'package:locainfo/services/auth/firebase_auth_provider.dart';
+import 'package:locainfo/services/firestore/bloc/database_bloc.dart';
+import 'package:locainfo/services/firestore/firestore_provider.dart';
 import 'package:locainfo/services/location/bloc/location_bloc.dart';
 import 'package:locainfo/services/location/location_provider.dart';
 import 'package:locainfo/services/main_bloc.dart';
+import 'package:locainfo/services/post_bloc/post_bloc.dart';
 
 void main() {
   runApp(MultiBlocProvider(providers: [
@@ -19,9 +22,15 @@ void main() {
     BlocProvider<MainBloc>(
       create: (BuildContext context) => MainBloc(),
     ),
-    BlocProvider<LocationBloc>(
-      create: (BuildContext context) => LocationBloc(LocationProvider()),
-    ),
+    // BlocProvider<LocationBloc>(
+    //   create: (BuildContext context) => LocationBloc(LocationProvider()),
+    // ),
+    BlocProvider<DatabaseBloc>(
+        create: (BuildContext context) => DatabaseBloc(
+            FireStoreProvider(), LocationBloc(LocationProvider()))),
+    BlocProvider<PostBloc>(
+        create: (BuildContext context) => PostBloc(
+            FireStoreProvider(), LocationProvider(), FirebaseAuthProvider()))
   ], child: const MyApp()));
 }
 

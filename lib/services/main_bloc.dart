@@ -5,6 +5,7 @@ import 'package:locainfo/services/main_state.dart';
 class MainBloc extends Bloc<MainEvent, MainState> {
   MainBloc() : super(const MainStateHome()) {
     on<MainEventInitialise>((event, emit) => emit(const MainStateHome()));
+
     on<MainEventNavigationChanged>((event, emit) {
       switch (event.index) {
         case 0:

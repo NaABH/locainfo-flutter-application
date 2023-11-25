@@ -1,14 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/components/my_back_button.dart';
 import 'package:locainfo/components/my_button.dart';
 import 'package:locainfo/components/my_dropdown_menu.dart';
 import 'package:locainfo/constants/font_styles.dart';
-import 'package:locainfo/services/auth/firebase_auth_provider.dart';
-import 'package:locainfo/services/firestore/firestore_provider.dart';
-import 'package:locainfo/services/location/location_provider.dart';
+import 'package:locainfo/services/post_bloc/post_bloc.dart';
+import 'package:locainfo/services/post_bloc/post_event.dart';
+import 'package:locainfo/services/post_bloc/post_state.dart';
 
 class CreatePostPage extends StatefulWidget {
   const CreatePostPage({super.key});
@@ -18,20 +16,14 @@ class CreatePostPage extends StatefulWidget {
 }
 
 class _CreatePostPageState extends State<CreatePostPage> {
-  late final FireStoreProvider _databaseProvider;
-  late final LocationProvider _locationProvider;
   late final TextEditingController _textControllerTitle;
   late final TextEditingController _textControllerBody;
-  Position? _currentLocation;
-  String? selectedValue;
+  String? selectedCategory;
 
   @override
   void initState() {
-    _databaseProvider = FireStoreProvider();
-    _locationProvider = LocationProvider();
     _textControllerTitle = TextEditingController();
     _textControllerBody = TextEditingController();
-    _getCurrentLocation();
     super.initState();
   }
 
@@ -44,27 +36,13 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   void handleValueChange(String value) {
     setState(() {
-      selectedValue = value;
+      selectedCategory = value;
     });
-  }
-
-  _getCurrentLocation() async {
-    try {
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-      setState(() {
-        _currentLocation = position;
-      });
-    } catch (e) {
-      print(e);
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final User? user = FirebaseAuth.instance.currentUser;
-    DateTime postedTime = DateTime.now();
-    Timestamp postedTimestamp = Timestamp.fromDate(postedTime);
+    context.read<PostBloc>().add(const PostEventCreatePostInitialise());
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -113,8 +91,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       obscureText: false,
                       enableSuggestions: true,
                       autocorrect: true,
-                      maxLines: 4,
-                      maxLength: 150,
+                      maxLines: 6,
+                      maxLength: 200,
                       keyboardType: TextInputType.multiline,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -132,46 +110,40 @@ class _CreatePostPageState extends State<CreatePostPage> {
               ),
               const SizedBox(height: 20),
               MyDropdownMenu(onValueChange: handleValueChange),
-              const SizedBox(height: 20),
-              TextField(
-                obscureText: false,
-                enableSuggestions: true,
-                autocorrect: true,
-                maxLines: 1,
-                keyboardType: TextInputType.multiline,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: BorderSide.none,
-                  ),
-                  fillColor: Colors.grey.shade200,
-                  filled: true,
-                  hintText: "Source",
-                  hintStyle: TextStyle(color: Colors.grey.shade500),
-                ),
-              ),
               const SizedBox(height: 5),
-              Text(
-                'Current Location: ${_currentLocation!.latitude}, ${_currentLocation!.longitude}',
-                style: TextStyle(
-                  fontStyle: FontStyle.italic,
-                  color: Colors.grey.shade500,
-                ),
+              BlocBuilder<PostBloc, PostState>(
+                builder: (context, state) {
+                  if (state is PostStateLoadingCurrentLocation) {
+                    return Text(
+                      'Current Location: Unknown, Unknown',
+                      style: TextStyle(
+                        fontStyle: FontStyle.italic,
+                        color: Colors.grey.shade500,
+                      ),
+                    );
+                  } else if (state is PostStateWantCreatePost) {
+                    final currentLocation = state.position;
+                    return Text(
+                      'Current Location: ${currentLocation.latitude}, ${currentLocation.longitude}',
+                      style: TextStyle(
+                        fontStyle: FontStyle.italic,
+                        color: Colors.grey.shade500,
+                      ),
+                    );
+                  } else {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                },
               ),
               const SizedBox(height: 20),
               MyButton(
-                  onPressed: () async {
-                    _databaseProvider.createNewPost(
-                      ownerUserId: FirebaseAuthProvider().currentUser!.id,
-                      ownerUserName: user?.displayName ?? 'Anonymous',
-                      title: _textControllerTitle.text,
-                      body: _textControllerBody.text,
-                      category: selectedValue!,
-                      latitude: _currentLocation!.latitude,
-                      longitude: _currentLocation!.longitude,
-                      postedDate: postedTimestamp,
-                    );
-                    Navigator.of(context).pop();
+                  onPressed: () {
+                    context.read<PostBloc>().add(PostEventCreatePost(
+                          _textControllerTitle.text,
+                          _textControllerBody.text,
+                          selectedCategory!,
+                        ));
+                    Navigator.of(context).pop(); // to be debug
                   },
                   text: 'Submit'),
             ],

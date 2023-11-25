@@ -1,3 +1,4 @@
+// Field name for the fields for posts collection
 const ownerUserIdFieldName = 'user_id';
 const ownerUserNameFieldName = 'username';
 const titleFieldName = 'title';

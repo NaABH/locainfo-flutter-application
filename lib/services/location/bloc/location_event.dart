@@ -1,21 +1,16 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
-import 'package:geolocator/geolocator.dart';
 
 @immutable
-abstract class LocationEvent extends Equatable {
+abstract class LocationEvent {
   const LocationEvent();
-
-  @override
-  List<Object?> get props => [];
 }
 
-class LoadLocationEvent extends LocationEvent {}
+class LocationEventLoadPosition extends LocationEvent {}
 
-class UpdateLocationEvent extends LocationEvent {
-  final Position position;
-  UpdateLocationEvent({required this.position});
-
-  @override
-  List<Object?> get props => [position];
-}
+// class UpdateLocationEvent extends LocationEvent {
+//   final Position position;
+//   const UpdateLocationEvent({required this.position});
+//
+//   @override
+//   List<Object?> get props => [position];
+// }
