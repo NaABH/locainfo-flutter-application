@@ -2,12 +2,14 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:locainfo/services/auth/firebase_auth_provider.dart';
 import 'package:locainfo/services/firestore/bloc/database_event.dart';
 import 'package:locainfo/services/firestore/bloc/database_state.dart';
 import 'package:locainfo/services/firestore/firestore_provider.dart';
 import 'package:locainfo/services/location/bloc/location_bloc.dart';
-import 'package:locainfo/services/location/bloc/location_event.dart';
 import 'package:locainfo/services/location/bloc/location_state.dart';
+
+import '../../location/bloc/location_event.dart';
 
 class DatabaseBloc extends Bloc<DatabaseEvent, DatabaseState> {
   Position? currentPosition;
@@ -30,7 +32,8 @@ class DatabaseBloc extends Bloc<DatabaseEvent, DatabaseState> {
         currentPosition = locationState.position;
         final posts = await databaseProvider.getNearbyPosts(
             userLat: currentPosition!.latitude,
-            userLng: currentPosition!.longitude);
+            userLng: currentPosition!.longitude,
+            currentUserId: FirebaseAuthProvider().currentUser!.id);
         emit(DatabaseStateNewsPagePostFetched(posts: posts));
       } else {
         print('LocationStateLoaded not received');

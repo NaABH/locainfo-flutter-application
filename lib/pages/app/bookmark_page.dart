@@ -16,7 +16,7 @@ class _BookMarkPageState extends State<BookMarkPage> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        title: const Row(
+        title: Row(
           children: [
             Text(
               'Bookmark',

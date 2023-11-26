@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:locainfo/constants/actions.dart';
 import 'package:locainfo/services/firestore/database_exceptions.dart';
 import 'package:locainfo/services/firestore/database_provider.dart';
 import 'package:locainfo/services/firestore/post.dart';
+import 'package:locainfo/utilities/address_converter.dart';
 
-import '../../utilities/address_converter.dart';
 import 'database_constants.dart';
 
 class FireStoreProvider implements DatabaseProvider {
@@ -15,32 +16,90 @@ class FireStoreProvider implements DatabaseProvider {
 
   // post collection in FireStore
   final posts = FirebaseFirestore.instance.collection('posts');
+  final users = FirebaseFirestore.instance.collection('users');
+
+  // get list of bookmarked posts id
+  Future<List<String>> getBookmarkedPostIds(String userId) async {
+    DocumentSnapshot userDoc = await users.doc(userId).get();
+
+    if (userDoc.exists) {
+      List<String> bookmarkedPostIds =
+          List<String>.from(userDoc[bookmarkFieldName]);
+      return bookmarkedPostIds;
+    } else {
+      return [];
+    }
+  }
+
+  // fetch the actual post from the list of bookmark post ids
+  Future<Iterable<Post>> getBookmarkedPosts(
+      List<String> bookmarkedPostIds, String currentUserId) async {
+    try {
+      return await posts
+          .where(FieldPath.documentId, whereIn: bookmarkedPostIds)
+          .get()
+          .then(
+            (value) => value.docs.map((doc) => Post.fromSnapshot(doc,
+                currentUserId)), // convert each document into a Post object
+          );
+    } catch (e) {
+      throw CouldNotGetPostsException();
+    }
+  }
+
+  // update bookmark list in the users collection
+  Future<void> updateBookmarkList({
+    required String documentId,
+    required String currentUserId,
+    required UserAction action,
+  }) async {
+    // Get the current list of bookmarked postIds
+    List<String> currentBookmarkedPosts =
+        await getBookmarkedPostIds(currentUserId);
+    if (action == UserAction.bookmark) {
+      // Add the new postId if it's not already in the list
+      if (!currentBookmarkedPosts.contains(documentId)) {
+        currentBookmarkedPosts.add(documentId);
+      }
+      // Update the 'bookmarked_posts' field in the user's document
+      await users.doc(currentUserId).set(
+        {bookmarkFieldName: currentBookmarkedPosts},
+        SetOptions(merge: true),
+      );
+    } else {
+      await users.doc(currentUserId).update({
+        bookmarkFieldName: FieldValue.arrayRemove([documentId]),
+      });
+    }
+  }
 
   @override
-  Stream<Iterable<Post>> getPostedPostStream({required String ownerUserId}) =>
-      posts.snapshots().map((event) {
+  Stream<Iterable<Post>> getPostedPostStream({required String currentUserId}) =>
+      posts.orderBy(ownerUserIdFieldName).snapshots().map((event) {
         try {
           return event.docs // see all changes that happen live
-              .map((doc) => Post.fromSnapshot(doc))
+              .map((doc) => Post.fromSnapshot(doc, currentUserId))
               .where((post) =>
-                  post.ownerUserId == ownerUserId); // posts created by the user
+                  post.ownerUserId ==
+                  currentUserId); // posts created by the user
         } catch (e) {
           throw CouldNotGetPostsException();
         }
       });
 
-  Future<Iterable<Post>> getPostedPosts({required String ownerUserId}) async {
+  Future<Iterable<Post>> getPostedPosts({required String currentUserId}) async {
     try {
       return await posts
+          .orderBy(ownerUserIdFieldName)
           .where(
             ownerUserIdFieldName,
             isEqualTo:
-                ownerUserId, //ownerUserIdFieldName equal to the ownerUserId
+                currentUserId, //ownerUserIdFieldName equal to the ownerUserId
           )
           .get()
           .then(
-            (value) => value.docs.map((doc) => Post.fromSnapshot(
-                doc)), // convert each document into a Post object
+            (value) => value.docs.map((doc) => Post.fromSnapshot(doc,
+                currentUserId)), // convert each document into a Post object
           );
     } catch (e) {
       throw CouldNotGetPostsException();
@@ -51,10 +110,14 @@ class FireStoreProvider implements DatabaseProvider {
   Future<Iterable<Post>> getNearbyPosts({
     required double userLat,
     required double userLng,
+    required String currentUserId,
   }) async {
     try {
-      var event = await posts.get();
-      return event.docs.map((doc) => Post.fromSnapshot(doc)).where((post) {
+      var event =
+          await posts.orderBy(postedDateFieldName, descending: true).get();
+      return event.docs
+          .map((doc) => Post.fromSnapshot(doc, currentUserId))
+          .where((post) {
         // Calculate the distance between the post location and the user location
         var distance = Geolocator.distanceBetween(
             post.latitude, post.longitude, userLat, userLng);
@@ -66,10 +129,14 @@ class FireStoreProvider implements DatabaseProvider {
     }
   }
 
-  Future<Iterable<Post>> getNearbyPosts2({required Position position}) async {
+  Future<Iterable<Post>> getNearbyPosts2(
+      {required Position position, required String currentUserId}) async {
     try {
-      var event = await posts.get();
-      return event.docs.map((doc) => Post.fromSnapshot(doc)).where((post) {
+      var event =
+          await posts.orderBy(postedDateFieldName, descending: true).get();
+      return event.docs
+          .map((doc) => Post.fromSnapshot(doc, currentUserId))
+          .where((post) {
         // Calculate the distance between the post location and the user location
         var distance = Geolocator.distanceBetween(
           post.latitude,
@@ -89,10 +156,16 @@ class FireStoreProvider implements DatabaseProvider {
   Stream<Iterable<Post>> getNearbyPostStream({
     required double userLat,
     required double userLng,
+    required String currentUserId,
   }) =>
-      posts.snapshots().map((event) {
+      posts
+          .orderBy(postedDateFieldName, descending: true)
+          .snapshots()
+          .map((event) {
         try {
-          return event.docs.map((doc) => Post.fromSnapshot(doc)).where((post) {
+          return event.docs
+              .map((doc) => Post.fromSnapshot(doc, currentUserId))
+              .where((post) {
             // Calculate the distance between the post location and the user location
             var distance = Geolocator.distanceBetween(
                 post.latitude, post.longitude, userLat, userLng);
@@ -103,6 +176,38 @@ class FireStoreProvider implements DatabaseProvider {
           throw CouldNotGetPostsException();
         }
       });
+
+  Future<void> updatePostLike({
+    required String documentId,
+    required String currentUserId,
+    required UserAction action,
+  }) async {
+    if (action == UserAction.like) {
+      await posts.doc(documentId).update({
+        likedByFieldName: FieldValue.arrayUnion([currentUserId])
+      });
+    } else {
+      await posts.doc(documentId).update({
+        likedByFieldName: FieldValue.arrayRemove([currentUserId])
+      });
+    }
+  }
+
+  Future<void> updatePostDislike({
+    required String documentId,
+    required String currentUserId,
+    required UserAction action,
+  }) async {
+    if (action == UserAction.dislike) {
+      await posts.doc(documentId).update({
+        dislikedByFieldName: FieldValue.arrayUnion([currentUserId])
+      });
+    } else {
+      await posts.doc(documentId).update({
+        dislikedByFieldName: FieldValue.arrayRemove([currentUserId])
+      });
+    }
+  }
 
   // create a new post
   @override
@@ -129,6 +234,8 @@ class FireStoreProvider implements DatabaseProvider {
         longitudeFieldName: longitude,
         locationNameFieldName: locationName,
         postedDateFieldName: postedDate,
+        likedByFieldName: [],
+        dislikedByFieldName: [],
       });
 
       // final fetchedPost =
@@ -188,6 +295,10 @@ class FireStoreProvider implements DatabaseProvider {
       longitude: longitude,
       locationName: locationName,
       postedDate: postedTime,
+      isLiked: false,
+      numberOfLikes: 0,
+      isDisliked: false,
+      numberOfDislikes: 0,
     );
   }
 

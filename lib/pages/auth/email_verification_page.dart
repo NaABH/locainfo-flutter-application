@@ -25,7 +25,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                 );
           },
         ),
-        title: const Text(
+        title: Text(
           'Email Verification',
           style: CustomFontStyles.appBarTitle,
         ),
@@ -40,7 +40,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
               textAlign: TextAlign.justify,
             ),
             const SizedBox(
-              height: 20,
+              height: 40,
             ),
             MyButton(
                 onPressed: () {
@@ -50,7 +50,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                 },
                 text: 'Resend Email'),
             const SizedBox(
-              height: 20,
+              height: 15,
             ),
             MyButton(
                 onPressed: () {

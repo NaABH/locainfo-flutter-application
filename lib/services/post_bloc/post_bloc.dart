@@ -22,6 +22,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       final position = await _locationProvider.getCurrentLocation();
       final posts = await _databaseProvider.getNearbyPosts2(
         position: position,
+        currentUserId: _authProvider.currentUser!.id,
       );
       if (posts.isEmpty) {
         emit(const PostStateNoAvailablePost());
@@ -33,7 +34,8 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     on<PostEventLoadPostedPosts>((event, emit) async {
       emit(const PostStateLoadingPosts());
       final userId = _authProvider.currentUser!.id;
-      final posts = await _databaseProvider.getPostedPosts(ownerUserId: userId);
+      final posts =
+          await _databaseProvider.getPostedPosts(currentUserId: userId);
       if (posts.isNotEmpty) {
         emit(PostStateLoaded(posts));
       } else {
@@ -47,8 +49,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         final position = await _locationProvider.getCurrentLocation();
         String locationName =
             await getLocationName(position.latitude, position.longitude);
-        DateTime postedTime = DateTime.now();
-        Timestamp postedTimestamp = Timestamp.fromDate(postedTime);
+        Timestamp postedTimestamp = Timestamp.fromDate(DateTime.now());
         await _databaseProvider.createNewPost(
           ownerUserId: _authProvider.currentUser!.id,
           ownerUserName: _authProvider.currentUserName!,
@@ -70,6 +71,30 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       emit(const PostStateLoadingCurrentLocation());
       final position = await _locationProvider.getCurrentLocation();
       emit(PostStateWantCreatePost(position));
+    });
+
+    on<PostEventUpdatePostLike>((event, emit) async {
+      await _databaseProvider.updatePostLike(
+        documentId: event.documentId,
+        currentUserId: _authProvider.currentUser!.id,
+        action: event.action,
+      );
+    });
+
+    on<PostEventUpdatePostDislike>((event, emit) async {
+      await _databaseProvider.updatePostDislike(
+        documentId: event.documentId,
+        currentUserId: _authProvider.currentUser!.id,
+        action: event.action,
+      );
+    });
+
+    on<PostEventUpdateBookmarkList>((event, emit) async {
+      await _databaseProvider.updateBookmarkList(
+        documentId: event.documentId,
+        currentUserId: _authProvider.currentUser!.id,
+        action: event.action,
+      );
     });
   }
 }

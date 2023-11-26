@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:locainfo/components/my_auth_textfield.dart';
 import 'package:locainfo/components/my_back_button.dart';
 import 'package:locainfo/components/my_button.dart';
 import 'package:locainfo/constants/app_colors.dart';
@@ -9,6 +10,7 @@ import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
 import 'package:locainfo/services/auth/bloc/auth_event.dart';
 import 'package:locainfo/services/auth/bloc/auth_state.dart';
 import 'package:locainfo/utilities/error_dialog.dart';
+import 'package:simple_gradient_text/simple_gradient_text.dart';
 
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({super.key});
@@ -45,7 +47,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         if (state is AuthStateRegistering) {
           if (state.exception is InvalidUsernameAuthException) {
             await showErrorDialog(context,
-                'Invalid Username. Username should not be empty or start with a number or symbol.');
+                'Username should not be empty or start with a number or symbol.');
           } else if (state.exception is WeakPasswordAuthException) {
             await showErrorDialog(context, 'Weak Password');
           } else if (state.exception is EmailAlreadyInUseAuthException) {
@@ -68,9 +70,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                   );
             },
           ),
-          title: const Text(
+          title: GradientText(
             'Create Account',
             style: CustomFontStyles.appBarTitle,
+            colors: const [AppColors.lighterBlue, AppColors.darkestBlue],
           ),
         ),
         body: Container(
@@ -86,27 +89,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 const SizedBox(
                   height: 10,
                 ),
-                TextField(
+                MyAuthTextField(
                   controller: _username,
-                  obscureText: false,
-                  enableSuggestions: false,
-                  autocorrect: false,
-                  keyboardType: TextInputType.text,
-                  decoration: InputDecoration(
-                    enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.white),
-                    ),
-                    focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: AppColors.lighterBlue,
-                        width: 2,
-                      ),
-                    ),
-                    fillColor: AppColors.grey2,
-                    filled: true,
-                    hintText: "Enter your name",
-                    hintStyle: CustomFontStyles.hintText,
-                  ),
+                  hintText: "Enter your name",
+                  textInputType: TextInputType.text,
                 ),
                 const SizedBox(
                   height: 30,
@@ -118,26 +104,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 const SizedBox(
                   height: 10,
                 ),
-                TextField(
+                MyAuthTextField(
                   controller: _email,
-                  obscureText: false,
-                  enableSuggestions: false,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.white),
-                    ),
-                    focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: AppColors.lighterBlue,
-                        width: 2,
-                      ),
-                    ),
-                    fillColor: AppColors.grey2,
-                    filled: true,
-                    hintText: "Enter your email",
-                    hintStyle: CustomFontStyles.hintText,
-                  ),
+                  hintText: "Enter your email",
+                  textInputType: TextInputType.emailAddress,
                 ),
                 const SizedBox(
                   height: 30,
@@ -149,28 +119,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 const SizedBox(
                   height: 10,
                 ),
-                TextField(
+                MyAuthTextField(
                   controller: _password,
-                  obscureText: true,
-                  enableSuggestions: false,
-                  autocorrect: false,
-                  decoration: InputDecoration(
-                    enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.white),
-                    ),
-                    focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: AppColors.lighterBlue,
-                        width: 2,
-                      ),
-                    ),
-                    fillColor: AppColors.grey2,
-                    filled: true,
-                    hintText: "Enter your password",
-                    hintStyle: CustomFontStyles.hintText,
-                  ),
+                  hideText: true,
+                  hintText: "Enter your email",
+                  textInputType: TextInputType.visiblePassword,
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 45),
                 MyButton(
                     onPressed: () async {
                       final username = _username.text;

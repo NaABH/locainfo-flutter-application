@@ -20,13 +20,17 @@ abstract class DatabaseProvider {
 
   // get all nearby posts
   Future<Iterable<Post>> getNearbyPosts(
-      {required double userLat, required double userLng});
+      {required double userLat,
+      required double userLng,
+      required String currentUserId});
 
   Stream<Iterable<Post>> getNearbyPostStream(
-      {required double userLat, required double userLng});
+      {required double userLat,
+      required double userLng,
+      required String currentUserId});
 
   // get all posts posted by the user
-  Stream<Iterable<Post>> getPostedPostStream({required String ownerUserId});
+  Stream<Iterable<Post>> getPostedPostStream({required String currentUserId});
 
   // // update posts
   // Future<void> updatePost({required String documentId, required text});

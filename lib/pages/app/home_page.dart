@@ -219,7 +219,8 @@ class _HomePageState extends State<HomePage> {
               stream: currentLocation != null
                   ? _databaseService.getNearbyPostStream(
                       userLat: currentLocation!.latitude,
-                      userLng: currentLocation!.longitude)
+                      userLng: currentLocation!.longitude,
+                      currentUserId: FirebaseAuthProvider().currentUser!.id)
                   : null,
               builder: (context, snapshot) {
                 switch (snapshot.connectionState) {

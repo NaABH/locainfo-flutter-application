@@ -3,8 +3,8 @@ import 'package:locainfo/constants/app_colors.dart';
 
 class CustomFontStyles {
   // used for appbar title
-  static const TextStyle appBarTitle = TextStyle(
-    fontWeight: FontWeight.bold,
+  static TextStyle appBarTitle = const TextStyle(
+    fontWeight: FontWeight.w600,
     color: AppColors.darkerBlue,
     fontSize: 24.0,
   );
@@ -66,7 +66,35 @@ class CustomFontStyles {
 
   // used for pressableText
   static TextStyle pressableText = TextStyle(
-      color: AppColors.grey6,
-      fontWeight: FontWeight.w500,
-      decoration: TextDecoration.underline);
+    color: AppColors.grey6,
+    fontWeight: FontWeight.w500,
+    decoration: TextDecoration.underline,
+  );
+
+  // used for label for bottomNavigationBar
+  static TextStyle bottomNavigationBarLabel = const TextStyle(
+    color: AppColors.black,
+    fontSize: 12,
+    fontWeight: FontWeight.w500,
+  );
+
+  // used for selected item in drop down menu
+  static TextStyle selectedDropDownItem = TextStyle(
+    color: AppColors.grey7,
+    fontSize: 16.0,
+    fontWeight: FontWeight.w500,
+  );
+
+  // used for label for like and dislike count
+  static TextStyle likeDislikeButtonLabel = const TextStyle(
+    color: Colors.black,
+    fontWeight: FontWeight.w500,
+    fontSize: 14,
+  );
+
+  static TextStyle loadingScreenText = const TextStyle(
+    color: AppColors.darkerBlue,
+    fontWeight: FontWeight.w400,
+    fontSize: 15,
+  );
 }

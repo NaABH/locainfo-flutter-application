@@ -2,13 +2,15 @@ import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.da
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/constants/app_colors.dart';
+import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/constants/icons.dart';
 import 'package:locainfo/services/main_bloc.dart';
 import 'package:locainfo/services/main_event.dart';
 import 'package:locainfo/services/main_state.dart';
 
+// custom bottom navigation bar
 class MyBottomNavigationBar extends StatefulWidget {
-  const MyBottomNavigationBar({super.key});
+  const MyBottomNavigationBar({Key? key}) : super(key: key);
 
   @override
   State<MyBottomNavigationBar> createState() => _MyBottomNavigationBarState();
@@ -19,9 +21,10 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
 
   @override
   void initState() {
-    final state = context.read<MainBloc>().state;
-    _bottomNavIndex = _mapStateToIndex(state);
     super.initState();
+    _bottomNavIndex = _mapStateToIndex(context
+        .read<MainBloc>()
+        .state); // map the selected index to the current state
   }
 
   @override
@@ -30,31 +33,12 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
       itemCount: iconList.length,
       tabBuilder: (int index, bool isActive) {
         final icon = isActive ? iconListSelected[index] : iconList[index];
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 30,
-              color: AppColors.darkerBlue,
-            ),
-            const SizedBox(height: 2),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Text(
-                iconTextList[index],
-                style:
-                    const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-              ),
-            )
-          ],
-        );
+        return _buildTabItem(icon, iconTextList[index]);
       },
-      backgroundColor: Colors.grey.shade100,
-      borderColor: Colors.grey.shade300,
+      backgroundColor: AppColors.grey1,
+      borderColor: AppColors.grey3,
       activeIndex: _bottomNavIndex,
-      height: 55,
+      height: MediaQuery.of(context).size.height * 1 / 15,
       gapLocation: GapLocation.center,
       notchSmoothness: NotchSmoothness.softEdge,
       leftCornerRadius: 26,
@@ -66,7 +50,27 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
     );
   }
 
-  // Helper method to map MainState to the corresponding index
+  Widget _buildTabItem(IconData icon, String label) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          icon,
+          size: 30,
+          color: AppColors.darkerBlue,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Text(
+            label,
+            style: CustomFontStyles.bottomNavigationBarLabel,
+          ),
+        )
+      ],
+    );
+  }
+
   int _mapStateToIndex(MainState state) {
     if (state is MainStateHome) {
       return 0;

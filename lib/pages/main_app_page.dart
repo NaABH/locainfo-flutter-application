@@ -4,7 +4,6 @@ import 'package:locainfo/components/my_bottom_navigation_bar.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/routes.dart';
 import 'package:locainfo/pages/app/bookmark_page.dart';
-import 'package:locainfo/pages/app/home_page.dart';
 import 'package:locainfo/pages/app/news_page.dart';
 import 'package:locainfo/pages/app/profile_page.dart';
 import 'package:locainfo/services/main_bloc.dart';
@@ -21,21 +20,15 @@ class MainAppPage extends StatelessWidget {
       body: BlocConsumer<MainBloc, MainState>(
         listener: (context, state) {},
         builder: (context, state) {
-          int currentActiveIndex;
           if (state is MainStateHome) {
-            currentActiveIndex = 0;
-            return const HomePage();
+            return const NewsPage();
           } else if (state is MainStateNews) {
-            currentActiveIndex = 1;
             return const NewsPage();
           } else if (state is MainStateBookmark) {
-            currentActiveIndex = 2;
             return const BookMarkPage();
           } else if (state is MainStateProfile) {
-            currentActiveIndex = 3;
             return const ProfilePage();
           } else {
-            currentActiveIndex = 0;
             return const Scaffold(
               body: CircularProgressIndicator(),
             );

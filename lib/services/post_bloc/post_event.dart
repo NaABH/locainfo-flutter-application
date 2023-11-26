@@ -1,3 +1,5 @@
+import 'package:locainfo/constants/actions.dart';
+
 abstract class PostEvent {
   const PostEvent();
 }
@@ -20,4 +22,22 @@ class PostEventCreatePost extends PostEvent {
 
 class PostEventCreatePostInitialise extends PostEvent {
   const PostEventCreatePostInitialise();
+}
+
+class PostEventUpdatePostLike extends PostEvent {
+  final String documentId;
+  final UserAction action;
+  const PostEventUpdatePostLike(this.documentId, this.action);
+}
+
+class PostEventUpdatePostDislike extends PostEvent {
+  final String documentId;
+  final UserAction action;
+  const PostEventUpdatePostDislike(this.documentId, this.action);
+}
+
+class PostEventUpdateBookmarkList extends PostEvent {
+  final String documentId;
+  final UserAction action;
+  const PostEventUpdateBookmarkList(this.documentId, this.action);
 }

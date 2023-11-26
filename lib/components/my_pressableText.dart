@@ -14,7 +14,7 @@ class MyPressableText extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: Text(
-        'Forgot Password?',
+        text,
         style: CustomFontStyles.pressableText,
       ),
     );

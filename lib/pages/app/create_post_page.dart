@@ -51,7 +51,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
               Navigator.of(context).pop();
             },
           ),
-          title: const Text(
+          title: Text(
             'Create Post',
             style: CustomFontStyles.appBarTitle,
           )),

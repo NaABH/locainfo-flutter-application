@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:locainfo/components/my_auth_textfield.dart';
 import 'package:locainfo/components/my_back_button.dart';
 import 'package:locainfo/components/my_button.dart';
-import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/services/auth/auth_exceptions.dart';
 import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
@@ -56,7 +56,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   );
             },
           ),
-          title: const Text(
+          title: Text(
             'Forgot Password',
             style: CustomFontStyles.appBarTitle,
           ),
@@ -82,29 +82,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 const SizedBox(
                   height: 10,
                 ),
-                TextField(
+                MyAuthTextField(
                   controller: _email,
-                  obscureText: false,
-                  enableSuggestions: false,
-                  autocorrect: false,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.white),
-                    ),
-                    focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: AppColors.lighterBlue,
-                        width: 2,
-                      ),
-                    ),
-                    fillColor: AppColors.grey2,
-                    filled: true,
-                    hintText: "Enter your email",
-                    hintStyle: CustomFontStyles.hintText,
-                  ),
+                  hintText: "Enter your email",
+                  textInputType: TextInputType.emailAddress,
                 ),
-                const SizedBox(height: 25),
+                const SizedBox(height: 45),
                 MyButton(
                     onPressed: () {
                       final email = _email.text;

@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:locainfo/components/my_post.dart';
 import 'package:locainfo/services/firestore/post.dart';
 
-// call when user press yes
-typedef PostCallBack = void Function(Post note);
+// call when user press the post
+typedef PostCallBack = void Function(Post post);
 
+// generate a list view of post
 class MyPostList extends StatelessWidget {
   final Iterable<Post> posts;
   final PostCallBack onTap;
@@ -21,12 +22,7 @@ class MyPostList extends StatelessWidget {
       itemCount: posts.length,
       itemBuilder: (context, index) {
         final post = posts.elementAt(index); // get current note
-        return MyPost(
-            author: post.ownerUserName,
-            locationName: post.locationName,
-            date: post.timeAgo,
-            title: post.title,
-            content: post.text);
+        return MyPost(post: post);
       },
     );
   }

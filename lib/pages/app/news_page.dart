@@ -17,7 +17,7 @@ class NewsPage extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: AppColors.white,
-        title: const Row(
+        title: Row(
           children: [
             Text(
               'News',

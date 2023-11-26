@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
 
-// Custom button
+// Custom button for submission event
 class MyButton extends StatelessWidget {
   final String text;
   const MyButton({super.key, required this.onPressed, required this.text});
@@ -16,6 +16,11 @@ class MyButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.bottomLeft,
+            end: Alignment.topRight,
+            colors: [AppColors.lightestBlue, AppColors.darkerBlue],
+          ),
           color: AppColors.lighterBlue,
           borderRadius: BorderRadius.circular(36),
           boxShadow: [

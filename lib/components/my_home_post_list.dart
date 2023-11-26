@@ -23,11 +23,17 @@ class MyHomePostList extends StatelessWidget {
       itemBuilder: (context, index) {
         final post = posts.elementAt(index); // get current note
         return MyPost(
-            author: post.ownerUserName,
-            locationName: post.locationName,
-            date: post.timeAgo,
-            title: post.title,
-            content: post.text);
+          postId: post.documentId,
+          author: post.ownerUserName,
+          locationName: post.locationName,
+          date: post.timeAgo,
+          title: post.title,
+          content: post.text,
+          isLiked: post.isLiked,
+          numberOfLikes: post.numberOfLikes,
+          isDisliked: post.isDisliked,
+          numberOfDislikes: post.numberOfDislikes,
+        );
       },
     );
   }

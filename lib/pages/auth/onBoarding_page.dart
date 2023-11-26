@@ -6,6 +6,7 @@ import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
 import 'package:locainfo/services/auth/bloc/auth_event.dart';
+import 'package:simple_gradient_text/simple_gradient_text.dart';
 
 class OnBoardingPage extends StatefulWidget {
   const OnBoardingPage({super.key});
@@ -24,11 +25,11 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
         child: Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Logo
               SizedBox(
-                height: 450,
+                height: MediaQuery.of(context).size.height * 5 / 10,
                 child: Image.asset('assets/icon/icon_transparent.png'),
               ),
 
@@ -36,9 +37,10 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
               const SizedBox(height: 10),
 
               // Logo Name
-              const Text(
+              GradientText(
                 'Welcome to LocaInfo',
                 style: CustomFontStyles.headingOne,
+                colors: const [AppColors.lighterBlue, AppColors.darkestBlue],
               ),
 
               // Get started
@@ -56,7 +58,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
               // Login Button
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 10.0, horizontal: 25),
+                    const EdgeInsets.symmetric(vertical: 15.0, horizontal: 25),
                 child: MyButton(
                     onPressed: () {
                       context.read<AuthBloc>().add(

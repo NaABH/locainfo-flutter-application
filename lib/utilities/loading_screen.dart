@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:locainfo/constants/app_colors.dart';
+import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/utilities/loading_screen_controller.dart';
 
 class LoadingScreen {
@@ -54,6 +56,11 @@ class LoadingScreen {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10.0),
+                gradient: LinearGradient(
+                  begin: Alignment.bottomLeft,
+                  end: Alignment.topRight,
+                  colors: [AppColors.white, AppColors.grey3],
+                ),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -72,6 +79,7 @@ class LoadingScreen {
                               return Text(
                                 snapshot.data as String,
                                 textAlign: TextAlign.center,
+                                style: CustomFontStyles.loadingScreenText,
                               );
                             } else {
                               return Container();

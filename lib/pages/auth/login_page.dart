@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:locainfo/components/my_auth_textfield.dart';
 import 'package:locainfo/components/my_back_button.dart';
 import 'package:locainfo/components/my_button.dart';
 import 'package:locainfo/components/my_pressableText.dart';
-import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/services/auth/auth_exceptions.dart';
 import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
@@ -64,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
                   );
             },
           ),
-          title: const Text(
+          title: Text(
             'Log In',
             style: CustomFontStyles.appBarTitle,
           ),
@@ -82,29 +82,10 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(
                   height: 10,
                 ),
-                TextField(
+                MyAuthTextField(
                   controller: _email,
-                  obscureText: false,
-                  enableSuggestions: false,
-                  autocorrect: false,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: AppColors.white,
-                      ),
-                    ),
-                    focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: AppColors.lighterBlue,
-                        width: 2,
-                      ),
-                    ),
-                    fillColor: AppColors.grey2,
-                    filled: true,
-                    hintText: "Enter your email",
-                    hintStyle: CustomFontStyles.hintText,
-                  ),
+                  hintText: "Enter your email",
+                  textInputType: TextInputType.emailAddress,
                 ),
                 const SizedBox(
                   height: 30,
@@ -116,29 +97,14 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(
                   height: 10,
                 ),
-                TextField(
+                MyAuthTextField(
                   controller: _password,
-                  obscureText: true,
-                  enableSuggestions: false,
-                  autocorrect: false,
-                  decoration: InputDecoration(
-                    enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.white),
-                    ),
-                    focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: AppColors.lighterBlue,
-                        width: 2,
-                      ),
-                    ),
-                    fillColor: AppColors.grey2,
-                    filled: true,
-                    hintText: "Enter your password",
-                    hintStyle: CustomFontStyles.hintText,
-                  ),
+                  hideText: true,
+                  hintText: "Enter your password",
+                  textInputType: TextInputType.emailAddress,
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 10, bottom: 25),
+                  padding: const EdgeInsets.only(top: 10, bottom: 45),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
