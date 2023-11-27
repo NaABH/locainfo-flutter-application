@@ -4,13 +4,16 @@ import 'package:locainfo/components/my_likedislike_button.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/services/firestore/post.dart';
+import 'package:share_plus/share_plus.dart';
 
 class MyPost extends StatelessWidget {
   final Post post;
+  final bool isBookMarked;
 
   const MyPost({
     Key? key,
     required this.post,
+    required this.isBookMarked,
   }) : super(key: key);
 
   @override
@@ -130,7 +133,9 @@ class MyPost extends StatelessWidget {
     return Row(
       children: [
         IconButton(
-          onPressed: () {},
+          onPressed: () async {
+            await Share.share('${post.title}\n${post.text}');
+          },
           splashRadius: 1,
           icon: const Icon(Icons.share, size: 20),
         ),
@@ -138,7 +143,7 @@ class MyPost extends StatelessWidget {
           padding: const EdgeInsets.only(right: 8.0),
           child: MyBookmarkButton(
             postId: post.documentId,
-            isBookmarked: true,
+            isBookmarked: isBookMarked,
           ),
         ),
       ],

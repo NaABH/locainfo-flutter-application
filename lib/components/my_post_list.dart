@@ -8,12 +8,14 @@ typedef PostCallBack = void Function(Post post);
 // generate a list view of post
 class MyPostList extends StatelessWidget {
   final Iterable<Post> posts;
+  final List<String> bookmarkedPosts;
   final PostCallBack onTap;
 
   const MyPostList({
     Key? key,
     required this.posts,
     required this.onTap,
+    required this.bookmarkedPosts,
   }) : super(key: key);
 
   @override
@@ -22,7 +24,10 @@ class MyPostList extends StatelessWidget {
       itemCount: posts.length,
       itemBuilder: (context, index) {
         final post = posts.elementAt(index); // get current note
-        return MyPost(post: post);
+        return MyPost(
+          post: post,
+          isBookMarked: bookmarkedPosts.contains(post.documentId),
+        );
       },
     );
   }

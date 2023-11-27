@@ -13,3 +13,7 @@ class CouldNotUpdatePostException extends DatabaseException {}
 
 // deleting
 class CouldNotDeletePostException extends DatabaseException {}
+
+class CouldNotGetBookmarkPostIdsException extends DatabaseException {}
+
+class CouldNotGetBookmarkPostException extends DatabaseException {}

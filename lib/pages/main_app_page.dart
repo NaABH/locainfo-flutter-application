@@ -20,7 +20,7 @@ class MainAppPage extends StatelessWidget {
       body: BlocBuilder<MainBloc, MainState>(
         builder: (context, state) {
           if (state is MainStateHome) {
-            return const NewsPage();
+            return const ProfilePage();
           } else if (state is MainStateNews) {
             return const NewsPage();
           } else if (state is MainStateBookmark) {

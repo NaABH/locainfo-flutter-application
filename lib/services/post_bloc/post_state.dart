@@ -21,9 +21,21 @@ class PostStateLoadingPosts extends PostState {
 
 class PostStateLoaded extends PostState {
   final Iterable<Post> posts;
+  final List<String> bookmarkedPosts;
   const PostStateLoaded({
     required bool isLoading,
     required this.posts,
+    required this.bookmarkedPosts,
+  }) : super(isLoading: isLoading);
+}
+
+class PostStateLoadedBookmarkedPosts extends PostState {
+  final Iterable<Post> posts;
+  final List<String> bookmarkedPosts;
+  const PostStateLoadedBookmarkedPosts({
+    required bool isLoading,
+    required this.posts,
+    required this.bookmarkedPosts,
   }) : super(isLoading: isLoading);
 }
 
@@ -32,8 +44,18 @@ class PostStateNoAvailablePost extends PostState {
       : super(isLoading: isLoading);
 }
 
+class PostStateNoAvailableBookmarkPost extends PostState {
+  const PostStateNoAvailableBookmarkPost({required bool isLoading})
+      : super(isLoading: isLoading);
+}
+
 class PostStateLoadError extends PostState {
   const PostStateLoadError({required bool isLoading})
+      : super(isLoading: isLoading);
+}
+
+class PostStateLoadBookmarksError extends PostState {
+  const PostStateLoadBookmarksError({required bool isLoading})
       : super(isLoading: isLoading);
 }
 

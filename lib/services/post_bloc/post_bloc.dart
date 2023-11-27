@@ -30,9 +30,12 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         if (posts.isEmpty) {
           emit(const PostStateNoAvailablePost(isLoading: false));
         } else {
-          emit(PostStateLoaded(isLoading: false, posts: posts));
+          final bookmarkedPost = await _databaseProvider
+              .getBookmarkedPostIds(_authProvider.currentUser!.id);
+          emit(PostStateLoaded(
+              isLoading: false, posts: posts, bookmarkedPosts: bookmarkedPost));
         }
-      } on Exception catch (e) {
+      } on Exception catch (_) {
         emit(const PostStateLoadError(isLoading: false));
       }
     });
@@ -43,13 +46,32 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       final posts =
           await _databaseProvider.getPostedPosts(currentUserId: userId);
       if (posts.isNotEmpty) {
-        emit(PostStateLoaded(posts: posts, isLoading: false));
+        final bookmarkedPost = await _databaseProvider
+            .getBookmarkedPostIds(_authProvider.currentUser!.id);
+        emit(PostStateLoaded(
+            posts: posts, isLoading: false, bookmarkedPosts: bookmarkedPost));
       } else {
         emit(const PostStateNoAvailablePost(isLoading: false));
       }
     });
 
-    on<PostEventLoadBookmarkedPosts>((event, emit) {});
+    on<PostEventLoadBookmarkedPosts>((event, emit) async {
+      emit(const PostStateLoadingPosts(isLoading: false));
+      try {
+        final userId = _authProvider.currentUser!.id;
+        final postIds = await _databaseProvider.getBookmarkedPostIds(userId);
+        final posts =
+            await _databaseProvider.getBookmarkedPosts(postIds, userId);
+        if (posts.isNotEmpty) {
+          emit(PostStateLoadedBookmarkedPosts(
+              posts: posts, isLoading: false, bookmarkedPosts: postIds));
+        } else {
+          emit(const PostStateNoAvailableBookmarkPost(isLoading: false));
+        }
+      } on Exception catch (e) {
+        emit(const PostStateLoadBookmarksError(isLoading: false));
+      }
+    });
 
     on<PostEventCreatePost>((event, emit) async {
       emit(const PostStateSubmittingPost(
@@ -66,25 +88,26 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         if (event.category == null || !categories.containsKey(event.category)) {
           throw CategoryInvalidPostException();
         }
-
-        final position = await _locationProvider
-            .getCurrentLocation(); // CouldNotGetLocationException
-        String locationName =
-            await getLocationName(position.latitude, position.longitude);
-        Timestamp postedTimestamp = Timestamp.fromDate(DateTime.now());
-        await _databaseProvider.createNewPost(
-          // CouldNotCreatePostException
-          ownerUserId: _authProvider.currentUser!.id,
-          ownerUserName: _authProvider.currentUserName!,
-          title: event.title,
-          body: event.body,
-          category: event.category!,
-          latitude: position.latitude,
-          longitude: position.longitude,
-          locationName: locationName,
-          postedDate: postedTimestamp,
-        );
-        emit(const PostStateCreatePostSuccessful(isLoading: false));
+        Future.delayed(const Duration(seconds: 1), () async {
+          final position = await _locationProvider
+              .getCurrentLocation(); // CouldNotGetLocationException
+          String locationName =
+              await getLocationName(position.latitude, position.longitude);
+          Timestamp postedTimestamp = Timestamp.fromDate(DateTime.now());
+          await _databaseProvider.createNewPost(
+            // CouldNotCreatePostException
+            ownerUserId: _authProvider.currentUser!.id,
+            ownerUserName: _authProvider.currentUserName!,
+            title: event.title,
+            body: event.body,
+            category: event.category!,
+            latitude: position.latitude,
+            longitude: position.longitude,
+            locationName: locationName,
+            postedDate: postedTimestamp,
+          );
+          emit(const PostStateCreatePostSuccessful(isLoading: false));
+        });
       } on Exception catch (e) {
         emit(PostStateCreatingPost(
             isLoading: false, exception: e, position: null));

@@ -20,14 +20,18 @@ class FireStoreProvider implements DatabaseProvider {
 
   // get list of bookmarked posts id
   Future<List<String>> getBookmarkedPostIds(String userId) async {
-    DocumentSnapshot userDoc = await users.doc(userId).get();
+    try {
+      DocumentSnapshot userDoc = await users.doc(userId).get();
 
-    if (userDoc.exists) {
-      List<String> bookmarkedPostIds =
-          List<String>.from(userDoc[bookmarkFieldName]);
-      return bookmarkedPostIds;
-    } else {
-      return [];
+      if (userDoc.exists) {
+        List<String> bookmarkedPostIds =
+            List<String>.from(userDoc[bookmarkFieldName]);
+        return bookmarkedPostIds;
+      } else {
+        return [];
+      }
+    } on Exception catch (e) {
+      throw CouldNotGetBookmarkPostIdsException();
     }
   }
 
@@ -35,6 +39,9 @@ class FireStoreProvider implements DatabaseProvider {
   Future<Iterable<Post>> getBookmarkedPosts(
       List<String> bookmarkedPostIds, String currentUserId) async {
     try {
+      if (bookmarkedPostIds.isEmpty) {
+        return []; // Return an empty list if bookmarkedPostIds is empty
+      }
       return await posts
           .where(FieldPath.documentId, whereIn: bookmarkedPostIds)
           .get()
@@ -43,7 +50,7 @@ class FireStoreProvider implements DatabaseProvider {
                 currentUserId)), // convert each document into a Post object
           );
     } catch (e) {
-      throw CouldNotGetPostsException();
+      throw CouldNotGetBookmarkPostException();
     }
   }
 

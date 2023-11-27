@@ -56,6 +56,7 @@ class NewsPage extends StatelessWidget {
               },
               child: MyPostList(
                 posts: allNearbyPosts,
+                bookmarkedPosts: state.bookmarkedPosts,
                 onTap: (post) {},
               ),
             );
