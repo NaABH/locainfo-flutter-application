@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:locainfo/components/my_bookmark_button.dart';
 import 'package:locainfo/components/my_likedislike_button.dart';
 import 'package:locainfo/constants/app_colors.dart';
+import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/services/firestore/post.dart';
 
 class MyPost extends StatelessWidget {
@@ -15,7 +16,7 @@ class MyPost extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(3),
+      margin: const EdgeInsets.all(5),
       padding: const EdgeInsets.symmetric(vertical: 6),
       decoration: BoxDecoration(
         color: AppColors.grey2,
@@ -37,14 +38,19 @@ class MyPost extends StatelessWidget {
 
   Widget _buildUserInfo() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Icon(Icons.person),
+          const Icon(
+            Icons.person,
+            size: 20,
+          ),
           const SizedBox(width: 8),
           Text(
             post.ownerUserName,
-            style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 16),
+            style: CustomFontStyles.postUsernameLabel,
           ),
         ],
       ),
@@ -53,14 +59,10 @@ class MyPost extends StatelessWidget {
 
   Widget _buildLocationAndDate() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Text(
         '${post.locationName}, ${post.timeAgo}',
-        style: const TextStyle(
-          fontSize: 15,
-          fontStyle: FontStyle.italic,
-          color: Colors.blueGrey,
-        ),
+        style: CustomFontStyles.postLocationDateLabel,
         maxLines: 1,
         softWrap: true,
         textAlign: TextAlign.justify,
@@ -70,10 +72,10 @@ class MyPost extends StatelessWidget {
 
   Widget _buildPostTitle() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.only(right: 10, left: 10, top: 10, bottom: 5),
       child: Text(
         post.title,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        style: CustomFontStyles.postTitleLabel,
         maxLines: 2,
         softWrap: true,
         textAlign: TextAlign.justify,
@@ -83,12 +85,12 @@ class MyPost extends StatelessWidget {
 
   Widget _buildPostContent() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.only(left: 10, right: 10, bottom: 5),
       child: Text(
         post.text,
-        style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 15),
+        style: CustomFontStyles.postContentText,
         textAlign: TextAlign.justify,
-        maxLines: 4,
+        maxLines: 3,
         softWrap: true,
         overflow: TextOverflow.ellipsis,
       ),
@@ -97,9 +99,10 @@ class MyPost extends StatelessWidget {
 
   Widget _buildActions() {
     return Padding(
-      padding: const EdgeInsets.only(left: 12, right: 10, top: 20, bottom: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _buildLikeDislikeButton(),
           _buildShareAndBookmark(),
@@ -128,10 +131,11 @@ class MyPost extends StatelessWidget {
       children: [
         IconButton(
           onPressed: () {},
+          splashRadius: 1,
           icon: const Icon(Icons.share, size: 20),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          padding: const EdgeInsets.only(right: 8.0),
           child: MyBookmarkButton(
             postId: post.documentId,
             isBookmarked: true,

@@ -38,7 +38,16 @@ class NewsPage extends StatelessWidget {
       body: BlocBuilder<PostBloc, PostState>(
         builder: (context, state) {
           if (state is PostStateLoadingPosts) {
-            return const Center(child: Text('Loading'));
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  Text('Fetching news...'),
+                ],
+              ),
+            );
           } else if (state is PostStateLoaded) {
             final allNearbyPosts = state.posts;
             return RefreshIndicator(
@@ -68,7 +77,20 @@ class NewsPage extends StatelessWidget {
               ),
             );
           } else {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                  const Text('Failed to load post at this moment.'),
+                  const Text('Kindly check your GPS and Internet connection.'),
+                  IconButton(
+                      onPressed: () async {
+                        context
+                            .read<PostBloc>()
+                            .add(const PostEventLoadNearbyPosts());
+                      },
+                      icon: const Icon(Icons.refresh)),
+                ]));
           }
         },
       ),

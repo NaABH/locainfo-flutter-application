@@ -89,11 +89,36 @@ class CustomFontStyles {
   static TextStyle likeDislikeButtonLabel = const TextStyle(
     color: Colors.black,
     fontWeight: FontWeight.w500,
-    fontSize: 14,
+    fontSize: 13,
   );
 
+  // used for text in loading screen
   static TextStyle loadingScreenText = const TextStyle(
     color: AppColors.darkerBlue,
+    fontWeight: FontWeight.w400,
+    fontSize: 15,
+  );
+
+  // used for username row in post
+  static TextStyle postUsernameLabel = const TextStyle(
+    fontWeight: FontWeight.w400,
+    fontSize: 15,
+  );
+
+  // used for location and date label in post
+  static TextStyle postLocationDateLabel = const TextStyle(
+    fontSize: 13,
+    fontStyle: FontStyle.italic,
+    color: AppColors.lightestBlue,
+  );
+
+  // used for post title
+  static TextStyle postTitleLabel = const TextStyle(
+    fontWeight: FontWeight.bold,
+    fontSize: 17,
+  );
+
+  static TextStyle postContentText = const TextStyle(
     fontWeight: FontWeight.w400,
     fontSize: 15,
   );

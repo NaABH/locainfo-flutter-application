@@ -5,23 +5,26 @@ abstract class PostEvent {
 }
 
 class PostEventLoadNearbyPosts extends PostEvent {
-  final int page;
-  const PostEventLoadNearbyPosts({this.page = 1});
+  const PostEventLoadNearbyPosts();
 }
 
 class PostEventLoadPostedPosts extends PostEvent {
   const PostEventLoadPostedPosts();
 }
 
+class PostEventLoadBookmarkedPosts extends PostEvent {
+  const PostEventLoadBookmarkedPosts();
+}
+
 class PostEventCreatePost extends PostEvent {
   final String title;
   final String body;
-  final String category;
+  final String? category;
   const PostEventCreatePost(this.title, this.body, this.category);
 }
 
-class PostEventCreatePostInitialise extends PostEvent {
-  const PostEventCreatePostInitialise();
+class PostEventCreatingPost extends PostEvent {
+  const PostEventCreatingPost();
 }
 
 class PostEventUpdatePostLike extends PostEvent {

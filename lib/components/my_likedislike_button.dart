@@ -99,10 +99,12 @@ class _MyLikeDislikeButtonState extends State<MyLikeDislikeButton> {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         LikeButton(
           onTap: onLikeButtonTapped,
-          size: 22,
+          size: 20,
           likeBuilder: (bool isLiked) {
             return Icon(
               this.isLiked ? Icons.thumb_up : Icons.thumb_up_off_alt_outlined,
@@ -127,10 +129,10 @@ class _MyLikeDislikeButtonState extends State<MyLikeDislikeButton> {
             return result;
           },
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 12),
         LikeButton(
           onTap: onDislikeButtonTapped,
-          size: 22,
+          size: 20,
           likeBuilder: (bool isDisliked) {
             return Icon(
               this.isDisliked ? Icons.thumb_down : Icons.thumb_down_outlined,

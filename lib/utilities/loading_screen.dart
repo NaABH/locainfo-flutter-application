@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/utilities/loading_screen_controller.dart';
+import 'package:lottie/lottie.dart';
 
 class LoadingScreen {
   factory LoadingScreen() => _shared;
@@ -70,7 +71,8 @@ class LoadingScreen {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const SizedBox(height: 10),
-                      const CircularProgressIndicator(),
+                      Lottie.asset('assets/animated_icon/loading.json',
+                          height: MediaQuery.of(context).size.height * 1 / 8),
                       const SizedBox(height: 20),
                       StreamBuilder(
                           stream: _text.stream,

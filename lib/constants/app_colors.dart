@@ -20,8 +20,10 @@ class AppColors {
   static Color grey4 = Colors.grey.shade400;
   // divider
   // navigation bar border
+  // border for post
   static Color grey3 = Colors.grey.shade300;
   // background for text field
+  // background for post
   static Color grey2 = Colors.grey.shade200;
   // navigation bar background
   static Color grey1 = Colors.grey.shade100;

@@ -17,8 +17,7 @@ class MainAppPage extends StatelessWidget {
   Widget build(BuildContext context) {
     context.read<MainBloc>().add(const MainEventNavigationChanged(index: 0));
     return Scaffold(
-      body: BlocConsumer<MainBloc, MainState>(
-        listener: (context, state) {},
+      body: BlocBuilder<MainBloc, MainState>(
         builder: (context, state) {
           if (state is MainStateHome) {
             return const NewsPage();

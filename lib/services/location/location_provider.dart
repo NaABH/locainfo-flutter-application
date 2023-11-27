@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:locainfo/services/location/geolocation_provider.dart';
+import 'package:locainfo/services/location/location_exceptions.dart';
 
 class LocationProvider implements GeoLocationProvider {
   LocationProvider();
@@ -22,27 +23,31 @@ class LocationProvider implements GeoLocationProvider {
     bool serviceEnabled;
     LocationPermission permission;
 
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
+    try {
+      permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied');
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return Future.error('Location permissions are denied');
+        }
       }
-    }
 
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
+      if (permission == LocationPermission.deniedForever) {
+        return Future.error(
+            'Location permissions are permanently denied, we cannot request permissions.');
+      }
 
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        return await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high);
+      }
+
       return await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
+    } on Exception catch (e) {
+      throw CouldNotGetLocationException();
     }
-
-    return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
   }
 
   // get last known location (value can be null)
