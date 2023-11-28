@@ -43,10 +43,12 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     on<PostEventSearchPostTextChanged>((event, emit) async {
       try {
         if (event.searchText != null) {
-          emit(const PostStateSearchLoading(
-              isLoading: true, loadingText: 'Searching posts'));
+          emit(const PostStateSearchLoading(isLoading: true));
+          final currentLocation = await _locationProvider.getCurrentLocation();
           final filteredPosts = await _databaseProvider.getSearchedPosts(
-              event.searchText!, _authProvider.currentUser!.id);
+              event.searchText!,
+              _authProvider.currentUser!.id,
+              currentLocation);
           emit(PostStateSearchLoaded(
               isLoading: false, filteredPosts: filteredPosts));
         } else {

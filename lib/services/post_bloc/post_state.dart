@@ -90,8 +90,8 @@ class PostStateSearchInitialise extends PostState {
 }
 
 class PostStateSearchLoading extends PostState {
-  const PostStateSearchLoading({required bool isLoading, String? loadingText})
-      : super(isLoading: isLoading, loadingText: loadingText);
+  const PostStateSearchLoading({required bool isLoading})
+      : super(isLoading: isLoading);
 }
 
 class PostStateSearchLoaded extends PostState {

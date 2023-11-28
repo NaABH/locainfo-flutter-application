@@ -19,16 +19,28 @@ class FireStoreProvider implements DatabaseProvider {
   final users = FirebaseFirestore.instance.collection('users');
 
   Future<Iterable<Post>> getSearchedPosts(
-      String searchText, String currentUserId) async {
+      String searchText, String currentUserId, Position position) async {
     try {
       var event =
           await posts.orderBy(postedDateFieldName, descending: true).get();
       return event.docs
           .map((doc) => Post.fromSnapshot(doc, currentUserId))
-          .where((post) => post.title
-              .toString()
-              .toLowerCase()
-              .contains(searchText.toLowerCase()));
+          .where((post) {
+        // Check if the post title contains the searchText
+        bool titleMatches =
+            post.title.toLowerCase().contains(searchText.toLowerCase());
+
+        // Calculate the distance between the post location and the user location
+        var distance = Geolocator.distanceBetween(
+          post.latitude,
+          post.longitude,
+          position.latitude,
+          position.longitude,
+        );
+
+        // Keep only the posts that are within 300 meters and match the title search
+        return distance <= 300 && titleMatches;
+      });
     } on Exception catch (e) {
       throw CouldNotGetSearchedPostException();
     }
