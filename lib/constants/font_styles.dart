@@ -102,7 +102,7 @@ class CustomFontStyles {
   // used for username row in post
   static TextStyle postUsernameLabel = const TextStyle(
     fontWeight: FontWeight.w400,
-    fontSize: 15,
+    fontSize: 12,
   );
 
   // used for location and date label in post

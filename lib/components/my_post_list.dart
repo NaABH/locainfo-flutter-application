@@ -10,25 +10,43 @@ class MyPostList extends StatelessWidget {
   final Iterable<Post> posts;
   final List<String> bookmarkedPosts;
   final PostCallBack onTap;
+  final String? selectedCategory; // New parameter for selected category
 
   const MyPostList({
     Key? key,
     required this.posts,
     required this.onTap,
     required this.bookmarkedPosts,
+    this.selectedCategory, // Provide a default value if needed
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: posts.length,
-      itemBuilder: (context, index) {
-        final post = posts.elementAt(index); // get current note
-        return MyPost(
-          post: post,
-          isBookMarked: bookmarkedPosts.contains(post.documentId),
-        );
-      },
+    // Filter posts based on the selected category
+    final filteredPosts = selectedCategory != null
+        ? posts.where((post) => post.category == selectedCategory)
+        : posts.toList();
+
+    return filteredPosts.isEmpty
+        ? _buildEmptyState()
+        : ListView.builder(
+            key: key,
+            itemCount: filteredPosts.length,
+            itemBuilder: (context, index) {
+              final post = filteredPosts.elementAt(index);
+              return MyPost(
+                post: post,
+                isBookMarked: bookmarkedPosts.contains(post.documentId),
+                onTap: onTap,
+                viewType: '',
+              );
+            },
+          );
+  }
+
+  Widget _buildEmptyState() {
+    return const Center(
+      child: Text('No posts available for the selected category'),
     );
   }
 }

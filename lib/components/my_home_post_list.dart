@@ -23,8 +23,10 @@ class MyHomePostList extends StatelessWidget {
       itemBuilder: (context, index) {
         final post = posts.elementAt(index); // get current note
         return MyPost(
+          onTap: onTap,
           post: post,
           isBookMarked: false,
+          viewType: '',
         );
       },
     );

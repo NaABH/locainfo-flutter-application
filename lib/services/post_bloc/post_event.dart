@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:locainfo/constants/actions.dart';
 
 abstract class PostEvent {
@@ -19,8 +21,9 @@ class PostEventLoadBookmarkedPosts extends PostEvent {
 class PostEventCreatePost extends PostEvent {
   final String title;
   final String body;
+  final File? image;
   final String? category;
-  const PostEventCreatePost(this.title, this.body, this.category);
+  const PostEventCreatePost(this.title, this.body, this.image, this.category);
 }
 
 class PostEventCreatingPost extends PostEvent {
@@ -48,4 +51,8 @@ class PostEventUpdateBookmarkList extends PostEvent {
 class PostEventSearchPostTextChanged extends PostEvent {
   final String? searchText;
   const PostEventSearchPostTextChanged(this.searchText);
+}
+
+class PostEventClearAllBookmark extends PostEvent {
+  const PostEventClearAllBookmark();
 }

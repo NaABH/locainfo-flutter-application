@@ -101,10 +101,20 @@ class FireStoreProvider implements DatabaseProvider {
         {bookmarkFieldName: currentBookmarkedPosts},
         SetOptions(merge: true),
       );
-    } else {
+    } else if (action == UserAction.removeBookmark) {
       await users.doc(currentUserId).update({
         bookmarkFieldName: FieldValue.arrayRemove([documentId]),
       });
+    }
+  }
+
+  Future<void> clearBookmarkList({required String currentUserId}) async {
+    try {
+      await users.doc(currentUserId).update({
+        bookmarkFieldName: [],
+      });
+    } on Exception catch (e) {
+      throw CouldClearBookmarkException();
     }
   }
 
@@ -124,18 +134,21 @@ class FireStoreProvider implements DatabaseProvider {
 
   Future<Iterable<Post>> getPostedPosts({required String currentUserId}) async {
     try {
-      return await posts
-          .orderBy(ownerUserIdFieldName)
+      var querySnapshot = await posts
           .where(
             ownerUserIdFieldName,
-            isEqualTo:
-                currentUserId, //ownerUserIdFieldName equal to the ownerUserId
+            isEqualTo: currentUserId,
           )
-          .get()
-          .then(
-            (value) => value.docs.map((doc) => Post.fromSnapshot(doc,
-                currentUserId)), // convert each document into a Post object
-          );
+          .get();
+
+      var postsList = querySnapshot.docs
+          .map((doc) => Post.fromSnapshot(doc, currentUserId))
+          .toList();
+
+      // Order posts by postCreatedDate in descending order
+      postsList.sort((a, b) => b.postedDate.compareTo(a.postedDate));
+
+      return postsList;
     } catch (e) {
       throw CouldNotGetPostsException();
     }
@@ -251,6 +264,7 @@ class FireStoreProvider implements DatabaseProvider {
     required String ownerUserName,
     required String title,
     required String body,
+    required String? imageUrl,
     required String category,
     required double latitude,
     required double longitude,
@@ -264,7 +278,7 @@ class FireStoreProvider implements DatabaseProvider {
         titleFieldName: title,
         textFieldName: body,
         categoryFieldName: category,
-        sourceFieldName: '',
+        imageLinkFieldName: imageUrl,
         latitudeFieldName: latitude,
         longitudeFieldName: longitude,
         locationNameFieldName: locationName,
@@ -310,7 +324,6 @@ class FireStoreProvider implements DatabaseProvider {
       titleFieldName: title,
       textFieldName: body,
       categoryFieldName: category,
-      sourceFieldName: '',
       latitudeFieldName: latitude,
       longitudeFieldName: longitude,
       locationNameFieldName: locationName,
@@ -325,6 +338,7 @@ class FireStoreProvider implements DatabaseProvider {
       ownerUserName: ownerUserName,
       title: title,
       text: body,
+      imageUrl: "",
       category: category,
       latitude: latitude,
       longitude: longitude,

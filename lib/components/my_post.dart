@@ -1,5 +1,7 @@
+import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:locainfo/components/my_bookmark_button.dart';
+import 'package:locainfo/components/my_home_post_list.dart';
 import 'package:locainfo/components/my_likedislike_button.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
@@ -9,11 +11,15 @@ import 'package:share_plus/share_plus.dart';
 class MyPost extends StatelessWidget {
   final Post post;
   final bool isBookMarked;
+  final String viewType;
+  final PostCallBack onTap;
 
   const MyPost({
     Key? key,
     required this.post,
     required this.isBookMarked,
+    required this.onTap,
+    required this.viewType,
   }) : super(key: key);
 
   @override
@@ -29,10 +35,92 @@ class MyPost extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildUserInfo(),
-          _buildLocationAndDate(),
-          _buildPostTitle(),
-          _buildPostContent(),
+          GestureDetector(
+              onTap: () {
+                onTap(post);
+              },
+              child: _buildPostTitle()),
+          Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    onTap(post);
+                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      _buildUserInfo(),
+                      _buildLocationAndDate(),
+                      _buildPostContent(),
+                    ],
+                  ),
+                ),
+              ),
+              post.imageUrl != null
+                  ? Padding(
+                      padding: const EdgeInsets.only(
+                          top: 10, left: 10, bottom: 10, right: 20),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            final imageProvider =
+                                Image.network(post.imageUrl!).image;
+                            showImageViewer(
+                              context,
+                              imageProvider,
+                              swipeDismissible: true,
+                              doubleTapZoomable: true,
+                            );
+                          },
+                          child: Image.network(
+                            post.imageUrl!,
+                            height: 70,
+                            width: 70,
+                            fit: BoxFit.fill,
+                            loadingBuilder: (BuildContext context, Widget child,
+                                ImageChunkEvent? loadingProgress) {
+                              if (loadingProgress == null) {
+                                return child;
+                              } else {
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                .cumulativeBytesLoaded /
+                                            (loadingProgress
+                                                    .expectedTotalBytes ??
+                                                1)
+                                        : null,
+                                  ),
+                                );
+                              }
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                  padding: const EdgeInsets.all(4),
+                                  width: 80,
+                                  height: 80,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: AppColors.grey5,
+                                  ),
+                                  child: const Center(
+                                      child: Text(
+                                    'Unavailable',
+                                    style: TextStyle(fontSize: 12),
+                                  )));
+                            },
+                          ),
+                        ),
+                      ),
+                    )
+                  : Container(),
+            ],
+          ),
           _buildActions(),
         ],
       ),
@@ -41,14 +129,14 @@ class MyPost extends StatelessWidget {
 
   Widget _buildUserInfo() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const Icon(
             Icons.person,
-            size: 20,
+            size: 18,
           ),
           const SizedBox(width: 8),
           Text(
@@ -68,31 +156,31 @@ class MyPost extends StatelessWidget {
         style: CustomFontStyles.postLocationDateLabel,
         maxLines: 1,
         softWrap: true,
-        textAlign: TextAlign.justify,
+        textAlign: TextAlign.start,
       ),
     );
   }
 
   Widget _buildPostTitle() {
     return Padding(
-      padding: const EdgeInsets.only(right: 10, left: 10, top: 10, bottom: 5),
+      padding: const EdgeInsets.only(right: 10, left: 10, top: 2),
       child: Text(
         post.title,
         style: CustomFontStyles.postTitleLabel,
         maxLines: 2,
         softWrap: true,
-        textAlign: TextAlign.justify,
+        textAlign: TextAlign.start,
       ),
     );
   }
 
   Widget _buildPostContent() {
     return Padding(
-      padding: const EdgeInsets.only(left: 10, right: 10, bottom: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Text(
         post.text,
         style: CustomFontStyles.postContentText,
-        textAlign: TextAlign.justify,
+        textAlign: TextAlign.start,
         maxLines: 3,
         softWrap: true,
         overflow: TextOverflow.ellipsis,

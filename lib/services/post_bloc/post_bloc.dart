@@ -1,7 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:locainfo/constants/categories.dart';
 import 'package:locainfo/services/auth/firebase_auth_provider.dart';
+import 'package:locainfo/services/cloud_storage/cloudstorage_provider.dart';
 import 'package:locainfo/services/firestore/firestore_provider.dart';
 import 'package:locainfo/services/location/location_provider.dart';
 import 'package:locainfo/services/post_bloc/post_event.dart';
@@ -13,11 +15,13 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   final FireStoreProvider _databaseProvider;
   final LocationProvider _locationProvider;
   final FirebaseAuthProvider _authProvider;
+  final CloudStorageProvider _cloudStorageProvider;
 
   PostBloc(
     this._databaseProvider,
     this._locationProvider,
     this._authProvider,
+    this._cloudStorageProvider,
   ) : super(const PostStateInitial(isLoading: true)) {
     on<PostEventLoadNearbyPosts>((event, emit) async {
       emit(const PostStateLoadingPosts(isLoading: false));
@@ -37,6 +41,16 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         }
       } on Exception catch (_) {
         emit(const PostStateLoadError(isLoading: false));
+      }
+    });
+
+    on<PostEventClearAllBookmark>((event, emit) async {
+      try {
+        final userId = _authProvider.currentUser!.id;
+        await _databaseProvider.clearBookmarkList(currentUserId: userId);
+        emit(const PostStateClearBookmarkSuccessfully(isLoading: false));
+      } on Exception catch (_) {
+        emit(const PostStateClearBookmarkError(isLoading: false));
       }
     });
 
@@ -61,16 +75,20 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 
     on<PostEventLoadPostedPosts>((event, emit) async {
       emit(const PostStateLoadingPosts(isLoading: false));
-      final userId = _authProvider.currentUser!.id;
-      final posts =
-          await _databaseProvider.getPostedPosts(currentUserId: userId);
-      if (posts.isNotEmpty) {
-        final bookmarkedPost = await _databaseProvider
-            .getBookmarkedPostIds(_authProvider.currentUser!.id);
-        emit(PostStateLoaded(
-            posts: posts, isLoading: false, bookmarkedPosts: bookmarkedPost));
-      } else {
-        emit(const PostStateNoAvailablePost(isLoading: false));
+      try {
+        final userId = _authProvider.currentUser!.id;
+        final posts =
+            await _databaseProvider.getPostedPosts(currentUserId: userId);
+        if (posts.isNotEmpty) {
+          final bookmarkedPost = await _databaseProvider
+              .getBookmarkedPostIds(_authProvider.currentUser!.id);
+          emit(PostStateLoadedPostedPost(
+              posts: posts, isLoading: false, bookmarkedPosts: bookmarkedPost));
+        } else {
+          emit(const PostStateNoAvailablePostedPost(isLoading: false));
+        }
+      } on Exception catch (e) {
+        emit(const PostStateLoadPostedPostsError(isLoading: false));
       }
     });
 
@@ -93,9 +111,13 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     });
 
     on<PostEventCreatePost>((event, emit) async {
+      String? imageUrl;
+      late Position position;
       emit(const PostStateSubmittingPost(
           isLoading: true, loadingText: 'Submitting...'));
       try {
+        position = await _locationProvider
+            .getCurrentLocation(); // CouldNotGetLocationException
         if (event.title.trim().isEmpty ||
             RegExp(r'^[0-9\W_]').hasMatch(event.title)) {
           throw TitleCouldNotEmptyPostException();
@@ -108,8 +130,11 @@ class PostBloc extends Bloc<PostEvent, PostState> {
           throw CategoryInvalidPostException();
         }
         Future.delayed(const Duration(seconds: 1), () async {
-          final position = await _locationProvider
-              .getCurrentLocation(); // CouldNotGetLocationException
+          //upload picture
+          if (event.image != null) {
+            imageUrl = await _cloudStorageProvider
+                .uploadImageToFirebaseStorage(event.image!);
+          }
           String locationName =
               await getLocationName(position.latitude, position.longitude);
           Timestamp postedTimestamp = Timestamp.fromDate(DateTime.now());
@@ -119,6 +144,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
             ownerUserName: _authProvider.currentUserName!,
             title: event.title,
             body: event.body,
+            imageUrl: imageUrl != null ? imageUrl! : null,
             category: event.category!,
             latitude: position.latitude,
             longitude: position.longitude,
@@ -129,7 +155,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         });
       } on Exception catch (e) {
         emit(PostStateCreatingPost(
-            isLoading: false, exception: e, position: null));
+            isLoading: false, exception: e, position: position));
       }
     });
 

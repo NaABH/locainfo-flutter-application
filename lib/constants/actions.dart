@@ -5,4 +5,5 @@ enum UserAction {
   removeDislike,
   bookmark,
   removeBookmark,
+  clearBookmark,
 }

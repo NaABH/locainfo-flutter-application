@@ -8,6 +8,7 @@ abstract class DatabaseProvider {
     required String ownerUserName,
     required String title,
     required String body,
+    required String? imageUrl,
     required String category,
     required double latitude,
     required double longitude,

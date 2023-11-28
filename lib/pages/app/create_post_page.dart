@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:locainfo/components/my_back_button.dart';
 import 'package:locainfo/components/my_button.dart';
@@ -28,6 +29,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
   late final TextEditingController _textControllerTitle;
   late final TextEditingController _textControllerBody;
   late final ImagePicker _picker;
+  Position? currentPosition;
   String? selectedCategory;
   File? image;
 
@@ -67,6 +69,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
         }
 
         if (state is PostStateCreatingPost) {
+          setState(() {
+            currentPosition = state.position!;
+          });
           if (state.exception is TitleCouldNotEmptyPostException) {
             await showErrorDialog(context, 'Title could not be empty!');
           } else if (state.exception is ContentCouldNotEmptyPostException) {
@@ -104,11 +109,12 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       context.read<PostBloc>().add(PostEventCreatePost(
                             _textControllerTitle.text,
                             _textControllerBody.text,
+                            image,
                             selectedCategory,
                           ));
                       // Navigator.of(context).pop(); // to be debug
                     },
-                    text: 'Submit'),
+                    text: 'Post'),
               ),
             ],
           ),
@@ -246,22 +252,15 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       ),
                 MyDropdownMenu(onValueChange: handleValueChange),
                 const SizedBox(height: 5),
-                BlocBuilder<PostBloc, PostState>(builder: (context, state) {
-                  if (state is PostStateCreatingPost) {
-                    final position = state.position;
-                    return Text(
-                      (position == null)
-                          ? 'Current Location: Unknown, Unknown'
-                          : 'Current Location: ${position.latitude}, ${position.longitude}',
-                      style: TextStyle(
-                        fontStyle: FontStyle.italic,
-                        color: Colors.grey.shade500,
-                      ),
-                    );
-                  } else {
-                    return Container();
-                  }
-                }),
+                Text(
+                  (currentPosition == null)
+                      ? 'Current Location: Unknown, Unknown'
+                      : 'Current Location: ${currentPosition!.latitude}, ${currentPosition!.longitude}',
+                  style: TextStyle(
+                    fontStyle: FontStyle.italic,
+                    color: Colors.grey.shade500,
+                  ),
+                ),
               ],
             ),
           ),

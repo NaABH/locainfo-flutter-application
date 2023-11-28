@@ -11,6 +11,7 @@ class Post {
   final String ownerUserName;
   final String title;
   final String text;
+  final String? imageUrl;
   final String category;
   final double latitude;
   final double longitude;
@@ -27,6 +28,7 @@ class Post {
       required this.ownerUserName,
       required this.title,
       required this.text,
+      required this.imageUrl,
       required this.category,
       required this.latitude,
       required this.longitude,
@@ -44,6 +46,7 @@ class Post {
         ownerUserName = snapshot.data()[ownerUserNameFieldName] as String,
         title = snapshot.data()[titleFieldName] as String,
         text = snapshot.data()[textFieldName] as String,
+        imageUrl = snapshot.data()[imageLinkFieldName] as String?,
         category = snapshot.data()[categoryFieldName] as String,
         latitude = snapshot.data()[latitudeFieldName] as double,
         longitude = snapshot.data()[longitudeFieldName] as double,

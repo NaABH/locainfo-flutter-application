@@ -19,3 +19,5 @@ class CouldNotGetBookmarkPostIdsException extends DatabaseException {}
 class CouldNotGetBookmarkPostException extends DatabaseException {}
 
 class CouldNotGetSearchedPostException extends DatabaseException {}
+
+class CouldClearBookmarkException extends DatabaseException {}

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/components/my_profile_listtile.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
+import 'package:locainfo/constants/routes.dart';
 import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
 import 'package:locainfo/services/auth/bloc/auth_event.dart';
 import 'package:locainfo/services/auth/firebase_auth_provider.dart';
@@ -128,13 +129,22 @@ class _ProfilePageState extends State<ProfilePage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12.0),
                   child: MyProfileListTile(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.of(context).pushNamed(postedPostRoute);
+                      },
                       leadingIcon: Icons.article,
                       trailingIcon: Icons.arrow_right,
                       title: 'Posted Post'),
                 ),
                 MyProfileListTile(
-                    onTap: () {},
+                    onTap: () async {
+                      final shouldLogout = await showLogOutDialog(context);
+                      if (shouldLogout) {
+                        context.read<AuthBloc>().add(
+                              const AuthEventLogOut(),
+                            );
+                      }
+                    },
                     leadingIcon: Icons.logout,
                     trailingIcon: Icons.arrow_right,
                     title: 'Logout'),
