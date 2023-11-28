@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:locainfo/components/my_post.dart';
+import 'package:locainfo/constants/actions.dart';
 import 'package:locainfo/services/firestore/post.dart';
 
 // call when user press yes
@@ -26,7 +27,7 @@ class MyHomePostList extends StatelessWidget {
           onTap: onTap,
           post: post,
           isBookMarked: false,
-          viewType: '',
+          patternType: PostPatternType.newsPost,
         );
       },
     );

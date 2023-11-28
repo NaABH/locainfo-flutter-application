@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:locainfo/components/my_bookmark_button.dart';
 import 'package:locainfo/components/my_home_post_list.dart';
 import 'package:locainfo/components/my_likedislike_button.dart';
+import 'package:locainfo/constants/actions.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/services/firestore/post.dart';
@@ -11,15 +12,15 @@ import 'package:share_plus/share_plus.dart';
 class MyPost extends StatelessWidget {
   final Post post;
   final bool isBookMarked;
-  final String viewType;
   final PostCallBack onTap;
+  final PostPatternType patternType;
 
   const MyPost({
     Key? key,
     required this.post,
     required this.isBookMarked,
     required this.onTap,
-    required this.viewType,
+    required this.patternType,
   }) : super(key: key);
 
   @override
@@ -51,7 +52,9 @@ class MyPost extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      _buildUserInfo(),
+                      patternType != PostPatternType.postedPost
+                          ? _buildUserInfo()
+                          : Container(),
                       _buildLocationAndDate(),
                       _buildPostContent(),
                     ],
@@ -86,15 +89,20 @@ class MyPost extends StatelessWidget {
                                 return child;
                               } else {
                                 return Center(
-                                  child: CircularProgressIndicator(
-                                    value: loadingProgress.expectedTotalBytes !=
-                                            null
-                                        ? loadingProgress
-                                                .cumulativeBytesLoaded /
-                                            (loadingProgress
-                                                    .expectedTotalBytes ??
-                                                1)
-                                        : null,
+                                  child: SizedBox(
+                                    height: 70,
+                                    width: 70,
+                                    child: CircularProgressIndicator(
+                                      value:
+                                          loadingProgress.expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  (loadingProgress
+                                                          .expectedTotalBytes ??
+                                                      1)
+                                              : null,
+                                    ),
                                   ),
                                 );
                               }
@@ -102,8 +110,8 @@ class MyPost extends StatelessWidget {
                             errorBuilder: (context, error, stackTrace) {
                               return Container(
                                   padding: const EdgeInsets.all(4),
-                                  width: 80,
-                                  height: 80,
+                                  width: 70,
+                                  height: 70,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
                                     color: AppColors.grey5,
@@ -196,7 +204,16 @@ class MyPost extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _buildLikeDislikeButton(),
-          _buildShareAndBookmark(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _buildShareAndBookmark(),
+              patternType == PostPatternType.postedPost
+                  ? _buildEditAndDelete()
+                  : Container(),
+            ],
+          ),
         ],
       ),
     );
@@ -234,6 +251,60 @@ class MyPost extends StatelessWidget {
             isBookmarked: isBookMarked,
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildEditAndDelete() {
+    return Row(
+      children: [
+        Material(
+            color: Colors.transparent,
+            child: InkWell(
+                onTap: () {},
+                borderRadius: BorderRadius.circular(30.0),
+                child: const Padding(
+                  padding: EdgeInsets.all(5.0),
+                  child: Icon(Icons.edit, size: 20),
+                ))),
+        Padding(
+          padding: const EdgeInsets.only(right: 10),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {},
+              borderRadius: BorderRadius.circular(30.0),
+              child: const Padding(
+                padding: EdgeInsets.all(5),
+                child: Icon(Icons.delete_forever, size: 20),
+              ),
+            ),
+          ),
+        ),
+        // IconButton(
+        //   onPressed: () async {
+        //     // Navigator.push(
+        //     //   context,
+        //     //   MaterialPageRoute(
+        //     //     builder: (context) => UpdatePostPage(post: post),
+        //     //   ),
+        //     // );
+        //   },
+        //   splashRadius: 1,
+        //   icon: const Icon(Icons.edit, size: 20),
+        // ),
+        // IconButton(
+        //   onPressed: () async {
+        //     // Navigator.push(
+        //     //   context,
+        //     //   MaterialPageRoute(
+        //     //     builder: (context) => UpdatePostPage(post: post),
+        //     //   ),
+        //     // );
+        //   },
+        //   splashRadius: 1,
+        //   icon: const Icon(Icons.delete_forever, size: 20),
+        // ),
       ],
     );
   }

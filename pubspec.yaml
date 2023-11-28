@@ -53,6 +53,7 @@ dependencies:
   image_picker: ^1.0.4
   firebase_storage: ^11.5.2
   easy_image_viewer: ^1.2.1
+  uuid: ^4.2.1
 
 dev_dependencies:
   flutter_test:

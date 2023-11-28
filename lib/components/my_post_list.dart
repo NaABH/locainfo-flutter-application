@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:locainfo/components/my_post.dart';
+import 'package:locainfo/constants/actions.dart';
 import 'package:locainfo/services/firestore/post.dart';
 
 // call when user press the post
@@ -11,13 +12,15 @@ class MyPostList extends StatelessWidget {
   final List<String> bookmarkedPosts;
   final PostCallBack onTap;
   final String? selectedCategory; // New parameter for selected category
+  final PostPatternType postPatternType;
 
   const MyPostList({
     Key? key,
     required this.posts,
     required this.onTap,
     required this.bookmarkedPosts,
-    this.selectedCategory, // Provide a default value if needed
+    this.selectedCategory,
+    required this.postPatternType, // Provide a default value if needed
   }) : super(key: key);
 
   @override
@@ -38,7 +41,7 @@ class MyPostList extends StatelessWidget {
                 post: post,
                 isBookMarked: bookmarkedPosts.contains(post.documentId),
                 onTap: onTap,
-                viewType: '',
+                patternType: postPatternType,
               );
             },
           );

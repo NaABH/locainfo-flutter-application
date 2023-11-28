@@ -26,6 +26,16 @@ class PostEventCreatePost extends PostEvent {
   const PostEventCreatePost(this.title, this.body, this.image, this.category);
 }
 
+class PostEventUpdatePost extends PostEvent {
+  final String postId;
+  final String title;
+  final String body;
+  final File? image;
+  final bool imageUpdated;
+  const PostEventUpdatePost(
+      this.postId, this.title, this.body, this.image, this.imageUpdated);
+}
+
 class PostEventCreatingPost extends PostEvent {
   const PostEventCreatingPost();
 }

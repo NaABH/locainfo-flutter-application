@@ -361,13 +361,35 @@ class FireStoreProvider implements DatabaseProvider {
   //   }
   // }
   //
-  // // update post
-  // @override
-  // Future<void> updatePost({required String documentId, required text}) async {
-  //   try {
-  //     posts.doc(documentId).update({textFieldName: text});
-  //   } catch (e) {
-  //     throw CouldNotUpdatePostException();
-  //   }
-  // }
+
+  // update post
+  @override
+  Future<void> updatePost({
+    required String documentId,
+    required String title,
+    required String text,
+  }) async {
+    try {
+      await posts.doc(documentId).update({
+        titleFieldName: title,
+        textFieldName: text,
+      });
+    } catch (e) {
+      throw CouldNotUpdatePostException();
+    }
+  }
+
+  Future<void> updatePostImage({
+    required String documentId,
+    required String? imageUrl,
+  }) async {
+    try {
+      // Update the Firestore document with the new image URL
+      await posts.doc(documentId).update({
+        imageLinkFieldName: imageUrl,
+      });
+    } catch (e) {
+      throw CouldNotUpdatePostException();
+    }
+  }
 }

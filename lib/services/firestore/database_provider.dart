@@ -33,9 +33,13 @@ abstract class DatabaseProvider {
   // get all posts posted by the user
   Stream<Iterable<Post>> getPostedPostStream({required String currentUserId});
 
-  // // update posts
-  // Future<void> updatePost({required String documentId, required text});
-  //
+  // update posts
+  Future<void> updatePost({
+    required String documentId,
+    required String title,
+    required String text,
+  });
+
   // // delete posts
   // Future<void> deletePost({required String documentId});
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/components/my_post_list.dart';
+import 'package:locainfo/constants/actions.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/categories.dart';
 import 'package:locainfo/constants/font_styles.dart';
@@ -67,6 +68,7 @@ class _NewsPageState extends State<NewsPage> {
                   _buildCategoryButtons(),
                   Expanded(
                     child: MyPostList(
+                      postPatternType: PostPatternType.newsPost,
                       selectedCategory: selectedCategory,
                       posts: allNearbyPosts,
                       bookmarkedPosts: state.bookmarkedPosts,

@@ -92,6 +92,41 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       }
     });
 
+    on<PostEventUpdatePost>((event, emit) async {
+      String? imageUrl;
+      emit(const PostStateUpdatingPosts(
+          isLoading: false, loadingText: 'Updating'));
+      try {
+        if (event.title.trim().isEmpty ||
+            RegExp(r'^[0-9\W_]').hasMatch(event.title)) {
+          throw TitleCouldNotEmptyPostException();
+        }
+        if (event.body.trim().isEmpty ||
+            RegExp(r'^[0-9\W_]').hasMatch(event.body)) {
+          throw ContentCouldNotEmptyPostException();
+        }
+
+        if (event.imageUpdated) {
+          if (event.image != null) {
+            imageUrl = await _cloudStorageProvider
+                .uploadImageToFirebaseStorage(event.image!);
+          }
+
+          await _databaseProvider.updatePostImage(
+              documentId: event.postId, imageUrl: imageUrl);
+        }
+
+        await _databaseProvider.updatePost(
+          documentId: event.postId,
+          title: event.title,
+          text: event.body,
+        );
+        emit(const PostStateUpdatePostSuccessfully(isLoading: false));
+      } on Exception catch (e) {
+        emit(const PostStateUpdatePostError(isLoading: false));
+      }
+    });
+
     on<PostEventLoadBookmarkedPosts>((event, emit) async {
       emit(const PostStateLoadingPosts(isLoading: false));
       try {

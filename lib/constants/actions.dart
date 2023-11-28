@@ -7,3 +7,10 @@ enum UserAction {
   removeBookmark,
   clearBookmark,
 }
+
+enum PostPatternType {
+  homePost,
+  newsPost,
+  bookmarkPost,
+  postedPost,
+}

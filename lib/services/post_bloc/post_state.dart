@@ -79,6 +79,11 @@ class PostStateLoadBookmarksError extends PostState {
       : super(isLoading: isLoading);
 }
 
+class PostStateUpdatePostError extends PostState {
+  const PostStateUpdatePostError({required bool isLoading})
+      : super(isLoading: isLoading);
+}
+
 class PostStateCreatingPost extends PostState {
   final Position? position;
   final Exception? exception;
@@ -94,8 +99,18 @@ class PostStateSubmittingPost extends PostState {
       : super(isLoading: isLoading, loadingText: loadingText);
 }
 
+class PostStateUpdatingPosts extends PostState {
+  const PostStateUpdatingPosts({required bool isLoading, String? loadingText})
+      : super(isLoading: isLoading, loadingText: loadingText);
+}
+
 class PostStateCreatePostSuccessful extends PostState {
   const PostStateCreatePostSuccessful({required bool isLoading})
+      : super(isLoading: isLoading);
+}
+
+class PostStateUpdatePostSuccessfully extends PostState {
+  const PostStateUpdatePostSuccessfully({required bool isLoading})
       : super(isLoading: isLoading);
 }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/components/my_post_list.dart';
 import 'package:locainfo/components/my_pressableText.dart';
+import 'package:locainfo/constants/actions.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/services/post_bloc/post_bloc.dart';
@@ -87,6 +88,7 @@ class BookMarkPage extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(top: 20),
                       child: MyPostList(
+                        postPatternType: PostPatternType.bookmarkPost,
                         posts: state.posts,
                         bookmarkedPosts: state.bookmarkedPosts,
                         onTap: (post) {},
