@@ -24,6 +24,7 @@ class MyProfileListTile extends StatelessWidget {
         height: 70,
         width: MediaQuery.of(context).size.width * 0.9,
         decoration: BoxDecoration(
+          border: Border.all(width: 1, color: AppColors.grey3),
           boxShadow: [
             BoxShadow(
               color: AppColors.grey3.withOpacity(0.5),
@@ -48,7 +49,7 @@ class MyProfileListTile extends StatelessWidget {
                     gradient: LinearGradient(
                       begin: Alignment.bottomLeft,
                       end: Alignment.topRight,
-                      colors: [AppColors.grey1, AppColors.grey5],
+                      colors: [AppColors.grey1, AppColors.grey4],
                     ),
                     borderRadius: BorderRadius.circular(36)),
                 child: Icon(

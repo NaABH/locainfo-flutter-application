@@ -18,6 +18,22 @@ class FireStoreProvider implements DatabaseProvider {
   final posts = FirebaseFirestore.instance.collection('posts');
   final users = FirebaseFirestore.instance.collection('users');
 
+  Future<Iterable<Post>> getSearchedPosts(
+      String searchText, String currentUserId) async {
+    try {
+      var event =
+          await posts.orderBy(postedDateFieldName, descending: true).get();
+      return event.docs
+          .map((doc) => Post.fromSnapshot(doc, currentUserId))
+          .where((post) => post.title
+              .toString()
+              .toLowerCase()
+              .contains(searchText.toLowerCase()));
+    } on Exception catch (e) {
+      throw CouldNotGetSearchedPostException();
+    }
+  }
+
   // get list of bookmarked posts id
   Future<List<String>> getBookmarkedPostIds(String userId) async {
     try {

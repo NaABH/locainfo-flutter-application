@@ -6,6 +6,7 @@ import 'package:locainfo/constants/routes.dart';
 import 'package:locainfo/pages/app/bookmark_page.dart';
 import 'package:locainfo/pages/app/news_page.dart';
 import 'package:locainfo/pages/app/profile_page.dart';
+import 'package:locainfo/pages/app/searching_page.dart';
 import 'package:locainfo/services/main_bloc.dart';
 import 'package:locainfo/services/main_event.dart';
 import 'package:locainfo/services/main_state.dart';
@@ -20,7 +21,7 @@ class MainAppPage extends StatelessWidget {
       body: BlocBuilder<MainBloc, MainState>(
         builder: (context, state) {
           if (state is MainStateHome) {
-            return const ProfilePage();
+            return const SearchingPage();
           } else if (state is MainStateNews) {
             return const NewsPage();
           } else if (state is MainStateBookmark) {

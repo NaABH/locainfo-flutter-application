@@ -3,31 +3,59 @@ import 'package:locainfo/constants/app_colors.dart';
 
 class MySearchBar extends StatelessWidget {
   final TextEditingController controller;
-  const MySearchBar({super.key, required this.controller});
+  final String hintText;
+  final Function(String) onChanged;
+  const MySearchBar(
+      {super.key,
+      required this.controller,
+      required this.hintText,
+      required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      obscureText: false,
-      enableSuggestions: false,
-      autocorrect: false,
-      keyboardType: TextInputType.emailAddress,
-      decoration: InputDecoration(
-        enabledBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
-        ),
-        focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(
-            color: AppColors.lighterBlue,
-            width: 2,
+    return Stack(alignment: Alignment.centerRight, children: [
+      TextField(
+        controller: controller,
+        obscureText: false,
+        enableSuggestions: true,
+        autocorrect: true,
+        onChanged: onChanged,
+        keyboardType: TextInputType.text,
+        decoration: InputDecoration(
+          enabledBorder: OutlineInputBorder(
+            borderSide: const BorderSide(color: AppColors.white),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: AppColors.grey3,
+              width: 1,
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          fillColor: AppColors.grey3,
+          filled: true,
+          hintText: hintText,
+          hintStyle: TextStyle(color: Colors.grey.shade500),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
         ),
-        fillColor: Colors.grey.shade200,
-        filled: true,
-        hintText: "Enter your email",
-        hintStyle: TextStyle(color: Colors.grey.shade500),
       ),
-    );
+      GestureDetector(
+        onTap: () {
+          controller.clear();
+          FocusScope.of(context).unfocus();
+        },
+        child: Padding(
+          padding: const EdgeInsets.only(right: 12),
+          child: Icon(
+            Icons.cancel,
+            size: 24,
+            color: AppColors.grey5,
+          ),
+        ),
+      )
+    ]);
   }
 }

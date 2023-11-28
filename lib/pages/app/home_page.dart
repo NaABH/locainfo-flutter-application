@@ -23,8 +23,8 @@ class _HomePageState extends State<HomePage> {
   late final LocationProvider _locationService; // location provider
   Position? currentLocation; // current location
   Set<Marker> markers = {
-    Marker(
-      markerId: const MarkerId('Current Location'),
+    const Marker(
+      markerId: MarkerId('Current Location'),
       position: LatLng(2.8727883, 101.4947),
     ),
   }; // market on map

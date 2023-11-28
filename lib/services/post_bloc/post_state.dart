@@ -83,3 +83,26 @@ class PostStateLoadingCurrentLocation extends PostState {
   const PostStateLoadingCurrentLocation({required bool isLoading})
       : super(isLoading: isLoading);
 }
+
+class PostStateSearchInitialise extends PostState {
+  const PostStateSearchInitialise({required bool isLoading})
+      : super(isLoading: isLoading);
+}
+
+class PostStateSearchLoading extends PostState {
+  const PostStateSearchLoading({required bool isLoading, String? loadingText})
+      : super(isLoading: isLoading, loadingText: loadingText);
+}
+
+class PostStateSearchLoaded extends PostState {
+  final Iterable<Post> filteredPosts;
+  const PostStateSearchLoaded({
+    required bool isLoading,
+    required this.filteredPosts,
+  }) : super(isLoading: isLoading);
+}
+
+class PostStateSearchError extends PostState {
+  const PostStateSearchError({required bool isLoading})
+      : super(isLoading: isLoading);
+}

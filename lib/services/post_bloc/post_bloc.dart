@@ -40,6 +40,23 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       }
     });
 
+    on<PostEventSearchPostTextChanged>((event, emit) async {
+      try {
+        if (event.searchText != null) {
+          emit(const PostStateSearchLoading(
+              isLoading: true, loadingText: 'Searching posts'));
+          final filteredPosts = await _databaseProvider.getSearchedPosts(
+              event.searchText!, _authProvider.currentUser!.id);
+          emit(PostStateSearchLoaded(
+              isLoading: false, filteredPosts: filteredPosts));
+        } else {
+          return;
+        }
+      } on Exception catch (_) {
+        emit(const PostStateSearchError(isLoading: false));
+      }
+    });
+
     on<PostEventLoadPostedPosts>((event, emit) async {
       emit(const PostStateLoadingPosts(isLoading: false));
       final userId = _authProvider.currentUser!.id;

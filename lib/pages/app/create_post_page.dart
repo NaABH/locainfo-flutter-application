@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:locainfo/components/my_back_button.dart';
 import 'package:locainfo/components/my_button.dart';
 import 'package:locainfo/components/my_dropdown_menu.dart';
+import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/services/firestore/database_exceptions.dart';
 import 'package:locainfo/services/location/location_exceptions.dart';
@@ -23,12 +27,15 @@ class CreatePostPage extends StatefulWidget {
 class _CreatePostPageState extends State<CreatePostPage> {
   late final TextEditingController _textControllerTitle;
   late final TextEditingController _textControllerBody;
+  late final ImagePicker _picker;
   String? selectedCategory;
+  File? image;
 
   @override
   void initState() {
     _textControllerTitle = TextEditingController();
     _textControllerBody = TextEditingController();
+    _picker = ImagePicker();
     super.initState();
   }
 
@@ -78,15 +85,34 @@ class _CreatePostPageState extends State<CreatePostPage> {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-            leading: MyBackButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            title: Text(
-              'Create Post',
-              style: CustomFontStyles.appBarTitle,
-            )),
+          leading: MyBackButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Create Post',
+                style: CustomFontStyles.appBarTitle,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: MyButton(
+                    onPressed: () {
+                      context.read<PostBloc>().add(PostEventCreatePost(
+                            _textControllerTitle.text,
+                            _textControllerBody.text,
+                            selectedCategory,
+                          ));
+                      // Navigator.of(context).pop(); // to be debug
+                    },
+                    text: 'Submit'),
+              ),
+            ],
+          ),
+        ),
         body: Container(
           color: Colors.white,
           padding: const EdgeInsets.all(20),
@@ -119,29 +145,105 @@ class _CreatePostPageState extends State<CreatePostPage> {
                           hintStyle: TextStyle(color: Colors.grey.shade700),
                         ),
                       ),
-                      TextField(
-                        controller: _textControllerBody,
-                        obscureText: false,
-                        enableSuggestions: true,
-                        autocorrect: true,
-                        maxLines: 6,
-                        maxLength: 250,
-                        keyboardType: TextInputType.multiline,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            borderSide: BorderSide.none,
+                      Stack(
+                        alignment: Alignment.bottomLeft,
+                        children: [
+                          TextField(
+                            controller: _textControllerBody,
+                            obscureText: false,
+                            enableSuggestions: true,
+                            autocorrect: true,
+                            maxLines: 6,
+                            maxLength: 250,
+                            keyboardType: TextInputType.multiline,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide: BorderSide.none,
+                              ),
+                              fillColor: Colors.grey.shade200,
+                              filled: true,
+                              hintText: "Description / body text",
+                              hintStyle: TextStyle(color: Colors.grey.shade500),
+                            ),
                           ),
-                          fillColor: Colors.grey.shade200,
-                          filled: true,
-                          hintText: "Description / body text",
-                          hintStyle: TextStyle(color: Colors.grey.shade500),
-                        ),
+                          GestureDetector(
+                            onTap: () async {
+                              final image = await ImagePicker()
+                                  .pickImage(source: ImageSource.gallery);
+                              if (image != null) {
+                                final imageTemp = File(image.path);
+                                setState(() => this.image = imageTemp);
+                              }
+                            },
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.only(bottom: 12, left: 12),
+                              child: Icon(
+                                Icons.image,
+                                size: 30,
+                                color: AppColors.grey6,
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () async {
+                              final image = await ImagePicker()
+                                  .pickImage(source: ImageSource.camera);
+                              if (image != null) {
+                                final imageTemp = File(image.path);
+                                setState(() => this.image = imageTemp);
+                              }
+                            },
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.only(bottom: 12, left: 56),
+                              child: Icon(
+                                Icons.camera_alt,
+                                size: 30,
+                                color: AppColors.grey6,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
+                image == null
+                    ? const SizedBox(
+                        height: 10,
+                      )
+                    : Container(
+                        padding: const EdgeInsets.all(10),
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                            color: Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(10.0)),
+                        child: Stack(children: [
+                          Center(
+                            child: Image.file(
+                              image!,
+                              height: 120,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                image = null;
+                              });
+                            },
+                            child: const Align(
+                              alignment: Alignment.topRight,
+                              child: Icon(
+                                Icons.cancel,
+                                color: Colors.red,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                        ]),
+                      ),
                 MyDropdownMenu(onValueChange: handleValueChange),
                 const SizedBox(height: 5),
                 BlocBuilder<PostBloc, PostState>(builder: (context, state) {
@@ -160,17 +262,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
                     return Container();
                   }
                 }),
-                const SizedBox(height: 20),
-                MyButton(
-                    onPressed: () {
-                      context.read<PostBloc>().add(PostEventCreatePost(
-                            _textControllerTitle.text,
-                            _textControllerBody.text,
-                            selectedCategory,
-                          ));
-                      // Navigator.of(context).pop(); // to be debug
-                    },
-                    text: 'Submit'),
               ],
             ),
           ),

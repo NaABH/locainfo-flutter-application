@@ -44,3 +44,8 @@ class PostEventUpdateBookmarkList extends PostEvent {
   final UserAction action;
   const PostEventUpdateBookmarkList(this.documentId, this.action);
 }
+
+class PostEventSearchPostTextChanged extends PostEvent {
+  final String? searchText;
+  const PostEventSearchPostTextChanged(this.searchText);
+}

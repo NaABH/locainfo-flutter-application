@@ -8,7 +8,9 @@ class MyAuthTextField extends StatelessWidget {
   final bool hideText;
   final bool wantSuggestion;
   final bool autoCorrect;
+  final FocusNode? focusNode;
   final TextInputType textInputType;
+  final Function(String)? onChanged;
   const MyAuthTextField(
       {super.key,
       required this.controller,
@@ -16,6 +18,8 @@ class MyAuthTextField extends StatelessWidget {
       this.hideText = false,
       this.wantSuggestion = false,
       this.autoCorrect = false,
+      this.focusNode,
+      this.onChanged,
       required this.textInputType});
 
   @override
@@ -26,6 +30,8 @@ class MyAuthTextField extends StatelessWidget {
       enableSuggestions: wantSuggestion,
       autocorrect: autoCorrect,
       keyboardType: textInputType,
+      focusNode: focusNode,
+      onChanged: onChanged,
       decoration: InputDecoration(
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
