@@ -13,3 +13,7 @@ class MainEventNavigationChanged extends MainEvent {
   final int index;
   const MainEventNavigationChanged({required this.index});
 }
+
+class MainEventViewPostedPosts extends MainEvent {
+  const MainEventViewPostedPosts();
+}

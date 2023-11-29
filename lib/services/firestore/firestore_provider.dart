@@ -352,15 +352,13 @@ class FireStoreProvider implements DatabaseProvider {
   }
 
   // // delete Post
-  // @override
-  // Future<void> deletePost({required String documentId}) async {
-  //   try {
-  //     posts.doc(documentId).delete();
-  //   } catch (e) {
-  //     throw CouldNotDeletePostException();
-  //   }
-  // }
-  //
+  Future<void> deletePost({required String documentId}) async {
+    try {
+      posts.doc(documentId).delete();
+    } catch (e) {
+      throw CouldNotDeletePostException();
+    }
+  }
 
   // update post
   @override

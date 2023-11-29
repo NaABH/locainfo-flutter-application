@@ -21,12 +21,6 @@ void main() {
     BlocProvider<MainBloc>(
       create: (BuildContext context) => MainBloc(),
     ),
-    // BlocProvider<LocationBloc>(
-    //   create: (BuildContext context) => LocationBloc(LocationProvider()),
-    // ),
-    // BlocProvider<DatabaseBloc>(
-    //     create: (BuildContext context) => DatabaseBloc(
-    //         FireStoreProvider(), LocationBloc(LocationProvider()))),
     BlocProvider<PostBloc>(
         create: (BuildContext context) => PostBloc(FireStoreProvider(),
             LocationProvider(), FirebaseAuthProvider(), CloudStorageProvider()))

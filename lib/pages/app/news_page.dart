@@ -72,6 +72,7 @@ class _NewsPageState extends State<NewsPage> {
                       selectedCategory: selectedCategory,
                       posts: allNearbyPosts,
                       bookmarkedPosts: state.bookmarkedPosts,
+                      currentPosition: state.currentPosition,
                       onTap: (post) {
                         print('this is the post ${post.title}');
                       },

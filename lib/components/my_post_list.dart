@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:locainfo/components/my_post.dart';
 import 'package:locainfo/constants/actions.dart';
 import 'package:locainfo/services/firestore/post.dart';
@@ -8,6 +9,7 @@ typedef PostCallBack = void Function(Post post);
 
 // generate a list view of post
 class MyPostList extends StatelessWidget {
+  final Position? currentPosition;
   final Iterable<Post> posts;
   final List<String> bookmarkedPosts;
   final PostCallBack onTap;
@@ -20,7 +22,8 @@ class MyPostList extends StatelessWidget {
     required this.onTap,
     required this.bookmarkedPosts,
     this.selectedCategory,
-    required this.postPatternType, // Provide a default value if needed
+    required this.postPatternType,
+    this.currentPosition, // Provide a default value if needed
   }) : super(key: key);
 
   @override
@@ -39,6 +42,7 @@ class MyPostList extends StatelessWidget {
               final post = filteredPosts.elementAt(index);
               return MyPost(
                 post: post,
+                currentPosition: currentPosition,
                 isBookMarked: bookmarkedPosts.contains(post.documentId),
                 onTap: onTap,
                 patternType: postPatternType,

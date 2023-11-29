@@ -128,11 +128,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final email = event.email;
       final password = event.password;
       try {
+        print('trying to login');
         final user = await provider.logIn(
           email: email,
           password: password,
         );
-
+        print('start checking');
         if (!user.isEmailVerified) {
           // user  have not verify email
           emit(

@@ -20,3 +20,7 @@ class MainStateBookmark extends MainState {
 class MainStateProfile extends MainState {
   const MainStateProfile();
 }
+
+class MainStateViewPostedPosts extends MainState {
+  const MainStateViewPostedPosts();
+}

@@ -20,10 +20,12 @@ class PostStateLoadingPosts extends PostState {
 }
 
 class PostStateLoaded extends PostState {
+  final Position currentPosition;
   final Iterable<Post> posts;
   final List<String> bookmarkedPosts;
   const PostStateLoaded({
     required bool isLoading,
+    required this.currentPosition,
     required this.posts,
     required this.bookmarkedPosts,
   }) : super(isLoading: isLoading);
@@ -69,6 +71,11 @@ class PostStateLoadError extends PostState {
       : super(isLoading: isLoading);
 }
 
+class PostStateDeleteError extends PostState {
+  const PostStateDeleteError({required bool isLoading})
+      : super(isLoading: isLoading);
+}
+
 class PostStateLoadPostedPostsError extends PostState {
   const PostStateLoadPostedPostsError({required bool isLoading})
       : super(isLoading: isLoading);
@@ -99,6 +106,11 @@ class PostStateSubmittingPost extends PostState {
       : super(isLoading: isLoading, loadingText: loadingText);
 }
 
+class PostStateDeletingPost extends PostState {
+  const PostStateDeletingPost({required bool isLoading, String? loadingText})
+      : super(isLoading: isLoading, loadingText: loadingText);
+}
+
 class PostStateUpdatingPosts extends PostState {
   const PostStateUpdatingPosts({required bool isLoading, String? loadingText})
       : super(isLoading: isLoading, loadingText: loadingText);
@@ -106,6 +118,11 @@ class PostStateUpdatingPosts extends PostState {
 
 class PostStateCreatePostSuccessful extends PostState {
   const PostStateCreatePostSuccessful({required bool isLoading})
+      : super(isLoading: isLoading);
+}
+
+class PostStateDeletePostSuccessful extends PostState {
+  const PostStateDeletePostSuccessful({required bool isLoading})
       : super(isLoading: isLoading);
 }
 

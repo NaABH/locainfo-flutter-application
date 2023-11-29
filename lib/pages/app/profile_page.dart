@@ -3,10 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/components/my_profile_listtile.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
-import 'package:locainfo/constants/routes.dart';
 import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
 import 'package:locainfo/services/auth/bloc/auth_event.dart';
 import 'package:locainfo/services/auth/firebase_auth_provider.dart';
+import 'package:locainfo/services/main_bloc.dart';
+import 'package:locainfo/services/main_event.dart';
 import 'package:locainfo/utilities/logout_dialog.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -130,7 +131,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   padding: const EdgeInsets.symmetric(vertical: 12.0),
                   child: MyProfileListTile(
                       onTap: () {
-                        Navigator.of(context).pushNamed(postedPostRoute);
+                        context
+                            .read<MainBloc>()
+                            .add(const MainEventViewPostedPosts());
                       },
                       leadingIcon: Icons.article,
                       trailingIcon: Icons.arrow_right,

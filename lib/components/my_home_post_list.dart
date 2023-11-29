@@ -28,6 +28,7 @@ class MyHomePostList extends StatelessWidget {
           post: post,
           isBookMarked: false,
           patternType: PostPatternType.newsPost,
+          currentPosition: null,
         );
       },
     );

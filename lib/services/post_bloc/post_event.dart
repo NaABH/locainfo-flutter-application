@@ -66,3 +66,8 @@ class PostEventSearchPostTextChanged extends PostEvent {
 class PostEventClearAllBookmark extends PostEvent {
   const PostEventClearAllBookmark();
 }
+
+class PostEventDeletePost extends PostEvent {
+  final String documentId;
+  const PostEventDeletePost(this.documentId);
+}

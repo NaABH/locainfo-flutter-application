@@ -22,5 +22,8 @@ class MainBloc extends Bloc<MainEvent, MainState> {
           break;
       }
     });
+
+    on<MainEventViewPostedPosts>(
+        (event, emit) => emit(const MainStateViewPostedPosts()));
   }
 }

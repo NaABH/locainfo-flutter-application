@@ -37,7 +37,10 @@ class PostBloc extends Bloc<PostEvent, PostState> {
           final bookmarkedPost = await _databaseProvider
               .getBookmarkedPostIds(_authProvider.currentUser!.id);
           emit(PostStateLoaded(
-              isLoading: false, posts: posts, bookmarkedPosts: bookmarkedPost));
+              isLoading: false,
+              posts: posts,
+              bookmarkedPosts: bookmarkedPost,
+              currentPosition: position));
         }
       } on Exception catch (_) {
         emit(const PostStateLoadError(isLoading: false));
@@ -225,6 +228,17 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         currentUserId: _authProvider.currentUser!.id,
         action: event.action,
       );
+    });
+
+    on<PostEventDeletePost>((event, emit) async {
+      emit(const PostStateDeletingPost(
+          isLoading: false, loadingText: 'Deleting'));
+      try {
+        await _databaseProvider.deletePost(documentId: event.documentId);
+        emit(const PostStateDeletePostSuccessful(isLoading: false));
+      } on Exception catch (e) {
+        emit(const PostStateDeleteError(isLoading: false));
+      }
     });
   }
 }

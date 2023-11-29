@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:locainfo/services/firestore/database_constants.dart';
 import 'package:locainfo/utilities/datetime_formatter.dart';
 
@@ -63,11 +62,5 @@ class Post {
 
   String get timeAgo {
     return dateTimeFormatter(postedDate);
-  }
-
-  int distanceAway(double userLat, double userLon) {
-    final distance =
-        Geolocator.distanceBetween(userLat, userLon, latitude, longitude);
-    return distance.toInt();
   }
 }

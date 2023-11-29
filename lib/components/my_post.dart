@@ -1,15 +1,23 @@
 import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:locainfo/components/my_bookmark_button.dart';
 import 'package:locainfo/components/my_home_post_list.dart';
 import 'package:locainfo/components/my_likedislike_button.dart';
 import 'package:locainfo/constants/actions.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
+import 'package:locainfo/pages/app/update_post_page.dart';
 import 'package:locainfo/services/firestore/post.dart';
+import 'package:locainfo/services/post_bloc/post_bloc.dart';
+import 'package:locainfo/services/post_bloc/post_event.dart';
+import 'package:locainfo/utilities/delete_dialog.dart';
+import 'package:locainfo/utilities/distance_converter.dart';
 import 'package:share_plus/share_plus.dart';
 
 class MyPost extends StatelessWidget {
+  final Position? currentPosition;
   final Post post;
   final bool isBookMarked;
   final PostCallBack onTap;
@@ -21,6 +29,7 @@ class MyPost extends StatelessWidget {
     required this.isBookMarked,
     required this.onTap,
     required this.patternType,
+    required this.currentPosition,
   }) : super(key: key);
 
   @override
@@ -55,7 +64,10 @@ class MyPost extends StatelessWidget {
                       patternType != PostPatternType.postedPost
                           ? _buildUserInfo()
                           : Container(),
-                      _buildLocationAndDate(),
+                      patternType != PostPatternType.homePost &&
+                              patternType != PostPatternType.newsPost
+                          ? _buildLocationAndDate()
+                          : _buildDistanceAndDate(),
                       _buildPostContent(),
                     ],
                   ),
@@ -119,7 +131,7 @@ class MyPost extends StatelessWidget {
                                   child: const Center(
                                       child: Text(
                                     'Unavailable',
-                                    style: TextStyle(fontSize: 12),
+                                    style: TextStyle(fontSize: 11),
                                   )));
                             },
                           ),
@@ -129,7 +141,66 @@ class MyPost extends StatelessWidget {
                   : Container(),
             ],
           ),
-          _buildActions(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildLikeDislikeButton(),
+                Row(
+                  children: [
+                    _buildShareAndBookmark(),
+                    patternType == PostPatternType.postedPost
+                        ? Row(
+                            children: [
+                              Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                UpdatePostPage(post: post),
+                                          ),
+                                        );
+                                      },
+                                      borderRadius: BorderRadius.circular(30.0),
+                                      child: const Padding(
+                                        padding: EdgeInsets.all(5.0),
+                                        child: Icon(Icons.edit, size: 20),
+                                      ))),
+                              Padding(
+                                padding: const EdgeInsets.only(right: 10),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () async {
+                                      final wantDelete =
+                                          await showDeleteDialog(context);
+                                      if (wantDelete) {
+                                        context.read<PostBloc>().add(
+                                            PostEventDeletePost(
+                                                post.documentId));
+                                      }
+                                    },
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(5),
+                                      child:
+                                          Icon(Icons.delete_forever, size: 20),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                        : Container(),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -169,6 +240,19 @@ class MyPost extends StatelessWidget {
     );
   }
 
+  Widget _buildDistanceAndDate() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Text(
+        '${getDistanceText(currentPosition!, post.latitude, post.longitude)}, ${post.timeAgo}',
+        style: CustomFontStyles.postLocationDateLabel,
+        maxLines: 1,
+        softWrap: true,
+        textAlign: TextAlign.start,
+      ),
+    );
+  }
+
   Widget _buildPostTitle() {
     return Padding(
       padding: const EdgeInsets.only(right: 10, left: 10, top: 2),
@@ -192,29 +276,6 @@ class MyPost extends StatelessWidget {
         maxLines: 3,
         softWrap: true,
         overflow: TextOverflow.ellipsis,
-      ),
-    );
-  }
-
-  Widget _buildActions() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          _buildLikeDislikeButton(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _buildShareAndBookmark(),
-              patternType == PostPatternType.postedPost
-                  ? _buildEditAndDelete()
-                  : Container(),
-            ],
-          ),
-        ],
       ),
     );
   }
@@ -251,60 +312,6 @@ class MyPost extends StatelessWidget {
             isBookmarked: isBookMarked,
           ),
         ),
-      ],
-    );
-  }
-
-  Widget _buildEditAndDelete() {
-    return Row(
-      children: [
-        Material(
-            color: Colors.transparent,
-            child: InkWell(
-                onTap: () {},
-                borderRadius: BorderRadius.circular(30.0),
-                child: const Padding(
-                  padding: EdgeInsets.all(5.0),
-                  child: Icon(Icons.edit, size: 20),
-                ))),
-        Padding(
-          padding: const EdgeInsets.only(right: 10),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () {},
-              borderRadius: BorderRadius.circular(30.0),
-              child: const Padding(
-                padding: EdgeInsets.all(5),
-                child: Icon(Icons.delete_forever, size: 20),
-              ),
-            ),
-          ),
-        ),
-        // IconButton(
-        //   onPressed: () async {
-        //     // Navigator.push(
-        //     //   context,
-        //     //   MaterialPageRoute(
-        //     //     builder: (context) => UpdatePostPage(post: post),
-        //     //   ),
-        //     // );
-        //   },
-        //   splashRadius: 1,
-        //   icon: const Icon(Icons.edit, size: 20),
-        // ),
-        // IconButton(
-        //   onPressed: () async {
-        //     // Navigator.push(
-        //     //   context,
-        //     //   MaterialPageRoute(
-        //     //     builder: (context) => UpdatePostPage(post: post),
-        //     //   ),
-        //     // );
-        //   },
-        //   splashRadius: 1,
-        //   icon: const Icon(Icons.delete_forever, size: 20),
-        // ),
       ],
     );
   }

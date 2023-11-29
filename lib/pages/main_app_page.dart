@@ -5,6 +5,7 @@ import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/routes.dart';
 import 'package:locainfo/pages/app/bookmark_page.dart';
 import 'package:locainfo/pages/app/news_page.dart';
+import 'package:locainfo/pages/app/post_detail_page.dart';
 import 'package:locainfo/pages/app/posted_posts_page.dart';
 import 'package:locainfo/pages/app/profile_page.dart';
 import 'package:locainfo/services/main_bloc.dart';
@@ -18,16 +19,19 @@ class MainAppPage extends StatelessWidget {
   Widget build(BuildContext context) {
     context.read<MainBloc>().add(const MainEventNavigationChanged(index: 0));
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: BlocBuilder<MainBloc, MainState>(
         builder: (context, state) {
           if (state is MainStateHome) {
-            return const PostedPostsPage();
+            return const PostDetailPage();
           } else if (state is MainStateNews) {
             return const NewsPage();
           } else if (state is MainStateBookmark) {
             return const BookMarkPage();
           } else if (state is MainStateProfile) {
             return const ProfilePage();
+          } else if (state is MainStateViewPostedPosts) {
+            return const PostedPostsPage();
           } else {
             return const Scaffold(
               body: CircularProgressIndicator(),
@@ -35,7 +39,6 @@ class MainAppPage extends StatelessWidget {
           }
         },
       ),
-      resizeToAvoidBottomInset: false,
       floatingActionButton: SizedBox(
         height: 60,
         width: 60,
