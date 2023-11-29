@@ -5,6 +5,7 @@ import 'package:locainfo/constants/actions.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/categories.dart';
 import 'package:locainfo/constants/font_styles.dart';
+import 'package:locainfo/pages/app/post_detail_page.dart';
 import 'package:locainfo/services/post_bloc/post_bloc.dart';
 import 'package:locainfo/services/post_bloc/post_event.dart';
 import 'package:locainfo/services/post_bloc/post_state.dart';
@@ -74,7 +75,13 @@ class _NewsPageState extends State<NewsPage> {
                       bookmarkedPosts: state.bookmarkedPosts,
                       currentPosition: state.currentPosition,
                       onTap: (post) {
-                        print('this is the post ${post.title}');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PostDetailPage(
+                                post: post, bookmarksId: state.bookmarkedPosts),
+                          ),
+                        );
                       },
                     ),
                   ),

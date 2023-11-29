@@ -20,6 +20,7 @@ class Post {
   final int numberOfLikes;
   final bool isDisliked;
   final int numberOfDislikes;
+  final bool isBookmarked;
 
   const Post(
       {required this.documentId,
@@ -36,11 +37,14 @@ class Post {
       required this.isLiked,
       required this.numberOfLikes,
       required this.isDisliked,
-      required this.numberOfDislikes});
+      required this.numberOfDislikes,
+      required this.isBookmarked});
 
-  Post.fromSnapshot(QueryDocumentSnapshot<Map<String, dynamic>> snapshot,
-      String currentUserId)
-      : documentId = snapshot.id,
+  Post.fromSnapshot(
+    QueryDocumentSnapshot<Map<String, dynamic>> snapshot,
+    String currentUserId,
+    List<String> bookmarkedPostIds,
+  )   : documentId = snapshot.id,
         ownerUserId = snapshot.data()[ownerUserIdFieldName],
         ownerUserName = snapshot.data()[ownerUserNameFieldName] as String,
         title = snapshot.data()[titleFieldName] as String,
@@ -58,7 +62,8 @@ class Post {
         isDisliked = (snapshot.data()[dislikedByFieldName] as List)
             .contains(currentUserId),
         numberOfDislikes =
-            (snapshot.data()[dislikedByFieldName] as List).length;
+            (snapshot.data()[dislikedByFieldName] as List).length,
+        isBookmarked = bookmarkedPostIds.contains(snapshot.id);
 
   String get timeAgo {
     return dateTimeFormatter(postedDate);

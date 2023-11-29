@@ -23,7 +23,7 @@ class MainAppPage extends StatelessWidget {
       body: BlocBuilder<MainBloc, MainState>(
         builder: (context, state) {
           if (state is MainStateHome) {
-            return const PostDetailPage();
+            return const NewsPage();
           } else if (state is MainStateNews) {
             return const NewsPage();
           } else if (state is MainStateBookmark) {
@@ -32,6 +32,9 @@ class MainAppPage extends StatelessWidget {
             return const ProfilePage();
           } else if (state is MainStateViewPostedPosts) {
             return const PostedPostsPage();
+          } else if (state is MainStateViewPostDetail) {
+            return PostDetailPage(
+                post: state.post, bookmarksId: state.bookmarkedPostIds);
           } else {
             return const Scaffold(
               body: CircularProgressIndicator(),

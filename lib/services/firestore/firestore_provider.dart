@@ -21,10 +21,16 @@ class FireStoreProvider implements DatabaseProvider {
   Future<Iterable<Post>> getSearchedPosts(
       String searchText, String currentUserId, Position position) async {
     try {
+      final bookmarkedPostIds = await getBookmarkedPostIds(currentUserId);
+
       var event =
           await posts.orderBy(postedDateFieldName, descending: true).get();
       return event.docs
-          .map((doc) => Post.fromSnapshot(doc, currentUserId))
+          .map((doc) => Post.fromSnapshot(
+                doc,
+                currentUserId,
+                bookmarkedPostIds,
+              ))
           .where((post) {
         // Check if the post title contains the searchText
         bool titleMatches =
@@ -64,9 +70,10 @@ class FireStoreProvider implements DatabaseProvider {
   }
 
   // fetch the actual post from the list of bookmark post ids
-  Future<Iterable<Post>> getBookmarkedPosts(
-      List<String> bookmarkedPostIds, String currentUserId) async {
+  Future<Iterable<Post>> getBookmarkedPosts(String currentUserId) async {
     try {
+      final bookmarkedPostIds = await getBookmarkedPostIds(currentUserId);
+
       if (bookmarkedPostIds.isEmpty) {
         return []; // Return an empty list if bookmarkedPostIds is empty
       }
@@ -74,8 +81,10 @@ class FireStoreProvider implements DatabaseProvider {
           .where(FieldPath.documentId, whereIn: bookmarkedPostIds)
           .get()
           .then(
-            (value) => value.docs.map((doc) => Post.fromSnapshot(doc,
-                currentUserId)), // convert each document into a Post object
+            (value) => value.docs.map((doc) => Post.fromSnapshot(
+                doc,
+                currentUserId,
+                bookmarkedPostIds)), // convert each document into a Post object
           );
     } catch (e) {
       throw CouldNotGetBookmarkPostException();
@@ -89,8 +98,7 @@ class FireStoreProvider implements DatabaseProvider {
     required UserAction action,
   }) async {
     // Get the current list of bookmarked postIds
-    List<String> currentBookmarkedPosts =
-        await getBookmarkedPostIds(currentUserId);
+    final currentBookmarkedPosts = await getBookmarkedPostIds(currentUserId);
     if (action == UserAction.bookmark) {
       // Add the new postId if it's not already in the list
       if (!currentBookmarkedPosts.contains(documentId)) {
@@ -123,7 +131,7 @@ class FireStoreProvider implements DatabaseProvider {
       posts.orderBy(ownerUserIdFieldName).snapshots().map((event) {
         try {
           return event.docs // see all changes that happen live
-              .map((doc) => Post.fromSnapshot(doc, currentUserId))
+              .map((doc) => Post.fromSnapshot(doc, currentUserId, []))
               .where((post) =>
                   post.ownerUserId ==
                   currentUserId); // posts created by the user
@@ -140,9 +148,10 @@ class FireStoreProvider implements DatabaseProvider {
             isEqualTo: currentUserId,
           )
           .get();
-
+      final bookmarkedPostIds = await getBookmarkedPostIds(currentUserId);
       var postsList = querySnapshot.docs
-          .map((doc) => Post.fromSnapshot(doc, currentUserId))
+          .map(
+              (doc) => Post.fromSnapshot(doc, currentUserId, bookmarkedPostIds))
           .toList();
 
       // Order posts by postCreatedDate in descending order
@@ -161,10 +170,12 @@ class FireStoreProvider implements DatabaseProvider {
     required String currentUserId,
   }) async {
     try {
+      final bookmarkedPostIds = await getBookmarkedPostIds(currentUserId);
       var event =
           await posts.orderBy(postedDateFieldName, descending: true).get();
       return event.docs
-          .map((doc) => Post.fromSnapshot(doc, currentUserId))
+          .map(
+              (doc) => Post.fromSnapshot(doc, currentUserId, bookmarkedPostIds))
           .where((post) {
         // Calculate the distance between the post location and the user location
         var distance = Geolocator.distanceBetween(
@@ -180,10 +191,12 @@ class FireStoreProvider implements DatabaseProvider {
   Future<Iterable<Post>> getNearbyPosts2(
       {required Position position, required String currentUserId}) async {
     try {
+      final bookmarkedPostIds = await getBookmarkedPostIds(currentUserId);
       var event =
           await posts.orderBy(postedDateFieldName, descending: true).get();
       return event.docs
-          .map((doc) => Post.fromSnapshot(doc, currentUserId))
+          .map(
+              (doc) => Post.fromSnapshot(doc, currentUserId, bookmarkedPostIds))
           .where((post) {
         // Calculate the distance between the post location and the user location
         var distance = Geolocator.distanceBetween(
@@ -212,7 +225,7 @@ class FireStoreProvider implements DatabaseProvider {
           .map((event) {
         try {
           return event.docs
-              .map((doc) => Post.fromSnapshot(doc, currentUserId))
+              .map((doc) => Post.fromSnapshot(doc, currentUserId, []))
               .where((post) {
             // Calculate the distance between the post location and the user location
             var distance = Geolocator.distanceBetween(
@@ -348,6 +361,7 @@ class FireStoreProvider implements DatabaseProvider {
       numberOfLikes: 0,
       isDisliked: false,
       numberOfDislikes: 0,
+      isBookmarked: false,
     );
   }
 

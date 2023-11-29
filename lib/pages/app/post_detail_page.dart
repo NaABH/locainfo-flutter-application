@@ -1,80 +1,108 @@
 import 'package:flutter/material.dart';
 import 'package:locainfo/components/my_back_button.dart';
+import 'package:locainfo/components/my_post_bottombar.dart';
 import 'package:locainfo/components/mytag.dart';
 import 'package:locainfo/constants/app_colors.dart';
+import 'package:locainfo/constants/categories.dart';
+import 'package:locainfo/services/firestore/post.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PostDetailPage extends StatelessWidget {
-  const PostDetailPage({super.key});
+  final Post post;
+  final List<String> bookmarksId;
+  const PostDetailPage({
+    super.key,
+    required this.post,
+    required this.bookmarksId,
+  });
 
   @override
   Widget build(BuildContext context) {
-    var imageUrl =
-        'https://images.unsplash.com/photo-1575936123452-b67c3203c357?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
-
     return SafeArea(
       child: Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           leading: MyBackButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
           elevation: 0,
           backgroundColor: Colors.transparent,
         ),
         body: ListView(padding: EdgeInsets.zero, children: [
-          Container(
-            height: MediaQuery.of(context).size.height * 0.45,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              image: DecorationImage(
-                  image: NetworkImage(imageUrl), fit: BoxFit.cover),
-            ),
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10.0),
+          post.imageUrl != null
+              ? Container(
+                  height: MediaQuery.of(context).size.height * 0.45,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(20),
+                        bottomRight: Radius.circular(20)),
+                    image: DecorationImage(
+                        image: NetworkImage(post.imageUrl!), fit: BoxFit.cover),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10.0),
+                          child: MyTag(
+                              backgroundColor: Colors.grey.withAlpha(150),
+                              children: [
+                                Text(
+                                  categories[post.category]!,
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              ]),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.only(top: 50.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
                     child: MyTag(
                         backgroundColor: Colors.grey.withAlpha(150),
-                        children: const [
+                        children: [
                           Text(
-                            'Category',
-                            style: TextStyle(
+                            categories[post.category]!,
+                            style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w500),
                           ),
                         ]),
                   ),
-                ],
-              ),
-            ),
-          ),
+                ),
           Container(
             padding: const EdgeInsets.all(10),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'The Rise of Sustainable Living',
-                  style: TextStyle(
+                Text(
+                  post.title,
+                  style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
                       fontSize: 26),
                 ),
-                const Text(
-                  'Posted by Name, 5 hours ago',
-                  style: TextStyle(
+                Text(
+                  'Posted by ${post.ownerUserName}, ${post.timeAgo}',
+                  style: const TextStyle(
                       color: Colors.grey,
                       fontWeight: FontWeight.w500,
                       fontSize: 12),
                 ),
-                const Text(
-                  'At Place Name',
-                  style: TextStyle(
+                Text(
+                  'At ${post.locationName}',
+                  style: const TextStyle(
                       color: Colors.grey,
                       fontWeight: FontWeight.w500,
                       fontSize: 12),
@@ -82,17 +110,19 @@ class PostDetailPage extends StatelessWidget {
                 const SizedBox(
                   height: 10,
                 ),
-                const Text(
-                  'In a world increasingly conscious of its environmental impact, sustainable living practices have gained significant traction. From eco-friendly homes to zero-waste lifestyles, individuals are embracing choices that minimize their carbon footprint. This shift extends beyond personal habits to influence industries and policies. As we navigate the challenges of climate change, the rise of sustainable living emerges as a beacon of hope, inspiring a collective commitment to a greener, healthier planet.',
+                Text(
+                  post.text,
                   textAlign: TextAlign.justify,
-                  style: TextStyle(
+                  style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w500,
                       fontSize: 15),
                 ),
                 const SizedBox(height: 20),
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () async {
+                    await _launchMaps();
+                  },
                   child: MyTag(
                     backgroundColor: AppColors.grey3,
                     children: const [
@@ -111,22 +141,22 @@ class PostDetailPage extends StatelessWidget {
             ),
           ),
         ]),
-        bottomNavigationBar: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10.0),
-          height: 50,
-          color: Colors.grey[200],
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Icon(Icons.thumb_up),
-              Icon(Icons.thumb_down),
-              Icon(Icons.report),
-              Icon(Icons.share),
-              Icon(Icons.bookmark),
-            ],
-          ),
+        bottomNavigationBar: MyPostBottomBar(
+          post: post,
+          isBookmarked: bookmarksId.contains(post.documentId),
         ),
       ),
     );
+  }
+
+  Future<void> _launchMaps() async {
+    String googleMapsUrl =
+        "https://www.google.com/maps/dir/?api=1&destination=${post.latitude},${post.longitude}";
+    Uri mapUrl = Uri.parse(googleMapsUrl);
+    if (await canLaunchUrl(mapUrl)) {
+      await launchUrl(mapUrl);
+    } else {
+      throw 'Could not launch Google Map now';
+    }
   }
 }

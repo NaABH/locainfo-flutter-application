@@ -25,5 +25,8 @@ class MainBloc extends Bloc<MainEvent, MainState> {
 
     on<MainEventViewPostedPosts>(
         (event, emit) => emit(const MainStateViewPostedPosts()));
+
+    on<MainEventViewPostDetail>((event, emit) =>
+        emit(MainStateViewPostDetail(event.post, event.bookmarkedPostId)));
   }
 }

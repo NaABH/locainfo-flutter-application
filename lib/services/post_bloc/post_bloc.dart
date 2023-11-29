@@ -135,8 +135,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       try {
         final userId = _authProvider.currentUser!.id;
         final postIds = await _databaseProvider.getBookmarkedPostIds(userId);
-        final posts =
-            await _databaseProvider.getBookmarkedPosts(postIds, userId);
+        final posts = await _databaseProvider.getBookmarkedPosts(userId);
         if (posts.isNotEmpty) {
           emit(PostStateLoadedBookmarkedPosts(
               posts: posts, isLoading: false, bookmarkedPosts: postIds));

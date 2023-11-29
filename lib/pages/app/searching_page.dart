@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/components/my_search_bar.dart';
+import 'package:locainfo/pages/app/post_detail_page.dart';
 import 'package:locainfo/services/post_bloc/post_bloc.dart';
 import 'package:locainfo/services/post_bloc/post_event.dart';
 import 'package:locainfo/services/post_bloc/post_state.dart';
@@ -73,7 +74,15 @@ class _SearchingPageState extends State<SearchingPage> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PostDetailPage(
+                                  post: post, bookmarksId: ['ssdsdjadka']),
+                            ),
+                          );
+                        },
                       ),
                     );
                   }).toList(),

@@ -5,6 +5,7 @@ import 'package:locainfo/components/my_pressableText.dart';
 import 'package:locainfo/constants/actions.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
+import 'package:locainfo/pages/app/post_detail_page.dart';
 import 'package:locainfo/services/post_bloc/post_bloc.dart';
 import 'package:locainfo/services/post_bloc/post_event.dart';
 import 'package:locainfo/services/post_bloc/post_state.dart';
@@ -91,7 +92,16 @@ class BookMarkPage extends StatelessWidget {
                         postPatternType: PostPatternType.bookmarkPost,
                         posts: state.posts,
                         bookmarkedPosts: state.bookmarkedPosts,
-                        onTap: (post) {},
+                        onTap: (post) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PostDetailPage(
+                                  post: post,
+                                  bookmarksId: state.bookmarkedPosts),
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ],
