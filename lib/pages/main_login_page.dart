@@ -9,7 +9,7 @@ import 'package:locainfo/pages/main_app_page.dart';
 import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
 import 'package:locainfo/services/auth/bloc/auth_event.dart';
 import 'package:locainfo/services/auth/bloc/auth_state.dart';
-import 'package:locainfo/utilities/loading_screen.dart';
+import 'package:locainfo/utilities/loading_screen/loading_screen.dart';
 
 // class to control for whole authentication process
 class MainLoginPage extends StatelessWidget {

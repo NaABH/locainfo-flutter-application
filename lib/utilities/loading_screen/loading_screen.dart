@@ -3,10 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
-import 'package:locainfo/utilities/loading_screen_controller.dart';
+import 'package:locainfo/utilities/loading_screen/loading_screen_controller.dart';
 import 'package:lottie/lottie.dart';
 
 class LoadingScreen {
+  // singleton
   factory LoadingScreen() => _shared;
   static final LoadingScreen _shared = LoadingScreen._sharedInstance();
   LoadingScreen._sharedInstance();

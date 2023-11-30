@@ -8,6 +8,7 @@ import 'package:locainfo/pages/app/news_page.dart';
 import 'package:locainfo/pages/app/post_detail_page.dart';
 import 'package:locainfo/pages/app/posted_posts_page.dart';
 import 'package:locainfo/pages/app/profile_page.dart';
+import 'package:locainfo/pages/app/profile_setting_page.dart';
 import 'package:locainfo/services/main_bloc.dart';
 import 'package:locainfo/services/main_event.dart';
 import 'package:locainfo/services/main_state.dart';
@@ -23,7 +24,7 @@ class MainAppPage extends StatelessWidget {
       body: BlocBuilder<MainBloc, MainState>(
         builder: (context, state) {
           if (state is MainStateHome) {
-            return const NewsPage();
+            return const ProfilePage();
           } else if (state is MainStateNews) {
             return const NewsPage();
           } else if (state is MainStateBookmark) {
@@ -35,6 +36,10 @@ class MainAppPage extends StatelessWidget {
           } else if (state is MainStateViewPostDetail) {
             return PostDetailPage(
                 post: state.post, bookmarksId: state.bookmarkedPostIds);
+          } else if (state is MainStateEditProfile) {
+            return UpdateProfilePage(
+              user: state.user,
+            );
           } else {
             return const Scaffold(
               body: CircularProgressIndicator(),

@@ -5,16 +5,17 @@ import 'package:geolocator/geolocator.dart';
 import 'package:locainfo/components/my_bookmark_button.dart';
 import 'package:locainfo/components/my_home_post_list.dart';
 import 'package:locainfo/components/my_likedislike_button.dart';
-import 'package:locainfo/constants/actions.dart';
 import 'package:locainfo/constants/app_colors.dart';
+import 'package:locainfo/constants/custom_datatype.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/pages/app/update_post_page.dart';
 import 'package:locainfo/services/firestore/post.dart';
 import 'package:locainfo/services/post_bloc/post_bloc.dart';
 import 'package:locainfo/services/post_bloc/post_event.dart';
-import 'package:locainfo/utilities/delete_dialog.dart';
-import 'package:locainfo/utilities/distance_converter.dart';
+import 'package:locainfo/utilities/dialog/delete_dialog.dart';
 import 'package:share_plus/share_plus.dart';
+
+import '../utilities/post_info_helper.dart';
 
 class MyPost extends StatelessWidget {
   final Position? currentPosition;
@@ -61,11 +62,11 @@ class MyPost extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      patternType != PostPatternType.postedPost
+                      patternType != PostPatternType.userPosted
                           ? _buildUserInfo()
                           : Container(),
-                      patternType != PostPatternType.homePost &&
-                              patternType != PostPatternType.newsPost
+                      patternType != PostPatternType.home &&
+                              patternType != PostPatternType.news
                           ? _buildLocationAndDate()
                           : _buildDistanceAndDate(),
                       _buildPostContent(),
@@ -150,7 +151,7 @@ class MyPost extends StatelessWidget {
                 Row(
                   children: [
                     _buildShareAndBookmark(),
-                    patternType == PostPatternType.postedPost
+                    patternType == PostPatternType.userPosted
                         ? Row(
                             children: [
                               Material(

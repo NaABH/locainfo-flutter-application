@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/components/my_post_list.dart';
-import 'package:locainfo/constants/actions.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/categories.dart';
+import 'package:locainfo/constants/custom_datatype.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/pages/app/post_detail_page.dart';
 import 'package:locainfo/services/post_bloc/post_bloc.dart';
@@ -69,7 +69,7 @@ class _NewsPageState extends State<NewsPage> {
                   _buildCategoryButtons(),
                   Expanded(
                     child: MyPostList(
-                      postPatternType: PostPatternType.newsPost,
+                      postPatternType: PostPatternType.news,
                       selectedCategory: selectedCategory,
                       posts: allNearbyPosts,
                       bookmarkedPosts: state.bookmarkedPosts,

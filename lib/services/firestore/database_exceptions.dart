@@ -21,3 +21,9 @@ class CouldNotGetBookmarkPostException extends DatabaseException {}
 class CouldNotGetSearchedPostException extends DatabaseException {}
 
 class CouldClearBookmarkException extends DatabaseException {}
+
+class CouldNotCreateReportException extends DatabaseException {}
+
+class CouldNotCreateNewUserException extends DatabaseException {}
+
+class CouldNotGetUserException extends DatabaseException {}

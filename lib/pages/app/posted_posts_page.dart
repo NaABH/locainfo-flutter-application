@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/components/my_post_list.dart';
-import 'package:locainfo/constants/actions.dart';
 import 'package:locainfo/constants/app_colors.dart';
+import 'package:locainfo/constants/custom_datatype.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/pages/app/post_detail_page.dart';
 import 'package:locainfo/services/post_bloc/post_bloc.dart';
@@ -47,7 +47,7 @@ class PostedPostsPage extends StatelessWidget {
                 context.read<PostBloc>().add(const PostEventLoadPostedPosts());
               },
               child: MyPostList(
-                postPatternType: PostPatternType.postedPost,
+                postPatternType: PostPatternType.userPosted,
                 posts: state.posts,
                 bookmarkedPosts: state.bookmarkedPosts,
                 onTap: (post) {

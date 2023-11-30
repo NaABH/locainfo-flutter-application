@@ -5,6 +5,7 @@ import 'package:locainfo/components/my_button.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
 import 'package:locainfo/services/auth/bloc/auth_event.dart';
+import 'package:locainfo/utilities/toast_message.dart';
 
 class EmailVerificationPage extends StatefulWidget {
   const EmailVerificationPage({super.key});
@@ -44,6 +45,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
             ),
             MyButton(
                 onPressed: () {
+                  showToastMessage('Email is sent');
                   context.read<AuthBloc>().add(
                         const AuthEventSendEmailVerification(), // resend email verification
                       );

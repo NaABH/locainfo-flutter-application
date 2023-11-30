@@ -1,6 +1,7 @@
 import 'dart:io';
 
-import 'package:locainfo/constants/actions.dart';
+import 'package:locainfo/constants/custom_datatype.dart';
+import 'package:locainfo/services/firestore/post.dart';
 
 abstract class PostEvent {
   const PostEvent();
@@ -24,6 +25,12 @@ class PostEventCreatePost extends PostEvent {
   final File? image;
   final String? category;
   const PostEventCreatePost(this.title, this.body, this.image, this.category);
+}
+
+class PostEventCreateReport extends PostEvent {
+  final Post post;
+  final String reason;
+  const PostEventCreateReport(this.post, this.reason);
 }
 
 class PostEventUpdatePost extends PostEvent {
@@ -70,4 +77,8 @@ class PostEventClearAllBookmark extends PostEvent {
 class PostEventDeletePost extends PostEvent {
   final String documentId;
   const PostEventDeletePost(this.documentId);
+}
+
+class PostEventInitialiseProfile extends PostEvent {
+  const PostEventInitialiseProfile();
 }

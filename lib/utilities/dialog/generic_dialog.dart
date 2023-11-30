@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:locainfo/constants/font_styles.dart';
 
+// idea come from https://youtu.be/VPvVD8t02U8?si=Qd-d_xGvdbAWYUIw
+// A generic class to build a dialog
 typedef DialogOptionBuilder<T> = Map<String, T?> Function();
 
 Future<T?> showGenericDialog<T>({
-  required BuildContext
-      context, // represent the location of a widget in the widget tree
+  required BuildContext context,
   required String title,
   required String content,
   required DialogOptionBuilder

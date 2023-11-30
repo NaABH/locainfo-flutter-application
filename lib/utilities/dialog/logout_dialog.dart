@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
-import 'package:locainfo/utilities/generic_dialog.dart';
+import 'package:locainfo/utilities/dialog/generic_dialog.dart';
 
+// dialog display to ensure user want to log out
 Future<bool> showLogOutDialog(BuildContext context) {
   return showGenericDialog<bool>(
     context: context,

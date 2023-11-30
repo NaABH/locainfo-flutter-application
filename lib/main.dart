@@ -1,6 +1,8 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/constants/routes.dart';
+import 'package:locainfo/firebase_options.dart';
 import 'package:locainfo/pages/app/create_post_page.dart';
 import 'package:locainfo/pages/app/posted_posts_page.dart';
 import 'package:locainfo/pages/app/searching_page.dart';
@@ -13,10 +15,15 @@ import 'package:locainfo/services/location/location_provider.dart';
 import 'package:locainfo/services/main_bloc.dart';
 import 'package:locainfo/services/post_bloc/post_bloc.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MultiBlocProvider(providers: [
     BlocProvider<AuthBloc>(
-      create: (BuildContext context) => AuthBloc(FirebaseAuthProvider()),
+      create: (BuildContext context) =>
+          AuthBloc(FirebaseAuthProvider(), FireStoreProvider()),
     ),
     BlocProvider<MainBloc>(
       create: (BuildContext context) => MainBloc(),
@@ -43,6 +50,7 @@ class MyApp extends StatelessWidget {
         createPostRoute: (context) => const CreatePostPage(),
         searchPostRoute: (context) => const SearchingPage(),
         postedPostRoute: (context) => const PostedPostsPage(),
+        // updateProfileRoute: (context) => const UpdateProfilePage(),
       },
     );
   }

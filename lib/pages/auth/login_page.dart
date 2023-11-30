@@ -9,7 +9,7 @@ import 'package:locainfo/services/auth/auth_exceptions.dart';
 import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
 import 'package:locainfo/services/auth/bloc/auth_event.dart';
 import 'package:locainfo/services/auth/bloc/auth_state.dart';
-import 'package:locainfo/utilities/error_dialog.dart';
+import 'package:locainfo/utilities/dialog/error_dialog.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -45,13 +45,15 @@ class _LoginPageState extends State<LoginPage> {
             await showErrorDialog(
                 context, 'Cannot find a user with the entered credentials');
           } else if (state.exception is WrongPasswordAuthException) {
-            await showErrorDialog(context, 'Wrong credentials');
+            await showErrorDialog(context,
+                'There is something wrong with your email or password');
           } else if (state.exception is InvalidEmailAuthException) {
             await showErrorDialog(context, 'The email entered is invalid');
           } else if (state.exception is AccountDisabledAuthException) {
             await showErrorDialog(context, 'Your account is blocked');
           } else if (state.exception is GenericAuthException) {
-            await showErrorDialog(context, 'Authentication error');
+            await showErrorDialog(context,
+                'Authentication error. Check your Internet connection and ensure all fields are filled.');
           }
         }
       },

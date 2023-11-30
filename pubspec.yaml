@@ -55,6 +55,7 @@ dependencies:
   easy_image_viewer: ^1.2.1
   uuid: ^4.2.1
   url_launcher: ^6.1.14
+  fluttertoast: ^8.2.4
 
 dev_dependencies:
   flutter_test:

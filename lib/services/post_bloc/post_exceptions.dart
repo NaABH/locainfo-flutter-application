@@ -7,3 +7,5 @@ class TitleCouldNotEmptyPostException extends PostException {}
 class CategoryInvalidPostException extends PostException {}
 
 class ContentCouldNotEmptyPostException extends PostException {}
+
+class ReasonCouldNotEmptyPostException extends PostException {}

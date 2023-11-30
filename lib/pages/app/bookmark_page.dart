@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/components/my_post_list.dart';
 import 'package:locainfo/components/my_pressableText.dart';
-import 'package:locainfo/constants/actions.dart';
 import 'package:locainfo/constants/app_colors.dart';
+import 'package:locainfo/constants/custom_datatype.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/pages/app/post_detail_page.dart';
 import 'package:locainfo/services/post_bloc/post_bloc.dart';
 import 'package:locainfo/services/post_bloc/post_event.dart';
 import 'package:locainfo/services/post_bloc/post_state.dart';
-import 'package:locainfo/utilities/clear_all_bookmark_dialog.dart';
-import 'package:locainfo/utilities/error_dialog.dart';
+import 'package:locainfo/utilities/dialog/clear_all_bookmark_dialog.dart';
+import 'package:locainfo/utilities/dialog/error_dialog.dart';
 
 class BookMarkPage extends StatelessWidget {
   const BookMarkPage({super.key});
@@ -78,7 +78,7 @@ class BookMarkPage extends StatelessWidget {
                           text: 'Clear all',
                           onPressed: () async {
                             final wantClear =
-                                await showClearAllBookmarkDialog(context);
+                                await showAllClearBookmarkDialog(context);
                             if (wantClear) {
                               context
                                   .read<PostBloc>()
@@ -89,7 +89,7 @@ class BookMarkPage extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(top: 20),
                       child: MyPostList(
-                        postPatternType: PostPatternType.bookmarkPost,
+                        postPatternType: PostPatternType.bookmark,
                         posts: state.posts,
                         bookmarkedPosts: state.bookmarkedPosts,
                         onTap: (post) {

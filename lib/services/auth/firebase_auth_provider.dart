@@ -1,19 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart'
     show FirebaseAuth, FirebaseAuthException, UserCredential;
-import 'package:firebase_core/firebase_core.dart';
-import 'package:locainfo/firebase_options.dart';
 import 'package:locainfo/services/auth/auth_exceptions.dart';
 import 'package:locainfo/services/auth/auth_provider.dart';
 import 'package:locainfo/services/auth/auth_user.dart';
 
 class FirebaseAuthProvider implements AuthProvider {
-  // initialise firebase auth
-  @override
-  Future<void> initialize() async {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-  }
+  // implement FireStoreProvider as a singleton
+  static final FirebaseAuthProvider _shared =
+      FirebaseAuthProvider._sharedInstance();
+  FirebaseAuthProvider._sharedInstance();
+  factory FirebaseAuthProvider() => _shared;
 
   // return Future<AuthUser>
   @override

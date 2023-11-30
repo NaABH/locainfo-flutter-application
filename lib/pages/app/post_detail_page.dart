@@ -1,3 +1,4 @@
+import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:locainfo/components/my_back_button.dart';
 import 'package:locainfo/components/my_post_bottombar.dart';
@@ -32,35 +33,47 @@ class PostDetailPage extends StatelessWidget {
         ),
         body: ListView(padding: EdgeInsets.zero, children: [
           post.imageUrl != null
-              ? Container(
-                  height: MediaQuery.of(context).size.height * 0.45,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(20),
-                        bottomRight: Radius.circular(20)),
-                    image: DecorationImage(
-                        image: NetworkImage(post.imageUrl!), fit: BoxFit.cover),
-                  ),
+              ? GestureDetector(
+                  onTap: () {
+                    final imageProvider = Image.network(post.imageUrl!).image;
+                    showImageViewer(
+                      context,
+                      imageProvider,
+                      swipeDismissible: true,
+                      doubleTapZoomable: true,
+                    );
+                  },
                   child: Container(
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10.0),
-                          child: MyTag(
-                              backgroundColor: Colors.grey.withAlpha(150),
-                              children: [
-                                Text(
-                                  categories[post.category]!,
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                              ]),
-                        ),
-                      ],
+                    height: MediaQuery.of(context).size.height * 0.45,
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(20)),
+                      image: DecorationImage(
+                          image: NetworkImage(post.imageUrl!),
+                          fit: BoxFit.cover),
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10.0),
+                            child: MyTag(
+                                backgroundColor: Colors.grey.withAlpha(150),
+                                children: [
+                                  Text(
+                                    categories[post.category]!,
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ]),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 )
@@ -68,16 +81,14 @@ class PostDetailPage extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 50.0),
                   child: Container(
                     padding: const EdgeInsets.all(10),
-                    child: MyTag(
-                        backgroundColor: Colors.grey.withAlpha(150),
-                        children: [
-                          Text(
-                            categories[post.category]!,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500),
-                          ),
-                        ]),
+                    child:
+                        MyTag(backgroundColor: AppColors.darkerBlue, children: [
+                      Text(
+                        categories[post.category]!,
+                        style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w500),
+                      ),
+                    ]),
                   ),
                 ),
           Container(

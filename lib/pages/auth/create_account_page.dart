@@ -9,7 +9,8 @@ import 'package:locainfo/services/auth/auth_exceptions.dart';
 import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
 import 'package:locainfo/services/auth/bloc/auth_event.dart';
 import 'package:locainfo/services/auth/bloc/auth_state.dart';
-import 'package:locainfo/utilities/error_dialog.dart';
+import 'package:locainfo/services/firestore/database_exceptions.dart';
+import 'package:locainfo/utilities/dialog/error_dialog.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
 class CreateAccountPage extends StatefulWidget {
@@ -55,6 +56,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 context, 'This email already in use. Try another one.');
           } else if (state.exception is InvalidEmailAuthException) {
             await showErrorDialog(context, 'Invalid email entered');
+          } else if (state.exception is CouldNotCreateNewUserException) {
+            await showErrorDialog(context, 'Failed to save username');
           } else if (state.exception is GenericAuthException) {
             await showErrorDialog(context, 'Failed to register');
           }

@@ -8,7 +8,8 @@ import 'package:locainfo/services/auth/auth_exceptions.dart';
 import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
 import 'package:locainfo/services/auth/bloc/auth_event.dart';
 import 'package:locainfo/services/auth/bloc/auth_state.dart';
-import 'package:locainfo/utilities/error_dialog.dart';
+import 'package:locainfo/utilities/dialog/error_dialog.dart';
+import 'package:locainfo/utilities/toast_message.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -91,6 +92,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 const SizedBox(height: 45),
                 MyButton(
                     onPressed: () {
+                      showToastMessage('Reset link is sent to email');
                       final email = _email.text;
                       context.read<AuthBloc>().add(
                             AuthEventForgotPassword(email: email),

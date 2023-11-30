@@ -28,5 +28,9 @@ class MainBloc extends Bloc<MainEvent, MainState> {
 
     on<MainEventViewPostDetail>((event, emit) =>
         emit(MainStateViewPostDetail(event.post, event.bookmarkedPostId)));
+
+    on<MainEventEditProfile>((event, emit) {
+      emit(MainStateEditProfile(event.user));
+    });
   }
 }

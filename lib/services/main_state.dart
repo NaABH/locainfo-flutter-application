@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:locainfo/services/firestore/post.dart';
+import 'package:locainfo/services/firestore/user.dart';
 
 @immutable
 abstract class MainState {
@@ -30,4 +31,9 @@ class MainStateViewPostDetail extends MainState {
   final Post post;
   final List<String> bookmarkedPostIds;
   const MainStateViewPostDetail(this.post, this.bookmarkedPostIds);
+}
+
+class MainStateEditProfile extends MainState {
+  final AppUser user;
+  const MainStateEditProfile(this.user);
 }

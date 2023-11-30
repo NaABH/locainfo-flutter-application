@@ -15,8 +15,8 @@ import 'package:locainfo/services/post_bloc/post_bloc.dart';
 import 'package:locainfo/services/post_bloc/post_event.dart';
 import 'package:locainfo/services/post_bloc/post_exceptions.dart';
 import 'package:locainfo/services/post_bloc/post_state.dart';
-import 'package:locainfo/utilities/error_dialog.dart';
-import 'package:locainfo/utilities/loading_screen.dart';
+import 'package:locainfo/utilities/dialog/error_dialog.dart';
+import 'package:locainfo/utilities/loading_screen/loading_screen.dart';
 
 class CreatePostPage extends StatefulWidget {
   const CreatePostPage({super.key});

@@ -11,8 +11,8 @@ import 'package:locainfo/services/firestore/post.dart';
 import 'package:locainfo/services/post_bloc/post_bloc.dart';
 import 'package:locainfo/services/post_bloc/post_event.dart';
 import 'package:locainfo/services/post_bloc/post_state.dart';
-import 'package:locainfo/utilities/error_dialog.dart';
-import 'package:locainfo/utilities/loading_screen.dart';
+import 'package:locainfo/utilities/dialog/error_dialog.dart';
+import 'package:locainfo/utilities/loading_screen/loading_screen.dart';
 
 class UpdatePostPage extends StatefulWidget {
   final Post post;

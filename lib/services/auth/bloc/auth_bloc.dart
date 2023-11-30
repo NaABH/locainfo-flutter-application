@@ -1,16 +1,21 @@
 import 'package:bloc/bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:locainfo/services/auth/auth_exceptions.dart';
 import 'package:locainfo/services/auth/auth_provider.dart';
 import 'package:locainfo/services/auth/bloc/auth_event.dart';
 import 'package:locainfo/services/auth/bloc/auth_state.dart';
+import 'package:locainfo/services/firestore/database_provider.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc(AuthProvider provider)
-      : super(const AuthStateUninitialized(isLoading: true)) {
+  final AuthProvider authProvider;
+  final DatabaseProvider databaseProvider;
+  AuthBloc(
+    this.authProvider,
+    this.databaseProvider,
+  ) : super(const AuthStateUninitialized(isLoading: true)) {
     // initialize
     on<AuthEventInitialize>((event, emit) async {
-      await provider.initialize();
-      final user = provider.currentUser;
+      final user = authProvider.currentUser;
       if (user == null) {
         // user not logged in
         emit(
@@ -68,7 +73,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       bool didSendEmail;
       Exception? exception;
       try {
-        await provider.sendPasswordReset(toEmail: email);
+        await authProvider.sendPasswordReset(toEmail: email);
         didSendEmail = true;
         exception = null;
       } on Exception catch (e) {
@@ -88,6 +93,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final username = event.username;
       final email = event.email;
       final password = event.password;
+      emit(const AuthStateRegistering(
+        exception: null,
+        isLoading: true,
+      ));
       try {
         if (username.trim().isEmpty ||
             RegExp(r'^[0-9\W_]').hasMatch(username)) {
@@ -96,12 +105,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             isLoading: false,
           ));
         } else {
-          await provider.createUser(
+          await authProvider.createUser(
             username: username,
             email: email,
             password: password,
           );
-          await provider.sendEmailVerification();
+          Timestamp currentDateTime = Timestamp.fromDate(DateTime.now());
+          await databaseProvider.createNewUser(
+              userId: authProvider.currentUser!.id,
+              username: username,
+              emailAddress: email,
+              registerDate: currentDateTime);
+          await authProvider.sendEmailVerification();
           emit(const AuthStateNeedsVerification(isLoading: false));
         }
       } on Exception catch (e) {
@@ -115,7 +130,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     // send email verification
     on<AuthEventSendEmailVerification>((event, emit) async {
-      await provider.sendEmailVerification();
+      await authProvider.sendEmailVerification();
       emit(state);
     });
 
@@ -129,7 +144,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final password = event.password;
       try {
         print('trying to login');
-        final user = await provider.logIn(
+        final user = await authProvider.logIn(
           email: email,
           password: password,
         );
@@ -168,7 +183,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     // log out event
     on<AuthEventLogOut>((event, emit) async {
       try {
-        await provider.logOut();
+        await authProvider.logOut();
         emit(
           const AuthStateLoggedOut(
             exception: null,

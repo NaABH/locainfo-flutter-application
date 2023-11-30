@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:locainfo/components/my_post.dart';
-import 'package:locainfo/constants/actions.dart';
+import 'package:locainfo/constants/custom_datatype.dart';
 import 'package:locainfo/services/firestore/post.dart';
 
 // call when user press the post

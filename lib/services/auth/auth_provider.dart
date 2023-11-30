@@ -1,9 +1,6 @@
 import 'package:locainfo/services/auth/auth_user.dart';
 
 abstract class AuthProvider {
-  // used to set up the authentication services
-  Future<void> initialize();
-
   // get currently authenticated user
   // if null means there is no authenticated user
   AuthUser? get currentUser;

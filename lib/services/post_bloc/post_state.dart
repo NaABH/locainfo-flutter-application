@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:locainfo/services/firestore/post.dart';
+import 'package:locainfo/services/firestore/user.dart';
 
 @immutable
 abstract class PostState {
@@ -116,6 +117,12 @@ class PostStateUpdatingPosts extends PostState {
       : super(isLoading: isLoading, loadingText: loadingText);
 }
 
+class PostStateSubmittingReport extends PostState {
+  const PostStateSubmittingReport(
+      {required bool isLoading, String? loadingText})
+      : super(isLoading: isLoading, loadingText: loadingText);
+}
+
 class PostStateCreatePostSuccessful extends PostState {
   const PostStateCreatePostSuccessful({required bool isLoading})
       : super(isLoading: isLoading);
@@ -123,6 +130,16 @@ class PostStateCreatePostSuccessful extends PostState {
 
 class PostStateDeletePostSuccessful extends PostState {
   const PostStateDeletePostSuccessful({required bool isLoading})
+      : super(isLoading: isLoading);
+}
+
+class PostStateCreateReportSuccessful extends PostState {
+  const PostStateCreateReportSuccessful({required bool isLoading})
+      : super(isLoading: isLoading);
+}
+
+class PostStateCreateReportError extends PostState {
+  const PostStateCreateReportError({required bool isLoading})
       : super(isLoading: isLoading);
 }
 
@@ -166,5 +183,17 @@ class PostStateClearBookmarkSuccessfully extends PostState {
 
 class PostStateClearBookmarkError extends PostState {
   const PostStateClearBookmarkError({required bool isLoading})
+      : super(isLoading: isLoading);
+}
+
+class PostStateProfileInitialised extends PostState {
+  final AppUser user;
+  const PostStateProfileInitialised(
+      {required bool isLoading, required this.user})
+      : super(isLoading: isLoading);
+}
+
+class PostStateProfileInitialiseFail extends PostState {
+  const PostStateProfileInitialiseFail({required bool isLoading})
       : super(isLoading: isLoading);
 }

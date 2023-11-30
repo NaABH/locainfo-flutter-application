@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:locainfo/services/firestore/database_constants.dart';
-import 'package:locainfo/utilities/datetime_formatter.dart';
+import 'package:locainfo/utilities/post_info_helper.dart';
 
 @immutable
 class Post {
@@ -66,6 +66,6 @@ class Post {
         isBookmarked = bookmarkedPostIds.contains(snapshot.id);
 
   String get timeAgo {
-    return dateTimeFormatter(postedDate);
+    return getDateFromNowText(postedDate);
   }
 }

@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:locainfo/constants/actions.dart';
+import 'package:locainfo/constants/custom_datatype.dart';
 import 'package:locainfo/services/firestore/database_exceptions.dart';
 import 'package:locainfo/services/firestore/database_provider.dart';
 import 'package:locainfo/services/firestore/post.dart';
-import 'package:locainfo/utilities/address_converter.dart';
+import 'package:locainfo/services/firestore/user.dart';
+import 'package:locainfo/utilities/post_info_helper.dart';
 
 import 'database_constants.dart';
 
@@ -17,6 +18,7 @@ class FireStoreProvider implements DatabaseProvider {
   // post collection in FireStore
   final posts = FirebaseFirestore.instance.collection('posts');
   final users = FirebaseFirestore.instance.collection('users');
+  final reports = FirebaseFirestore.instance.collection('reports');
 
   Future<Iterable<Post>> getSearchedPosts(
       String searchText, String currentUserId, Position position) async {
@@ -57,11 +59,14 @@ class FireStoreProvider implements DatabaseProvider {
     try {
       DocumentSnapshot userDoc = await users.doc(userId).get();
 
-      if (userDoc.exists) {
-        List<String> bookmarkedPostIds =
-            List<String>.from(userDoc[bookmarkFieldName]);
+      Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+
+      if (userData.containsKey(bookmarkFieldName)) {
+        final bookmarkedPostIds =
+            List<String>.from(userData[bookmarkFieldName]);
         return bookmarkedPostIds;
       } else {
+        // Bookmark field doesn't exist, return empty array
         return [];
       }
     } on Exception catch (e) {
@@ -88,6 +93,15 @@ class FireStoreProvider implements DatabaseProvider {
           );
     } catch (e) {
       throw CouldNotGetBookmarkPostException();
+    }
+  }
+
+  Future<AppUser> getUser({required String currentUserId}) async {
+    try {
+      DocumentSnapshot userDoc = await users.doc(currentUserId).get();
+      return AppUser.fromSnapshot(userDoc);
+    } on Exception catch (_) {
+      throw CouldNotGetUserException();
     }
   }
 
@@ -267,6 +281,42 @@ class FireStoreProvider implements DatabaseProvider {
       await posts.doc(documentId).update({
         dislikedByFieldName: FieldValue.arrayRemove([currentUserId])
       });
+    }
+  }
+
+  Future<void> createNewReport({
+    required String reporterId,
+    required String postId,
+    required String reason,
+    required Timestamp reportDate,
+  }) async {
+    try {
+      await reports.add({
+        reporterUserIdFieldName: reporterId,
+        reportPostIdFieldName: postId,
+        reasonFieldName: reason,
+        reportDateFieldName: reportDate,
+      });
+    } on Exception catch (e) {
+      throw CouldNotCreateReportException();
+    }
+  }
+
+  @override
+  Future<void> createNewUser({
+    required String userId,
+    required String username,
+    required String emailAddress,
+    required Timestamp registerDate,
+  }) async {
+    try {
+      await users.doc(userId).set({
+        usernameFieldName: username,
+        emailAddressFieldName: emailAddress,
+        registerDateFieldName: registerDate,
+      });
+    } on Exception catch (e) {
+      throw CouldNotCreateNewUserException();
     }
   }
 

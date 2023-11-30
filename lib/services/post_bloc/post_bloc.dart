@@ -9,7 +9,7 @@ import 'package:locainfo/services/location/location_provider.dart';
 import 'package:locainfo/services/post_bloc/post_event.dart';
 import 'package:locainfo/services/post_bloc/post_exceptions.dart';
 import 'package:locainfo/services/post_bloc/post_state.dart';
-import 'package:locainfo/utilities/address_converter.dart';
+import 'package:locainfo/utilities/post_info_helper.dart';
 
 class PostBloc extends Bloc<PostEvent, PostState> {
   final FireStoreProvider _databaseProvider;
@@ -42,7 +42,8 @@ class PostBloc extends Bloc<PostEvent, PostState> {
               bookmarkedPosts: bookmarkedPost,
               currentPosition: position));
         }
-      } on Exception catch (_) {
+      } on Exception catch (e) {
+        print(e.toString());
         emit(const PostStateLoadError(isLoading: false));
       }
     });
@@ -112,7 +113,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         if (event.imageUpdated) {
           if (event.image != null) {
             imageUrl = await _cloudStorageProvider
-                .uploadImageToFirebaseStorage(event.image!);
+                .uploadPostImageToFirebaseStorage(event.image!);
           }
 
           await _databaseProvider.updatePostImage(
@@ -170,7 +171,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
           //upload picture
           if (event.image != null) {
             imageUrl = await _cloudStorageProvider
-                .uploadImageToFirebaseStorage(event.image!);
+                .uploadPostImageToFirebaseStorage(event.image!);
           }
           String locationName =
               await getLocationName(position.latitude, position.longitude);
@@ -193,6 +194,27 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       } on Exception catch (e) {
         emit(PostStateCreatingPost(
             isLoading: false, exception: e, position: position));
+      }
+    });
+
+    on<PostEventCreateReport>((event, emit) async {
+      emit(const PostStateSubmittingReport(
+          isLoading: true, loadingText: 'Submitting...'));
+      if (event.reason.trim().isEmpty ||
+          RegExp(r'^[0-9\W_]').hasMatch(event.reason)) {
+        throw ReasonCouldNotEmptyPostException();
+      }
+      try {
+        Timestamp postedTimestamp = Timestamp.fromDate(DateTime.now());
+        await _databaseProvider.createNewReport(
+          reporterId: _authProvider.currentUser!.id,
+          postId: event.post.documentId,
+          reason: event.reason,
+          reportDate: postedTimestamp,
+        );
+        emit(const PostStateCreateReportSuccessful(isLoading: false));
+      } on Exception catch (e) {
+        emit(const PostStateCreateReportError(isLoading: false));
       }
     });
 
@@ -237,6 +259,18 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         emit(const PostStateDeletePostSuccessful(isLoading: false));
       } on Exception catch (e) {
         emit(const PostStateDeleteError(isLoading: false));
+      }
+    });
+
+    on<PostEventInitialiseProfile>((event, emit) async {
+      try {
+        final user = await _databaseProvider.getUser(
+            currentUserId: _authProvider.currentUser!.id);
+        print('sdhsjdjasdha');
+        emit(PostStateProfileInitialised(isLoading: false, user: user));
+      } on Exception catch (_) {
+        print('fail');
+        emit(const PostStateProfileInitialiseFail(isLoading: false));
       }
     });
   }

@@ -1,7 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:locainfo/services/firestore/post.dart';
+import 'package:locainfo/services/firestore/user.dart';
 
 abstract class DatabaseProvider {
+  Future<void> createNewUser({
+    required String userId,
+    required String username,
+    required String emailAddress,
+    required Timestamp registerDate,
+  });
+
   // create new post
   Future<void> createNewPost({
     required String ownerUserId,
@@ -39,6 +47,8 @@ abstract class DatabaseProvider {
     required String title,
     required String text,
   });
+
+  Future<AppUser> getUser({required String currentUserId});
 
   // // delete posts
   // Future<void> deletePost({required String documentId});
