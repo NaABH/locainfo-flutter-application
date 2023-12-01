@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:geolocator_platform_interface/src/models/position.dart';
 import 'package:locainfo/constants/categories.dart';
 import 'package:locainfo/services/auth/firebase_auth_provider.dart';
 import 'package:locainfo/services/cloud_storage/cloudstorage_provider.dart';
@@ -23,160 +23,105 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     this._locationProvider,
     this._authProvider,
     this._cloudStorageProvider,
-  ) : super(const PostStateInitial(isLoading: true)) {
+  ) : super(const PostStateInitial(isLoading: false)) {
+    // load nearby posts (news page)
     on<PostEventLoadNearbyPosts>((event, emit) async {
-      emit(const PostStateLoadingPosts(isLoading: false));
       try {
+        emit(const PostStateLoadingPosts(
+            isLoading: true, loadingText: 'Fetching nearby posts...'));
         final position = await _locationProvider.getCurrentLocation();
         final posts = await _databaseProvider.getNearbyPosts(
           position: position,
           currentUserId: _authProvider.currentUser!.id,
         );
         if (posts.isEmpty) {
+          emit(const PostStateLoadingPosts(isLoading: false));
           emit(const PostStateNoAvailablePost(isLoading: false));
         } else {
-          final bookmarkedPost = await _databaseProvider
-              .getBookmarkedPostIds(_authProvider.currentUser!.id);
-          emit(PostStateLoaded(
-              isLoading: false,
-              posts: posts,
-              bookmarkedPosts: bookmarkedPost,
-              currentPosition: position));
+          emit(const PostStateLoadingPosts(isLoading: false));
+          emit(PostStatePostLoaded(
+              isLoading: false, posts: posts, currentPosition: position));
         }
       } on Exception catch (e) {
-        print(e.toString());
-        emit(const PostStateLoadError(isLoading: false));
+        emit(const PostStateLoadingPosts(isLoading: false));
+        emit(PostStateLoadError(isLoading: false, exception: e));
       }
     });
 
+    // load bookmark posts (bookmark page)
+    on<PostEventLoadBookmarkedPosts>((event, emit) async {
+      try {
+        emit(const PostStateLoadingPosts(
+            isLoading: true, loadingText: 'Fetching bookmarks'));
+        final userId = _authProvider.currentUser!.id;
+        final posts = await _databaseProvider.getBookmarkedPosts(userId);
+        if (posts.isNotEmpty) {
+          emit(const PostStateLoadingPosts(isLoading: false));
+          emit(PostStateLoadedBookmarkedPosts(posts: posts, isLoading: false));
+        } else {
+          emit(const PostStateLoadingPosts(isLoading: false));
+          emit(const PostStateNoAvailablePost(isLoading: false));
+        }
+      } on Exception catch (e) {
+        emit(const PostStateLoadingPosts(isLoading: false));
+        emit(PostStateLoadError(isLoading: false, exception: e));
+      }
+    });
+
+    // clear all bookmark (bookmark page)
     on<PostEventClearAllBookmark>((event, emit) async {
       try {
+        emit(const PostStateClearingBookmarks(
+            isLoading: true, loadingText: 'Clearing all bookmarks'));
         final userId = _authProvider.currentUser!.id;
         await _databaseProvider.clearBookmarkList(currentUserId: userId);
+        emit(const PostStateClearingBookmarks(isLoading: false));
         emit(const PostStateClearBookmarkSuccessfully(isLoading: false));
       } on Exception catch (_) {
+        emit(const PostStateClearingBookmarks(isLoading: false));
         emit(const PostStateClearBookmarkError(isLoading: false));
       }
     });
 
-    on<PostEventSearchPostTextChanged>((event, emit) async {
+    // initiate create post page
+    on<PostEventCreatingPost>((event, emit) async {
       try {
-        if (event.searchText != null) {
-          emit(const PostStateSearchLoading(isLoading: true));
-          final currentLocation = await _locationProvider.getCurrentLocation();
-          final filteredPosts = await _databaseProvider.getSearchPosts(
-              event.searchText!,
-              _authProvider.currentUser!.id,
-              currentLocation);
-          emit(PostStateSearchLoaded(
-              isLoading: false, filteredPosts: filteredPosts));
-        } else {
-          return;
-        }
-      } on Exception catch (_) {
-        emit(const PostStateSearchError(isLoading: false));
-      }
-    });
-
-    on<PostEventLoadPostedPosts>((event, emit) async {
-      emit(const PostStateLoadingPosts(isLoading: false));
-      try {
-        final userId = _authProvider.currentUser!.id;
-        final posts =
-            await _databaseProvider.getPostedPosts(currentUserId: userId);
-        if (posts.isNotEmpty) {
-          final bookmarkedPost = await _databaseProvider
-              .getBookmarkedPostIds(_authProvider.currentUser!.id);
-          emit(PostStateLoadedPostedPost(
-              posts: posts, isLoading: false, bookmarkedPosts: bookmarkedPost));
-        } else {
-          emit(const PostStateNoAvailablePostedPost(isLoading: false));
-        }
+        final position = await _locationProvider.getCurrentLocation();
+        emit(PostStateCreatingPost(
+          isLoading: false,
+          position: position,
+          exception: null,
+        ));
       } on Exception catch (e) {
-        emit(const PostStateLoadPostedPostsError(isLoading: false));
+        emit(const PostStateCreatingPost(position: null, isLoading: false));
       }
     });
 
-    on<PostEventUpdatePost>((event, emit) async {
+    // create post (create post page)
+    on<PostEventCreatePost>((event, emit) async {
       String? imageUrl;
-      emit(const PostStateUpdatingPosts(
-          isLoading: false, loadingText: 'Updating'));
+      late final Position position;
       try {
+        emit(const PostStateSubmittingPost(
+            isLoading: true, loadingText: 'Submitting...'));
+        position = await _locationProvider.getCurrentLocation();
         if (!isInputValid(event.title)) {
           throw TitleCouldNotEmptyPostException();
         }
-
-        if (event.body.trim().isEmpty ||
-            RegExp(r'^[0-9\W_]').hasMatch(event.body)) {
-          throw ContentCouldNotEmptyPostException();
-        }
-
-        if (event.imageUpdated) {
-          if (event.image != null) {
-            imageUrl =
-                await _cloudStorageProvider.uploadPostImage(event.image!);
-          }
-
-          await _databaseProvider.updatePostImage(
-              documentId: event.postId, imageUrl: imageUrl);
-        }
-
-        await _databaseProvider.updatePostTitleContent(
-          documentId: event.postId,
-          title: event.title,
-          text: event.body,
-        );
-        emit(const PostStateUpdatePostSuccessfully(isLoading: false));
-      } on Exception catch (e) {
-        emit(const PostStateUpdatePostError(isLoading: false));
-      }
-    });
-
-    on<PostEventLoadBookmarkedPosts>((event, emit) async {
-      emit(const PostStateLoadingPosts(isLoading: false));
-      try {
-        final userId = _authProvider.currentUser!.id;
-        final postIds = await _databaseProvider.getBookmarkedPostIds(userId);
-        final posts = await _databaseProvider.getBookmarkedPosts(userId);
-        if (posts.isNotEmpty) {
-          emit(PostStateLoadedBookmarkedPosts(
-              posts: posts, isLoading: false, bookmarkedPosts: postIds));
-        } else {
-          emit(const PostStateNoAvailableBookmarkPost(isLoading: false));
-        }
-      } on Exception catch (e) {
-        emit(const PostStateLoadBookmarksError(isLoading: false));
-      }
-    });
-
-    on<PostEventCreatePost>((event, emit) async {
-      String? imageUrl;
-      late Position position;
-      emit(const PostStateSubmittingPost(
-          isLoading: true, loadingText: 'Submitting...'));
-      try {
-        position = await _locationProvider
-            .getCurrentLocation(); // CouldNotGetLocationException
-        if (event.title.trim().isEmpty ||
-            RegExp(r'^[0-9\W_]').hasMatch(event.title)) {
-          throw TitleCouldNotEmptyPostException();
-        }
-        if (event.body.trim().isEmpty ||
-            RegExp(r'^[0-9\W_]').hasMatch(event.body)) {
+        if (!isInputValid(event.body)) {
           throw ContentCouldNotEmptyPostException();
         }
         if (event.category == null ||
             !postCategories.containsKey(event.category)) {
-          throw CategoryInvalidPostException();
+          throw InvalidCategoryPostException();
         }
         Future.delayed(const Duration(seconds: 1), () async {
-          //upload picture
           if (event.image != null) {
             imageUrl =
                 await _cloudStorageProvider.uploadPostImage(event.image!);
-          }
+          } // CouldNotUploadPostImageException
           String locationName =
-              await getLocationName(position.latitude, position.longitude);
+              await getLocationName(position!.latitude, position!.longitude);
           Timestamp postedTimestamp = Timestamp.fromDate(DateTime.now());
           await _databaseProvider.createNewPost(
             // CouldNotCreatePostException
@@ -191,88 +136,148 @@ class PostBloc extends Bloc<PostEvent, PostState> {
             locationName: locationName,
             postedDate: postedTimestamp,
           );
+          emit(const PostStateSubmittingPost(isLoading: false));
           emit(const PostStateCreatePostSuccessful(isLoading: false));
         });
       } on Exception catch (e) {
+        emit(const PostStateSubmittingPost(isLoading: false));
         emit(PostStateCreatingPost(
             isLoading: false, exception: e, position: position));
       }
     });
 
-    on<PostEventCreateReport>((event, emit) async {
-      emit(const PostStateSubmittingReport(
-          isLoading: true, loadingText: 'Submitting...'));
-      if (event.reason.trim().isEmpty ||
-          RegExp(r'^[0-9\W_]').hasMatch(event.reason)) {
-        throw ReasonCouldNotEmptyPostException();
-      }
+    // searching (searching page)
+    on<PostEventSearchPostTextChanged>((event, emit) async {
       try {
-        Timestamp postedTimestamp = Timestamp.fromDate(DateTime.now());
-        await _databaseProvider.createNewReport(
-          reporterId: _authProvider.currentUser!.id,
-          postId: event.post.documentId,
-          reason: event.reason,
-          reportDate: postedTimestamp,
-        );
-        emit(const PostStateCreateReportSuccessful(isLoading: false));
-      } on Exception catch (e) {
-        emit(const PostStateCreateReportError(isLoading: false));
+        if (event.searchText != null) {
+          emit(const PostStateSearchLoading(isLoading: true));
+          final currentLocation = await _locationProvider.getCurrentLocation();
+          final filteredPosts = await _databaseProvider.getSearchPosts(
+              event.searchText!,
+              _authProvider.currentUser!.id,
+              currentLocation);
+          emit(PostStateSearchLoaded(
+              isLoading: false, filteredPosts: filteredPosts));
+        } else {
+          return; // do nothing
+        }
+      } on Exception catch (_) {
+        emit(const PostStateSearchError(isLoading: false));
       }
     });
 
-    on<PostEventCreatingPost>((event, emit) async {
-      final position = await _locationProvider.getCurrentLocation();
-      emit(PostStateCreatingPost(
-        isLoading: false,
-        position: position,
-        exception: null,
-      ));
-    });
-
-    on<PostEventUpdatePostLike>((event, emit) async {
-      await _databaseProvider.updatePostLike(
-        documentId: event.documentId,
-        currentUserId: _authProvider.currentUser!.id,
-        action: event.action,
-      );
-    });
-
-    on<PostEventUpdatePostDislike>((event, emit) async {
-      await _databaseProvider.updatePostDislike(
-        documentId: event.documentId,
-        currentUserId: _authProvider.currentUser!.id,
-        action: event.action,
-      );
-    });
-
-    on<PostEventUpdateBookmarkList>((event, emit) async {
-      await _databaseProvider.updateBookmarkList(
-        documentId: event.documentId,
-        currentUserId: _authProvider.currentUser!.id,
-        action: event.action,
-      );
-    });
-
-    on<PostEventDeletePost>((event, emit) async {
-      emit(const PostStateDeletingPost(
-          isLoading: false, loadingText: 'Deleting'));
-      try {
-        await _databaseProvider.deletePost(documentId: event.documentId);
-        emit(const PostStateDeletePostSuccessful(isLoading: false));
-      } on Exception catch (e) {
-        emit(const PostStateDeleteError(isLoading: false));
-      }
-    });
-
+    // initialise profile (profile page)
     on<PostEventInitialiseProfile>((event, emit) async {
       try {
         final user = await _databaseProvider.getUser(
             currentUserId: _authProvider.currentUser!.id);
-        print('sdhsjdjasdha');
         emit(PostStateProfileInitialised(isLoading: false, user: user));
       } on Exception catch (_) {
-        print('fail');
         emit(const PostStateProfileInitialiseFail(isLoading: false));
+      }
+    });
+
+    // initialise posted post page (posted post page)
+    on<PostEventLoadPostedPosts>((event, emit) async {
+      try {
+        emit(const PostStateLoadingPosts(
+            isLoading: true, loadingText: 'Fetching posted posts'));
+        final posts = await _databaseProvider.getPostedPosts(
+            currentUserId: _authProvider.currentUser!.id);
+        if (posts.isNotEmpty) {
+          emit(const PostStateLoadingPosts(isLoading: false));
+          emit(PostStateLoadedPostedPost(posts: posts, isLoading: false));
+        } else {
+          emit(const PostStateLoadingPosts(isLoading: false));
+          emit(const PostStateNoAvailablePostedPost(isLoading: false));
+        }
+      } on Exception catch (e) {
+        emit(const PostStateLoadingPosts(isLoading: false));
+        emit(const PostStateLoadPostedPostsError(isLoading: false));
+      }
+    });
+
+    // update a post (update post page)
+    on<PostEventUpdatePostContent>((event, emit) async {
+      String? imageUrl;
+      emit(const PostStateUpdatingPosts(
+          isLoading: true, loadingText: 'Updating post'));
+      try {
+        if (!isInputValid(event.title)) {
+          throw TitleCouldNotEmptyPostException();
+        }
+        if (!isInputValid(event.body)) {
+          throw ContentCouldNotEmptyPostException();
+        }
+        if (event.imageUpdated) {
+          if (event.image != null) {
+            // got image
+            imageUrl =
+                await _cloudStorageProvider.uploadPostImage(event.image!);
+          }
+          await _databaseProvider.updatePostImage(
+              documentId: event.postId, imageUrl: imageUrl);
+        }
+        await _databaseProvider.updatePostTitleContent(
+          documentId: event.postId,
+          title: event.title,
+          text: event.body,
+        );
+        emit(const PostStateUpdatingPosts(isLoading: false));
+        emit(const PostStateUpdatePostSuccessfully(isLoading: false));
+      } on Exception catch (e) {
+        emit(const PostStateUpdatingPosts(isLoading: false));
+        emit(PostStateUpdatePostError(isLoading: false, exception: e));
+      }
+    });
+
+    // update a post reactions (like, unlike, dislike, remove dislike, bookmark, remove bookmark)
+    on<PostEventUpdatePostReactions>((event, emit) async {
+      try {
+        await _databaseProvider.updatePostReactions(
+          documentId: event.documentId,
+          currentUserId: _authProvider.currentUser!.id,
+          action: event.action,
+        );
+      } on Exception catch (_) {
+        emit(const PostStateUpdateReactionsError(isLoading: false));
+      }
+    });
+
+    // create a post report (in report page)
+    on<PostEventCreateReport>((event, emit) async {
+      try {
+        emit(const PostStateSubmittingReport(
+            isLoading: true, loadingText: 'Submitting...'));
+        if (!isInputValid(event.reason)) {
+          throw ReasonCouldNotEmptyPostException();
+        }
+
+        Timestamp postedTimestamp = Timestamp.fromDate(DateTime.now());
+        await _databaseProvider.createNewReport(
+          // CouldNotCreateReportException
+          reporterId: _authProvider.currentUser!.id,
+          postId: event.postId,
+          reason: event.reason,
+          reportDate: postedTimestamp,
+        );
+        emit(const PostStateSubmittingReport(isLoading: false));
+        emit(const PostStateCreateReportSuccessful(isLoading: false));
+      } on Exception catch (e) {
+        emit(const PostStateSubmittingReport(isLoading: false));
+        emit(PostStateCreateReportError(isLoading: false, exception: e));
+      }
+    });
+
+    // call then deleting post ()
+    on<PostEventDeletePost>((event, emit) async {
+      try {
+        emit(const PostStateDeletingPost(
+            isLoading: true, loadingText: 'Deleting'));
+        await _databaseProvider.deletePost(documentId: event.documentId);
+        emit(const PostStateDeletePostSuccessful(isLoading: false));
+      } on Exception catch (e) {
+        emit(const PostStateDeleteError(isLoading: false));
       }
     });
   }

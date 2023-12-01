@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/components/my_bottom_navigation_bar.dart';
 import 'package:locainfo/constants/app_colors.dart';
-import 'package:locainfo/constants/routes.dart';
 import 'package:locainfo/pages/app/bookmark_page.dart';
+import 'package:locainfo/pages/app/create_post_page.dart';
 import 'package:locainfo/pages/app/news_page.dart';
-import 'package:locainfo/pages/app/post_detail_page.dart';
-import 'package:locainfo/pages/app/posted_posts_page.dart';
 import 'package:locainfo/pages/app/profile_page.dart';
-import 'package:locainfo/pages/app/profile_setting_page.dart';
 import 'package:locainfo/services/main_bloc.dart';
 import 'package:locainfo/services/main_event.dart';
 import 'package:locainfo/services/main_state.dart';
@@ -18,6 +15,7 @@ class MainAppPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // default to home page
     context.read<MainBloc>().add(const MainEventNavigationChanged(index: 0));
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -31,18 +29,9 @@ class MainAppPage extends StatelessWidget {
             return const BookMarkPage();
           } else if (state is MainStateProfile) {
             return const ProfilePage();
-          } else if (state is MainStateViewPostedPosts) {
-            return const PostedPostsPage();
-          } else if (state is MainStateViewPostDetail) {
-            return PostDetailPage(
-                post: state.post, bookmarksId: state.bookmarkedPostIds);
-          } else if (state is MainStateEditProfile) {
-            return UpdateProfilePage(
-              user: state.user,
-            );
           } else {
             return const Scaffold(
-              body: CircularProgressIndicator(),
+              body: Center(child: CircularProgressIndicator()),
             );
           }
         },
@@ -52,7 +41,12 @@ class MainAppPage extends StatelessWidget {
         width: 60,
         child: FloatingActionButton(
           onPressed: () {
-            Navigator.of(context).pushNamed(createPostRoute);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const CreatePostPage(),
+              ),
+            );
           },
           tooltip: 'Create Post',
           backgroundColor: AppColors.darkerBlue,

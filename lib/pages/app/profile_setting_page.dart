@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:locainfo/components/my_auth_textfield.dart';
 import 'package:locainfo/components/my_back_button.dart';
@@ -7,8 +6,6 @@ import 'package:locainfo/components/my_button.dart';
 import 'package:locainfo/components/my_divider.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/services/firestore/current_user.dart';
-import 'package:locainfo/services/main_bloc.dart';
-import 'package:locainfo/services/main_event.dart';
 import 'package:locainfo/utilities/dialog/change_profile_picture_dialog.dart';
 import 'package:locainfo/utilities/dialog/update_username_dialog.dart';
 
@@ -44,9 +41,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
       appBar: AppBar(
         leading: MyBackButton(
           onPressed: () {
-            context
-                .read<MainBloc>()
-                .add(const MainEventNavigationChanged(index: 3));
+            Navigator.of(context).pop();
           },
         ),
         title: Row(

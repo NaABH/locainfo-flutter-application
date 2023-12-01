@@ -20,14 +20,12 @@ import '../utilities/post_info_helper.dart';
 class MyPost extends StatelessWidget {
   final Position? currentPosition;
   final Post post;
-  final bool isBookMarked;
   final PostCallBack onTap;
   final PostPatternType patternType;
 
   const MyPost({
     Key? key,
     required this.post,
-    required this.isBookMarked,
     required this.onTap,
     required this.patternType,
     required this.currentPosition,
@@ -310,7 +308,7 @@ class MyPost extends StatelessWidget {
           padding: const EdgeInsets.only(right: 8.0),
           child: MyBookmarkButton(
             postId: post.documentId,
-            isBookmarked: isBookMarked,
+            isBookmarked: post.isBookmarked,
           ),
         ),
       ],

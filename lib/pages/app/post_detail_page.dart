@@ -6,15 +6,14 @@ import 'package:locainfo/components/my_tag.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/categories.dart';
 import 'package:locainfo/services/firestore/post.dart';
+import 'package:locainfo/utilities/toast_message.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PostDetailPage extends StatelessWidget {
   final Post post;
-  final List<String> bookmarksId;
   const PostDetailPage({
     super.key,
     required this.post,
-    required this.bookmarksId,
   });
 
   @override
@@ -154,7 +153,6 @@ class PostDetailPage extends StatelessWidget {
         ]),
         bottomNavigationBar: MyPostBottomBar(
           post: post,
-          isBookmarked: bookmarksId.contains(post.documentId),
         ),
       ),
     );
@@ -167,7 +165,7 @@ class PostDetailPage extends StatelessWidget {
     if (await canLaunchUrl(mapUrl)) {
       await launchUrl(mapUrl);
     } else {
-      throw 'Could not launch Google Map now';
+      showToastMessage('Could not launch Google Map now');
     }
   }
 }

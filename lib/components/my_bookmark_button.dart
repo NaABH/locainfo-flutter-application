@@ -36,11 +36,11 @@ class _MyBookmarkButtonState extends State<MyBookmarkButton> {
       if (this.isBookmarked) {
         context
             .read<PostBloc>()
-            .add(PostEventUpdateBookmarkList(postId, UserAction.bookmark));
+            .add(PostEventUpdatePostReactions(postId, UserAction.bookmark));
       } else {
         // update the database, remove bookmark
         context.read<PostBloc>().add(
-            PostEventUpdateBookmarkList(postId, UserAction.removeBookmark));
+            PostEventUpdatePostReactions(postId, UserAction.removeBookmark));
       }
     });
     return this.isBookmarked;

@@ -50,8 +50,8 @@ class _MyLikeDislikeButtonState extends State<MyLikeDislikeButton> {
       this.isLiked = !this.isLiked;
       numberOfLikes = this.isLiked ? numberOfLikes + 1 : numberOfLikes - 1;
       context.read<PostBloc>().add(this.isLiked
-          ? PostEventUpdatePostLike(postId, UserAction.like)
-          : PostEventUpdatePostLike(postId, UserAction.unlike));
+          ? PostEventUpdatePostReactions(postId, UserAction.like)
+          : PostEventUpdatePostReactions(postId, UserAction.unlike));
 
       // remove the disliked if it is enabled
       _removeDisliked();
@@ -66,7 +66,7 @@ class _MyLikeDislikeButtonState extends State<MyLikeDislikeButton> {
           isDisliked ? numberOfDislikes + 1 : numberOfDislikes - 1;
       context
           .read<PostBloc>()
-          .add(PostEventUpdatePostDislike(postId, UserAction.removeDislike));
+          .add(PostEventUpdatePostReactions(postId, UserAction.removeDislike));
     }
   }
 
@@ -77,8 +77,8 @@ class _MyLikeDislikeButtonState extends State<MyLikeDislikeButton> {
           this.isDisliked ? numberOfDislikes + 1 : numberOfDislikes - 1;
 
       context.read<PostBloc>().add(this.isDisliked
-          ? PostEventUpdatePostDislike(postId, UserAction.dislike)
-          : PostEventUpdatePostDislike(postId, UserAction.removeDislike));
+          ? PostEventUpdatePostReactions(postId, UserAction.dislike)
+          : PostEventUpdatePostReactions(postId, UserAction.removeDislike));
 
       // remove like if enabled
       _removeLiked();
@@ -92,7 +92,7 @@ class _MyLikeDislikeButtonState extends State<MyLikeDislikeButton> {
       numberOfLikes = isLiked ? numberOfLikes + 1 : numberOfLikes - 1;
       context
           .read<PostBloc>()
-          .add(PostEventUpdatePostLike(postId, UserAction.unlike));
+          .add(PostEventUpdatePostReactions(postId, UserAction.unlike));
     }
   }
 

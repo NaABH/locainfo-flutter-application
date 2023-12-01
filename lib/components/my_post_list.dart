@@ -11,7 +11,6 @@ typedef PostCallBack = void Function(Post post);
 class MyPostList extends StatelessWidget {
   final Position? currentPosition;
   final Iterable<Post> posts;
-  final List<String> bookmarkedPosts;
   final PostCallBack onTap;
   final String? selectedCategory; // New parameter for selected category
   final PostPatternType postPatternType;
@@ -20,7 +19,6 @@ class MyPostList extends StatelessWidget {
     Key? key,
     required this.posts,
     required this.onTap,
-    required this.bookmarkedPosts,
     this.selectedCategory,
     required this.postPatternType,
     this.currentPosition, // Provide a default value if needed
@@ -43,7 +41,6 @@ class MyPostList extends StatelessWidget {
               return MyPost(
                 post: post,
                 currentPosition: currentPosition,
-                isBookMarked: bookmarkedPosts.contains(post.documentId),
                 onTap: onTap,
                 patternType: postPatternType,
               );

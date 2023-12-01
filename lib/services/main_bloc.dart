@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:locainfo/services/main_event.dart';
 import 'package:locainfo/services/main_state.dart';
 
+// the main bloc is used for navigation between different main pages of the application
 class MainBloc extends Bloc<MainEvent, MainState> {
   MainBloc() : super(const MainStateHome()) {
     on<MainEventInitialise>((event, emit) => emit(const MainStateHome()));
@@ -21,16 +22,6 @@ class MainBloc extends Bloc<MainEvent, MainState> {
           emit(const MainStateProfile());
           break;
       }
-    });
-
-    on<MainEventViewPostedPosts>(
-        (event, emit) => emit(const MainStateViewPostedPosts()));
-
-    on<MainEventViewPostDetail>((event, emit) =>
-        emit(MainStateViewPostDetail(event.post, event.bookmarkedPostId)));
-
-    on<MainEventEditProfile>((event, emit) {
-      emit(MainStateEditProfile(event.user));
     });
   }
 }

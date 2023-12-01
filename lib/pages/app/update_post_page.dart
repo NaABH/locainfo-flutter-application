@@ -7,12 +7,16 @@ import 'package:locainfo/components/my_button.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/categories.dart';
 import 'package:locainfo/constants/font_styles.dart';
+import 'package:locainfo/services/cloud_storage/cloud_storage_exceptions.dart';
+import 'package:locainfo/services/firestore/database_exceptions.dart';
 import 'package:locainfo/services/firestore/post.dart';
 import 'package:locainfo/services/post/post_bloc.dart';
 import 'package:locainfo/services/post/post_event.dart';
+import 'package:locainfo/services/post/post_exceptions.dart';
 import 'package:locainfo/services/post/post_state.dart';
 import 'package:locainfo/utilities/dialog/error_dialog.dart';
 import 'package:locainfo/utilities/loading_screen/loading_screen.dart';
+import 'package:locainfo/utilities/toast_message.dart';
 
 class UpdatePostPage extends StatefulWidget {
   final Post post;
@@ -55,12 +59,32 @@ class _UpdatePostPageState extends State<UpdatePostPage> {
   Widget build(BuildContext context) {
     return BlocListener<PostBloc, PostState>(
       listener: (context, state) async {
-        if (state is PostStateUpdatePostSuccessfully) {
-          LoadingScreen().hide();
+        if (state is PostStateUpdatingPosts) {
+          if (state.isLoading) {
+            LoadingScreen().show(
+              context: context,
+              text: state.loadingText!,
+            );
+          } else {
+            LoadingScreen().hide();
+          }
+        } else if (state is PostStateUpdatePostSuccessfully) {
+          showToastMessage('Post is updated');
           Navigator.of(context).pop();
         } else if (state is PostStateUpdatePostError) {
-          LoadingScreen().hide();
-          await showErrorDialog(context, 'Error when updating post..');
+          if (state.exception is TitleCouldNotEmptyPostException) {
+            await showErrorDialog(
+                context, 'Title cannot be empty or start with symbol.');
+          } else if (state.exception is ContentCouldNotEmptyPostException) {
+            await showErrorDialog(
+                context, 'Content cannot be empty or start with symbol.');
+          } else if (state.exception is CouldNotUploadPostImageException) {
+            await showErrorDialog(
+                context, 'An error occurred when updating the new image.');
+          } else if (state.exception is CouldNotUpdatePostException) {
+            await showErrorDialog(
+                context, 'An error occurred when saving the updated post.');
+          }
         }
       },
       child: Scaffold(
@@ -77,7 +101,7 @@ class _UpdatePostPageState extends State<UpdatePostPage> {
                 padding: const EdgeInsets.only(right: 8.0),
                 child: MyButton(
                     onPressed: () {
-                      context.read<PostBloc>().add(PostEventUpdatePost(
+                      context.read<PostBloc>().add(PostEventUpdatePostContent(
                             currentPost.documentId,
                             _textControllerTitle.text,
                             _textControllerBody.text,

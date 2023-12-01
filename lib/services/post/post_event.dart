@@ -1,24 +1,32 @@
 import 'dart:io';
 
 import 'package:locainfo/constants/custom_datatype.dart';
-import 'package:locainfo/services/firestore/post.dart';
 
 abstract class PostEvent {
   const PostEvent();
 }
 
+// call in news page
 class PostEventLoadNearbyPosts extends PostEvent {
   const PostEventLoadNearbyPosts();
 }
 
-class PostEventLoadPostedPosts extends PostEvent {
-  const PostEventLoadPostedPosts();
-}
-
+// call in bookmark page
 class PostEventLoadBookmarkedPosts extends PostEvent {
   const PostEventLoadBookmarkedPosts();
 }
 
+// call in bookmark page
+class PostEventClearAllBookmark extends PostEvent {
+  const PostEventClearAllBookmark();
+}
+
+// call in create post page
+class PostEventCreatingPost extends PostEvent {
+  const PostEventCreatingPost();
+}
+
+// call in create post page
 class PostEventCreatePost extends PostEvent {
   final String title;
   final String body;
@@ -27,58 +35,49 @@ class PostEventCreatePost extends PostEvent {
   const PostEventCreatePost(this.title, this.body, this.image, this.category);
 }
 
-class PostEventCreateReport extends PostEvent {
-  final Post post;
-  final String reason;
-  const PostEventCreateReport(this.post, this.reason);
-}
-
-class PostEventUpdatePost extends PostEvent {
-  final String postId;
-  final String title;
-  final String body;
-  final File? image;
-  final bool imageUpdated;
-  const PostEventUpdatePost(
-      this.postId, this.title, this.body, this.image, this.imageUpdated);
-}
-
-class PostEventCreatingPost extends PostEvent {
-  const PostEventCreatingPost();
-}
-
-class PostEventUpdatePostLike extends PostEvent {
-  final String documentId;
-  final UserAction action;
-  const PostEventUpdatePostLike(this.documentId, this.action);
-}
-
-class PostEventUpdatePostDislike extends PostEvent {
-  final String documentId;
-  final UserAction action;
-  const PostEventUpdatePostDislike(this.documentId, this.action);
-}
-
-class PostEventUpdateBookmarkList extends PostEvent {
-  final String documentId;
-  final UserAction action;
-  const PostEventUpdateBookmarkList(this.documentId, this.action);
-}
-
+// call in search page when the text changed
 class PostEventSearchPostTextChanged extends PostEvent {
   final String? searchText;
   const PostEventSearchPostTextChanged(this.searchText);
 }
 
-class PostEventClearAllBookmark extends PostEvent {
-  const PostEventClearAllBookmark();
+// call in profile page when first enter
+class PostEventInitialiseProfile extends PostEvent {
+  const PostEventInitialiseProfile();
 }
 
+// call in posted post page
+class PostEventLoadPostedPosts extends PostEvent {
+  const PostEventLoadPostedPosts();
+}
+
+// call in update post page
+class PostEventUpdatePostContent extends PostEvent {
+  final String postId;
+  final String title;
+  final String body;
+  final File? image;
+  final bool imageUpdated;
+  const PostEventUpdatePostContent(
+      this.postId, this.title, this.body, this.image, this.imageUpdated);
+}
+
+// call when want update post reactions
+class PostEventUpdatePostReactions extends PostEvent {
+  final String documentId;
+  final UserAction action;
+  const PostEventUpdatePostReactions(this.documentId, this.action);
+}
+
+// call when creating a report (report page)
+class PostEventCreateReport extends PostEvent {
+  final String postId;
+  final String reason;
+  const PostEventCreateReport(this.postId, this.reason);
+}
+
+// call when delete a post (my post)
 class PostEventDeletePost extends PostEvent {
   final String documentId;
   const PostEventDeletePost(this.documentId);
-}
-
-class PostEventInitialiseProfile extends PostEvent {
-  const PostEventInitialiseProfile();
 }

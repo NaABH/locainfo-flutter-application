@@ -4,15 +4,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/components/my_profile_listtile.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
+import 'package:locainfo/pages/app/posted_posts_page.dart';
+import 'package:locainfo/pages/app/profile_setting_page.dart';
 import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
 import 'package:locainfo/services/auth/bloc/auth_event.dart';
 import 'package:locainfo/services/firestore/current_user.dart';
-import 'package:locainfo/services/main_bloc.dart';
-import 'package:locainfo/services/main_event.dart';
 import 'package:locainfo/services/post/post_bloc.dart';
 import 'package:locainfo/services/post/post_event.dart';
 import 'package:locainfo/services/post/post_state.dart';
-import 'package:locainfo/utilities/dialog/error_dialog.dart';
 import 'package:locainfo/utilities/dialog/logout_dialog.dart';
 import 'package:locainfo/utilities/toast_message.dart';
 
@@ -36,7 +35,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return BlocListener<PostBloc, PostState>(
       listener: (context, state) {
         if (state is PostStateProfileInitialiseFail) {
-          showErrorDialog(context, 'Cannot fetch your detail at the moment');
+          showToastMessage('Cannot fetch your detail at the moment');
         }
       },
       child: Scaffold(
@@ -212,9 +211,13 @@ class _ProfilePageState extends State<ProfilePage> {
                   MyProfileListTile(
                       onTap: () {
                         user != null
-                            ? context
-                                .read<MainBloc>()
-                                .add(MainEventEditProfile(user!))
+                            ? Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      UpdateProfilePage(user: user!),
+                                ),
+                              )
                             : showToastMessage('User cannot be identified');
                       },
                       leadingIcon: Icons.person,
@@ -224,9 +227,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     padding: const EdgeInsets.symmetric(vertical: 12.0),
                     child: MyProfileListTile(
                         onTap: () {
-                          context
-                              .read<MainBloc>()
-                              .add(const MainEventViewPostedPosts());
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const PostedPostsPage(),
+                            ),
+                          );
                         },
                         leadingIcon: Icons.article,
                         trailingIcon: Icons.arrow_right,

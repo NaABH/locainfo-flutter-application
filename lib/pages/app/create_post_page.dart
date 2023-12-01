@@ -9,6 +9,7 @@ import 'package:locainfo/components/my_button.dart';
 import 'package:locainfo/components/my_dropdown_menu.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
+import 'package:locainfo/services/cloud_storage/cloud_storage_exceptions.dart';
 import 'package:locainfo/services/firestore/database_exceptions.dart';
 import 'package:locainfo/services/location/location_exceptions.dart';
 import 'package:locainfo/services/post/post_bloc.dart';
@@ -17,6 +18,7 @@ import 'package:locainfo/services/post/post_exceptions.dart';
 import 'package:locainfo/services/post/post_state.dart';
 import 'package:locainfo/utilities/dialog/error_dialog.dart';
 import 'package:locainfo/utilities/loading_screen/loading_screen.dart';
+import 'package:locainfo/utilities/toast_message.dart';
 
 class CreatePostPage extends StatefulWidget {
   const CreatePostPage({super.key});
@@ -59,32 +61,40 @@ class _CreatePostPageState extends State<CreatePostPage> {
     context.read<PostBloc>().add(const PostEventCreatingPost());
     return BlocListener<PostBloc, PostState>(
       listener: (context, state) async {
-        if (state.isLoading) {
-          LoadingScreen().show(
-            context: context,
-            text: state.loadingText ?? 'Submitting...',
-          );
-        } else {
-          LoadingScreen().hide();
+        if (state is PostStateSubmittingPost) {
+          if (state.isLoading) {
+            LoadingScreen().show(
+              context: context,
+              text: state.loadingText!,
+            );
+          } else {
+            LoadingScreen().hide();
+          }
         }
 
         if (state is PostStateCreatingPost) {
           setState(() {
-            currentPosition = state.position!;
+            currentPosition = state.position;
           });
           if (state.exception is TitleCouldNotEmptyPostException) {
-            await showErrorDialog(context, 'Title could not be empty!');
+            await showErrorDialog(
+                context, 'Title could not be empty or start with symbol!');
           } else if (state.exception is ContentCouldNotEmptyPostException) {
-            await showErrorDialog(context, 'Content could not be empty!');
-          } else if (state.exception is CategoryInvalidPostException) {
+            await showErrorDialog(
+                context, 'Content could not be empty or start with symbol!');
+          } else if (state.exception is InvalidCategoryPostException) {
             await showErrorDialog(context, 'Please select a category!');
           } else if (state.exception is CouldNotGetLocationException) {
             await showErrorDialog(context, 'Your location cannot be accessed!');
           } else if (state.exception is CouldNotCreatePostException) {
             await showErrorDialog(context, 'Unknown error has occurred!');
+          } else if (state.exception is CouldNotUploadPostImageException) {
+            await showErrorDialog(
+                context, 'Error occurred when saving the attached image!');
           }
         } else if (state is PostStateCreatePostSuccessful) {
-          Navigator.of(context).pop();
+          showToastMessage('Your post is created successfully');
+          Navigator.pop(context);
         }
       },
       child: Scaffold(
@@ -112,7 +122,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
                             image,
                             selectedCategory,
                           ));
-                      // Navigator.of(context).pop(); // to be debug
                     },
                     text: 'Post'),
               ),
@@ -145,10 +154,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
                             borderRadius: BorderRadius.circular(10.0),
                             borderSide: BorderSide.none,
                           ),
-                          fillColor: Colors.grey.shade200,
+                          fillColor: AppColors.grey2,
                           filled: true,
                           hintText: "Title",
-                          hintStyle: TextStyle(color: Colors.grey.shade700),
+                          hintStyle: TextStyle(color: AppColors.grey7),
                         ),
                       ),
                       Stack(
@@ -167,10 +176,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                 borderRadius: BorderRadius.circular(10.0),
                                 borderSide: BorderSide.none,
                               ),
-                              fillColor: Colors.grey.shade200,
+                              fillColor: AppColors.grey2,
                               filled: true,
                               hintText: "Description / body text",
-                              hintStyle: TextStyle(color: Colors.grey.shade500),
+                              hintStyle: TextStyle(color: AppColors.grey5),
                             ),
                           ),
                           GestureDetector(
@@ -224,7 +233,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                         padding: const EdgeInsets.all(10),
                         margin: const EdgeInsets.symmetric(vertical: 8),
                         decoration: BoxDecoration(
-                            color: Colors.grey.shade200,
+                            color: AppColors.grey2,
                             borderRadius: BorderRadius.circular(10.0)),
                         child: Stack(children: [
                           Center(
@@ -243,7 +252,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                               alignment: Alignment.topRight,
                               child: Icon(
                                 Icons.cancel,
-                                color: Colors.red,
+                                color: AppColors.red,
                                 size: 20,
                               ),
                             ),
@@ -258,7 +267,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       : 'Current Location: ${currentPosition!.latitude}, ${currentPosition!.longitude}',
                   style: TextStyle(
                     fontStyle: FontStyle.italic,
-                    color: Colors.grey.shade500,
+                    color: AppColors.grey5,
                   ),
                 ),
               ],

@@ -9,11 +9,9 @@ import 'package:share_plus/share_plus.dart';
 
 class MyPostBottomBar extends StatefulWidget {
   final Post post;
-  final bool isBookmarked;
   const MyPostBottomBar({
     super.key,
     required this.post,
-    required this.isBookmarked,
   });
 
   @override
@@ -22,7 +20,7 @@ class MyPostBottomBar extends StatefulWidget {
 
 class _MyPostBottomBarState extends State<MyPostBottomBar> {
   late final Post post = widget.post;
-  late bool isBookmarked = widget.isBookmarked;
+  late bool isBookmarked = widget.post.isBookmarked;
   late bool isLiked = widget.post.isLiked;
   late bool isDisliked = widget.post.isDisliked;
   late int numberOfLikes = widget.post.numberOfLikes;
@@ -32,9 +30,8 @@ class _MyPostBottomBarState extends State<MyPostBottomBar> {
     if (isLiked) {
       isLiked = !isLiked;
       numberOfLikes = isLiked ? numberOfLikes + 1 : numberOfLikes - 1;
-      context
-          .read<PostBloc>()
-          .add(PostEventUpdatePostLike(post.documentId, UserAction.unlike));
+      context.read<PostBloc>().add(
+          PostEventUpdatePostReactions(post.documentId, UserAction.unlike));
     }
   }
 
@@ -43,7 +40,7 @@ class _MyPostBottomBarState extends State<MyPostBottomBar> {
       isDisliked = !isDisliked;
       numberOfDislikes =
           isDisliked ? numberOfDislikes + 1 : numberOfDislikes - 1;
-      context.read<PostBloc>().add(PostEventUpdatePostDislike(
+      context.read<PostBloc>().add(PostEventUpdatePostReactions(
           post.documentId, UserAction.removeDislike));
     }
   }
@@ -63,8 +60,9 @@ class _MyPostBottomBarState extends State<MyPostBottomBar> {
                 isLiked = !isLiked;
                 numberOfLikes = isLiked ? numberOfLikes + 1 : numberOfLikes - 1;
                 context.read<PostBloc>().add(isLiked
-                    ? PostEventUpdatePostLike(post.documentId, UserAction.like)
-                    : PostEventUpdatePostLike(
+                    ? PostEventUpdatePostReactions(
+                        post.documentId, UserAction.like)
+                    : PostEventUpdatePostReactions(
                         post.documentId, UserAction.unlike));
 
                 // remove the disliked if it is enabled
@@ -89,9 +87,9 @@ class _MyPostBottomBarState extends State<MyPostBottomBar> {
                     isDisliked ? numberOfDislikes + 1 : numberOfDislikes - 1;
 
                 context.read<PostBloc>().add(isDisliked
-                    ? PostEventUpdatePostDislike(
+                    ? PostEventUpdatePostReactions(
                         post.documentId, UserAction.dislike)
-                    : PostEventUpdatePostDislike(
+                    : PostEventUpdatePostReactions(
                         post.documentId, UserAction.removeDislike));
 
                 // remove like if enabled
@@ -131,11 +129,11 @@ class _MyPostBottomBarState extends State<MyPostBottomBar> {
                 isBookmarked = !isBookmarked;
                 // update the database, add bookmark
                 if (isBookmarked) {
-                  context.read<PostBloc>().add(PostEventUpdateBookmarkList(
+                  context.read<PostBloc>().add(PostEventUpdatePostReactions(
                       post.documentId, UserAction.bookmark));
                 } else {
                   // update the database, remove bookmark
-                  context.read<PostBloc>().add(PostEventUpdateBookmarkList(
+                  context.read<PostBloc>().add(PostEventUpdatePostReactions(
                       post.documentId, UserAction.removeBookmark));
                 }
               });

@@ -8,6 +8,8 @@ import 'package:locainfo/pages/app/post_detail_page.dart';
 import 'package:locainfo/services/post/post_bloc.dart';
 import 'package:locainfo/services/post/post_event.dart';
 import 'package:locainfo/services/post/post_state.dart';
+import 'package:locainfo/utilities/loading_screen/loading_screen.dart';
+import 'package:locainfo/utilities/toast_message.dart';
 
 class PostedPostsPage extends StatelessWidget {
   const PostedPostsPage({super.key});
@@ -15,85 +17,96 @@ class PostedPostsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     context.read<PostBloc>().add(const PostEventLoadPostedPosts());
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: AppColors.white,
-        title: Row(
-          children: [
-            Text(
-              'Posted Posts',
-              style: CustomFontStyles.appBarTitle,
-            ),
-          ],
-        ),
-      ),
-      body: BlocBuilder<PostBloc, PostState>(
-        builder: (context, state) {
-          if (state is PostStateLoadingPosts) {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  Text('Fetching posts...'),
-                ],
-              ),
-            );
-          } else if (state is PostStateLoadedPostedPost) {
-            return RefreshIndicator(
-              onRefresh: () async {
-                context.read<PostBloc>().add(const PostEventLoadPostedPosts());
-              },
-              child: MyPostList(
-                postPatternType: PostPatternType.userPosted,
-                posts: state.posts,
-                bookmarkedPosts: state.bookmarkedPosts,
-                onTap: (post) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PostDetailPage(
-                          post: post, bookmarksId: state.bookmarkedPosts),
-                    ),
-                  );
-                },
-              ),
-            );
-          } else if (state is PostStateNoAvailablePostedPost) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('You does not posted any post before.'),
-                  IconButton(
-                      onPressed: () async {
-                        context
-                            .read<PostBloc>()
-                            .add(const PostEventLoadPostedPosts());
-                      },
-                      icon: const Icon(Icons.refresh)),
-                ],
-              ),
+    return BlocListener<PostBloc, PostState>(
+      listener: (context, state) {
+        if (state is PostStateLoadingPosts) {
+          if (state.isLoading) {
+            LoadingScreen().show(
+              context: context,
+              text: state.loadingText!,
             );
           } else {
-            return Center(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                  const Text('Failed to load post at this moment.'),
-                  const Text('Kindly check your GPS and Internet connection.'),
-                  IconButton(
-                      onPressed: () async {
-                        context
-                            .read<PostBloc>()
-                            .add(const PostEventLoadBookmarkedPosts());
-                      },
-                      icon: const Icon(Icons.refresh)),
-                ]));
+            LoadingScreen().hide();
           }
-        },
+        } else if (state is PostStateDeletePostSuccessful) {
+          showToastMessage('Post deleted');
+        } else if (state is PostStateDeleteError) {
+          showToastMessage('Error occurred when deleting post');
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: AppColors.white,
+          title: Row(
+            children: [
+              Text(
+                'Posted Posts',
+                style: CustomFontStyles.appBarTitle,
+              ),
+            ],
+          ),
+        ),
+        body: BlocBuilder<PostBloc, PostState>(
+          builder: (context, state) {
+            if (state is PostStateLoadedPostedPost) {
+              return RefreshIndicator(
+                onRefresh: () async {
+                  context
+                      .read<PostBloc>()
+                      .add(const PostEventLoadPostedPosts());
+                },
+                child: MyPostList(
+                  postPatternType: PostPatternType.userPosted,
+                  posts: state.posts,
+                  onTap: (post) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PostDetailPage(post: post),
+                      ),
+                    );
+                  },
+                ),
+              );
+            } else if (state is PostStateNoAvailablePostedPost) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('You does not posted any post before.'),
+                    IconButton(
+                        onPressed: () async {
+                          context
+                              .read<PostBloc>()
+                              .add(const PostEventLoadPostedPosts());
+                        },
+                        icon: const Icon(Icons.refresh)),
+                  ],
+                ),
+              );
+            } else {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Try again'),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: IconButton(
+                          onPressed: () async {
+                            context
+                                .read<PostBloc>()
+                                .add(const PostEventLoadBookmarkedPosts());
+                          },
+                          icon: const Icon(Icons.refresh)),
+                    ),
+                  ],
+                ),
+              );
+            }
+          },
+        ),
       ),
     );
   }

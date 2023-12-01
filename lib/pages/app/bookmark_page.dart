@@ -6,11 +6,13 @@ import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/custom_datatype.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/pages/app/post_detail_page.dart';
+import 'package:locainfo/services/firestore/database_exceptions.dart';
 import 'package:locainfo/services/post/post_bloc.dart';
 import 'package:locainfo/services/post/post_event.dart';
 import 'package:locainfo/services/post/post_state.dart';
 import 'package:locainfo/utilities/dialog/clear_all_bookmark_dialog.dart';
 import 'package:locainfo/utilities/dialog/error_dialog.dart';
+import 'package:locainfo/utilities/loading_screen/loading_screen.dart';
 
 class BookMarkPage extends StatelessWidget {
   const BookMarkPage({super.key});
@@ -19,12 +21,27 @@ class BookMarkPage extends StatelessWidget {
   Widget build(BuildContext context) {
     context.read<PostBloc>().add(const PostEventLoadBookmarkedPosts());
     return BlocListener<PostBloc, PostState>(
-      listener: (context, state) {
-        if (state is PostStateClearBookmarkSuccessfully) {
-          context.read<PostBloc>().add(const PostEventLoadBookmarkedPosts());
+      listener: (context, state) async {
+        if (state is PostStateLoadingPosts) {
+          if (state.isLoading) {
+            LoadingScreen().show(
+              context: context,
+              text: state.loadingText!,
+            );
+          } else {
+            LoadingScreen().hide();
+          }
+        } else if (state is PostStateLoadError) {
+          if (state.exception is CouldNotGetBookmarkPostException) {
+            await showErrorDialog(context,
+                'An error occurred when fetching your bookmark posts.');
+          }
         } else if (state is PostStateClearBookmarkError) {
           showErrorDialog(context,
-              'Some error occur when clearing all bookmarks. Try again later.');
+              'Some error occurred when clearing all bookmarks. Try again later.');
+          context.read<PostBloc>().add(const PostEventLoadBookmarkedPosts());
+        } else if (state is PostStateClearBookmarkSuccessfully) {
+          context.read<PostBloc>().add(const PostEventLoadBookmarkedPosts());
         }
       },
       child: Scaffold(
@@ -51,18 +68,7 @@ class BookMarkPage extends StatelessWidget {
         ),
         body: BlocBuilder<PostBloc, PostState>(
           builder: (context, state) {
-            if (state is PostStateLoadingPosts) {
-              return const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(),
-                    Text('Fetching bookmarks...'),
-                  ],
-                ),
-              );
-            } else if (state is PostStateLoadedBookmarkedPosts) {
+            if (state is PostStateLoadedBookmarkedPosts) {
               return RefreshIndicator(
                 onRefresh: () async {
                   context
@@ -91,14 +97,11 @@ class BookMarkPage extends StatelessWidget {
                       child: MyPostList(
                         postPatternType: PostPatternType.bookmark,
                         posts: state.posts,
-                        bookmarkedPosts: state.bookmarkedPosts,
                         onTap: (post) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => PostDetailPage(
-                                  post: post,
-                                  bookmarksId: state.bookmarkedPosts),
+                              builder: (context) => PostDetailPage(post: post),
                             ),
                           );
                         },
@@ -108,37 +111,28 @@ class BookMarkPage extends StatelessWidget {
                 ),
               );
             } else if (state is PostStateNoAvailableBookmarkPost) {
+              return const Center(
+                child: Text('You does not bookmark any post.'),
+              );
+            } else {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('You does not bookmark any post.'),
-                    IconButton(
-                        onPressed: () async {
-                          context
-                              .read<PostBloc>()
-                              .add(const PostEventLoadBookmarkedPosts());
-                        },
-                        icon: const Icon(Icons.refresh)),
+                    const Text('Try again'),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: IconButton(
+                          onPressed: () async {
+                            context
+                                .read<PostBloc>()
+                                .add(const PostEventLoadBookmarkedPosts());
+                          },
+                          icon: const Icon(Icons.refresh)),
+                    ),
                   ],
                 ),
               );
-            } else {
-              return Center(
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                    const Text('Failed to load post at this moment.'),
-                    const Text(
-                        'Kindly check your GPS and Internet connection.'),
-                    IconButton(
-                        onPressed: () async {
-                          context
-                              .read<PostBloc>()
-                              .add(const PostEventLoadBookmarkedPosts());
-                        },
-                        icon: const Icon(Icons.refresh)),
-                  ]));
             }
           },
         ),

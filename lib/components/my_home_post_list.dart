@@ -26,7 +26,6 @@ class MyHomePostList extends StatelessWidget {
         return MyPost(
           onTap: onTap,
           post: post,
-          isBookMarked: false,
           patternType: PostPatternType.news,
           currentPosition: null,
         );

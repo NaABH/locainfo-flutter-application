@@ -78,8 +78,7 @@ class _SearchingPageState extends State<SearchingPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => PostDetailPage(
-                                  post: post, bookmarksId: ['ssdsdjadka']),
+                              builder: (context) => PostDetailPage(post: post),
                             ),
                           );
                         },
@@ -93,61 +92,6 @@ class _SearchingPageState extends State<SearchingPage> {
           return const Center(child: Text('Search post by title...'));
         }
       }),
-      // body: _searchText == null
-      //     ? const Center(
-      //         child: Text('No result'),
-      //       ) // Display nothing if the search text is empty
-      //     : StreamBuilder<QuerySnapshot>(
-      //         stream: posts.snapshots(),
-      //         builder: (context, snapshot) {
-      //           if (!snapshot.hasData) {
-      //             return const Center(child: CircularProgressIndicator());
-      //           }
-      //           final filteredPosts = snapshot.data!.docs.where((doc) {
-      //             return doc['title']
-      //                 .toString()
-      //                 .toLowerCase()
-      //                 .contains(_searchText!);
-      //           }).toList();
-      //           return ListView(
-      //             children: filteredPosts.isEmpty
-      //                 ? [
-      //                     const Padding(
-      //                       padding: EdgeInsets.all(20.0),
-      //                       child: Center(
-      //                         child: Text('No posts found'),
-      //                       ),
-      //                     ),
-      //                   ]
-      //                 : filteredPosts.map((doc) {
-      //                     return Container(
-      //                       margin: const EdgeInsets.symmetric(
-      //                           horizontal: 12, vertical: 1),
-      //                       decoration: BoxDecoration(
-      //                           borderRadius: BorderRadius.circular(12),
-      //                           color: Colors.grey.shade100),
-      //                       child: ListTile(
-      //                         leading: const Icon(Icons.search),
-      //                         title: Text(
-      //                           doc['title'],
-      //                           maxLines: 2,
-      //                           overflow: TextOverflow.ellipsis,
-      //                           softWrap: true,
-      //                           style: const TextStyle(
-      //                               fontWeight: FontWeight.w500),
-      //                         ),
-      //                         subtitle: Text(
-      //                           doc['text'],
-      //                           maxLines: 1,
-      //                           overflow: TextOverflow.ellipsis,
-      //                         ),
-      //                         onTap: () {},
-      //                       ),
-      //                     );
-      //                   }).toList(),
-      //           );
-      //         },
-      //       ),
     );
   }
 }
