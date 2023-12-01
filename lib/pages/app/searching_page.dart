@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/components/my_search_bar.dart';
 import 'package:locainfo/pages/app/post_detail_page.dart';
-import 'package:locainfo/services/post_bloc/post_bloc.dart';
-import 'package:locainfo/services/post_bloc/post_event.dart';
-import 'package:locainfo/services/post_bloc/post_state.dart';
+import 'package:locainfo/services/post/post_bloc.dart';
+import 'package:locainfo/services/post/post_event.dart';
+import 'package:locainfo/services/post/post_state.dart';
 
 class SearchingPage extends StatefulWidget {
   const SearchingPage({super.key});
@@ -70,7 +70,7 @@ class _SearchingPageState extends State<SearchingPage> {
                           style: const TextStyle(fontWeight: FontWeight.w500),
                         ),
                         subtitle: Text(
-                          post.text,
+                          post.content,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),

@@ -1,7 +1,10 @@
 import 'package:geolocator/geolocator.dart';
 
 abstract class GeoLocationProvider {
-  Future<Position?> getCurrentLocation() async {}
-
-  Future<Position?> getLastKnownLocation() async {}
+  // Function to get current location
+  Future<Position?> getCurrentLocation();
+  // Function to get last known location
+  Future<Position?> getLastKnownLocation();
+  // Function to get live location update
+  Stream<Position> getLocationStream();
 }

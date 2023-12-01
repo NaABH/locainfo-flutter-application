@@ -11,10 +11,10 @@ import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/services/firestore/database_exceptions.dart';
 import 'package:locainfo/services/location/location_exceptions.dart';
-import 'package:locainfo/services/post_bloc/post_bloc.dart';
-import 'package:locainfo/services/post_bloc/post_event.dart';
-import 'package:locainfo/services/post_bloc/post_exceptions.dart';
-import 'package:locainfo/services/post_bloc/post_state.dart';
+import 'package:locainfo/services/post/post_bloc.dart';
+import 'package:locainfo/services/post/post_event.dart';
+import 'package:locainfo/services/post/post_exceptions.dart';
+import 'package:locainfo/services/post/post_state.dart';
 import 'package:locainfo/utilities/dialog/error_dialog.dart';
 import 'package:locainfo/utilities/loading_screen/loading_screen.dart';
 

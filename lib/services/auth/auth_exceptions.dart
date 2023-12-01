@@ -7,6 +7,9 @@ class UserNotFoundAuthException implements Exception {}
 // login: incorrect password entered
 class WrongPasswordAuthException implements Exception {}
 
+// login: could not sign in with google
+class CouldNotSignInWithGoogleException implements Exception {}
+
 // login: not logged in
 class UserNotLoggedInAuthException implements Exception {}
 

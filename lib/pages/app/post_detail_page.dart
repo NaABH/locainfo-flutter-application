@@ -2,7 +2,7 @@ import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:locainfo/components/my_back_button.dart';
 import 'package:locainfo/components/my_post_bottombar.dart';
-import 'package:locainfo/components/mytag.dart';
+import 'package:locainfo/components/my_tag.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/categories.dart';
 import 'package:locainfo/services/firestore/post.dart';
@@ -65,7 +65,7 @@ class PostDetailPage extends StatelessWidget {
                                 backgroundColor: Colors.grey.withAlpha(150),
                                 children: [
                                   Text(
-                                    categories[post.category]!,
+                                    postCategories[post.category]!,
                                     style: const TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.w500),
@@ -84,7 +84,7 @@ class PostDetailPage extends StatelessWidget {
                     child:
                         MyTag(backgroundColor: AppColors.darkerBlue, children: [
                       Text(
-                        categories[post.category]!,
+                        postCategories[post.category]!,
                         style: const TextStyle(
                             color: Colors.white, fontWeight: FontWeight.w500),
                       ),
@@ -122,7 +122,7 @@ class PostDetailPage extends StatelessWidget {
                   height: 10,
                 ),
                 Text(
-                  post.text,
+                  post.content,
                   textAlign: TextAlign.justify,
                   style: const TextStyle(
                       color: Colors.black,

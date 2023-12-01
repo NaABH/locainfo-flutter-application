@@ -3,13 +3,14 @@ import 'package:flutter/foundation.dart';
 import 'package:locainfo/services/firestore/database_constants.dart';
 import 'package:locainfo/utilities/post_info_helper.dart';
 
+// class to store store value retrieve from the fireStore
 @immutable
 class Post {
   final String documentId;
   final String ownerUserId;
   final String ownerUserName;
   final String title;
-  final String text;
+  final String content;
   final String? imageUrl;
   final String category;
   final double latitude;
@@ -22,23 +23,24 @@ class Post {
   final int numberOfDislikes;
   final bool isBookmarked;
 
-  const Post(
-      {required this.documentId,
-      required this.ownerUserId,
-      required this.ownerUserName,
-      required this.title,
-      required this.text,
-      required this.imageUrl,
-      required this.category,
-      required this.latitude,
-      required this.longitude,
-      required this.locationName,
-      required this.postedDate,
-      required this.isLiked,
-      required this.numberOfLikes,
-      required this.isDisliked,
-      required this.numberOfDislikes,
-      required this.isBookmarked});
+  const Post({
+    required this.documentId,
+    required this.ownerUserId,
+    required this.ownerUserName,
+    required this.title,
+    required this.content,
+    required this.imageUrl,
+    required this.category,
+    required this.latitude,
+    required this.longitude,
+    required this.locationName,
+    required this.postedDate,
+    required this.isLiked,
+    required this.numberOfLikes,
+    required this.isDisliked,
+    required this.numberOfDislikes,
+    required this.isBookmarked,
+  });
 
   Post.fromSnapshot(
     QueryDocumentSnapshot<Map<String, dynamic>> snapshot,
@@ -48,7 +50,7 @@ class Post {
         ownerUserId = snapshot.data()[ownerUserIdFieldName],
         ownerUserName = snapshot.data()[ownerUserNameFieldName] as String,
         title = snapshot.data()[titleFieldName] as String,
-        text = snapshot.data()[textFieldName] as String,
+        content = snapshot.data()[textFieldName] as String,
         imageUrl = snapshot.data()[imageLinkFieldName] as String?,
         category = snapshot.data()[categoryFieldName] as String,
         latitude = snapshot.data()[latitudeFieldName] as double,

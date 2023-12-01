@@ -34,6 +34,6 @@ class MainStateViewPostDetail extends MainState {
 }
 
 class MainStateEditProfile extends MainState {
-  final AppUser user;
+  final CurrentUser user;
   const MainStateEditProfile(this.user);
 }

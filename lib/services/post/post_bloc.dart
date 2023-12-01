@@ -6,9 +6,9 @@ import 'package:locainfo/services/auth/firebase_auth_provider.dart';
 import 'package:locainfo/services/cloud_storage/cloudstorage_provider.dart';
 import 'package:locainfo/services/firestore/firestore_provider.dart';
 import 'package:locainfo/services/location/location_provider.dart';
-import 'package:locainfo/services/post_bloc/post_event.dart';
-import 'package:locainfo/services/post_bloc/post_exceptions.dart';
-import 'package:locainfo/services/post_bloc/post_state.dart';
+import 'package:locainfo/services/post/post_event.dart';
+import 'package:locainfo/services/post/post_exceptions.dart';
+import 'package:locainfo/services/post/post_state.dart';
 import 'package:locainfo/utilities/post_info_helper.dart';
 
 class PostBloc extends Bloc<PostEvent, PostState> {
@@ -27,7 +27,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       emit(const PostStateLoadingPosts(isLoading: false));
       try {
         final position = await _locationProvider.getCurrentLocation();
-        final posts = await _databaseProvider.getNearbyPosts2(
+        final posts = await _databaseProvider.getNearbyPosts(
           position: position,
           currentUserId: _authProvider.currentUser!.id,
         );
@@ -63,7 +63,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         if (event.searchText != null) {
           emit(const PostStateSearchLoading(isLoading: true));
           final currentLocation = await _locationProvider.getCurrentLocation();
-          final filteredPosts = await _databaseProvider.getSearchedPosts(
+          final filteredPosts = await _databaseProvider.getSearchPosts(
               event.searchText!,
               _authProvider.currentUser!.id,
               currentLocation);
@@ -120,7 +120,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
               documentId: event.postId, imageUrl: imageUrl);
         }
 
-        await _databaseProvider.updatePost(
+        await _databaseProvider.updatePostTitleContent(
           documentId: event.postId,
           title: event.title,
           text: event.body,
@@ -164,7 +164,8 @@ class PostBloc extends Bloc<PostEvent, PostState> {
             RegExp(r'^[0-9\W_]').hasMatch(event.body)) {
           throw ContentCouldNotEmptyPostException();
         }
-        if (event.category == null || !categories.containsKey(event.category)) {
+        if (event.category == null ||
+            !postCategories.containsKey(event.category)) {
           throw CategoryInvalidPostException();
         }
         Future.delayed(const Duration(seconds: 1), () async {

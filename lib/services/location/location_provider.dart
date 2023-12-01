@@ -7,16 +7,6 @@ import 'package:locainfo/services/location/location_exceptions.dart';
 class LocationProvider implements GeoLocationProvider {
   LocationProvider();
 
-  // start location stream
-  Stream<Position> getLocationStream() {
-    return Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 15,
-      ),
-    );
-  }
-
   // get current location
   @override
   Future<Position> getCurrentLocation() async {
@@ -54,5 +44,16 @@ class LocationProvider implements GeoLocationProvider {
   @override
   Future<Position?> getLastKnownLocation() async {
     return await Geolocator.getLastKnownPosition();
+  }
+
+  // start live location update (stream)
+  @override
+  Stream<Position> getLocationStream() {
+    return Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 25,
+      ),
+    );
   }
 }

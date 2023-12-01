@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
 
 // idea come from https://youtu.be/VPvVD8t02U8?si=Qd-d_xGvdbAWYUIw
@@ -17,6 +18,7 @@ Future<T?> showGenericDialog<T>({
       context: context,
       builder: (context) {
         return AlertDialog(
+          backgroundColor: AppColors.grey50,
           title: Text(
             title,
             style: CustomFontStyles.dialogHeading,
@@ -28,6 +30,8 @@ Future<T?> showGenericDialog<T>({
           actions: options.keys.map((optionTitle) {
             final T value = options[optionTitle];
             return TextButton(
+                style:
+                    TextButton.styleFrom(foregroundColor: AppColors.darkerBlue),
                 onPressed: () {
                   if (value != null) {
                     Navigator.of(context)

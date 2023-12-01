@@ -187,7 +187,7 @@ class PostStateClearBookmarkError extends PostState {
 }
 
 class PostStateProfileInitialised extends PostState {
-  final AppUser user;
+  final CurrentUser user;
   const PostStateProfileInitialised(
       {required bool isLoading, required this.user})
       : super(isLoading: isLoading);

@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:like_button/like_button.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/custom_datatype.dart';
-import 'package:locainfo/services/post_bloc/post_bloc.dart';
-import 'package:locainfo/services/post_bloc/post_event.dart';
+import 'package:locainfo/services/post/post_bloc.dart';
+import 'package:locainfo/services/post/post_event.dart';
 
 // custom book mark button using like_button package
 class MyBookmarkButton extends StatefulWidget {

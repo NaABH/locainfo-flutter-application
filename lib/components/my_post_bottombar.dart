@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/constants/custom_datatype.dart';
 import 'package:locainfo/pages/app/report_page.dart';
 import 'package:locainfo/services/firestore/post.dart';
-import 'package:locainfo/services/post_bloc/post_bloc.dart';
-import 'package:locainfo/services/post_bloc/post_event.dart';
+import 'package:locainfo/services/post/post_bloc.dart';
+import 'package:locainfo/services/post/post_event.dart';
 import 'package:share_plus/share_plus.dart';
 
 class MyPostBottomBar extends StatefulWidget {
@@ -121,7 +121,7 @@ class _MyPostBottomBarState extends State<MyPostBottomBar> {
           ),
           GestureDetector(
             onTap: () async {
-              await Share.share('${post.title}\n${post.text}');
+              await Share.share('${post.title}\n${post.content}');
             },
             child: const Icon(Icons.share),
           ),

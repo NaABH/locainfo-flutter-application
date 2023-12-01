@@ -1,6 +1,7 @@
+// exceptions for location provider services
+
 class LocationException implements Exception {
   const LocationException();
 }
 
-// creating
 class CouldNotGetLocationException extends LocationException {}

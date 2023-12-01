@@ -51,7 +51,7 @@ class _MyDropdownMenuState extends State<MyDropdownMenu> {
   }
 
   List<DropdownMenuItem<String>> _buildDropdownItems() {
-    return categories.entries.map<DropdownMenuItem<String>>((entry) {
+    return postCategories.entries.map<DropdownMenuItem<String>>((entry) {
       return DropdownMenuItem<String>(
         value: entry.key,
         child: Text(entry.value),

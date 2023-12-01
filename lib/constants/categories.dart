@@ -1,5 +1,5 @@
 // Mapping of categories of post
-const categories = {
+const postCategories = {
   '1': 'News & Announcement',
   '2': 'Events & Activities',
   '3': 'Promotions',

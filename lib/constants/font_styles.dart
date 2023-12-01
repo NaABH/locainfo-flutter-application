@@ -18,6 +18,7 @@ class CustomFontStyles {
 
   // used for general dialog
   static const TextStyle defaultFont = TextStyle(
+    color: AppColors.black,
     fontWeight: FontWeight.w400,
   );
 

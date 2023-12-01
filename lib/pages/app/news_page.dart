@@ -6,9 +6,9 @@ import 'package:locainfo/constants/categories.dart';
 import 'package:locainfo/constants/custom_datatype.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/pages/app/post_detail_page.dart';
-import 'package:locainfo/services/post_bloc/post_bloc.dart';
-import 'package:locainfo/services/post_bloc/post_event.dart';
-import 'package:locainfo/services/post_bloc/post_state.dart';
+import 'package:locainfo/services/post/post_bloc.dart';
+import 'package:locainfo/services/post/post_event.dart';
+import 'package:locainfo/services/post/post_state.dart';
 
 class NewsPage extends StatefulWidget {
   const NewsPage({super.key});
@@ -129,7 +129,7 @@ class _NewsPageState extends State<NewsPage> {
 
   Widget _buildCategoryButtons() {
     // Add 'All' as the default category
-    final List<String> categoryKeys = ['All', ...categories.keys.toList()];
+    final List<String> categoryKeys = ['All', ...postCategories.keys.toList()];
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -137,7 +137,7 @@ class _NewsPageState extends State<NewsPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: categoryKeys.map((categoryKey) {
-          final categoryText = categories[categoryKey] ?? 'All';
+          final categoryText = postCategories[categoryKey] ?? 'All';
           return Padding(
             padding: const EdgeInsets.only(bottom: 8.0, right: 4),
             child: ElevatedButton(

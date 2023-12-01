@@ -54,6 +54,16 @@ class AuthStateLoggingIn extends AuthState {
   }) : super(isLoading: isLoading);
 }
 
+// user logging in with Google
+class AuthStateLoggingInWithGoogle extends AuthState {
+  final Exception? exception; // prepare to hold an exception if occur
+  const AuthStateLoggingInWithGoogle({
+    required this.exception,
+    required isLoading,
+    String? loadingText,
+  }) : super(isLoading: isLoading);
+}
+
 // user forget password
 class AuthStateForgotPassword extends AuthState {
   final Exception? exception; // hold exception

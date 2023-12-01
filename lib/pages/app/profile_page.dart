@@ -9,9 +9,9 @@ import 'package:locainfo/services/auth/bloc/auth_event.dart';
 import 'package:locainfo/services/firestore/user.dart';
 import 'package:locainfo/services/main_bloc.dart';
 import 'package:locainfo/services/main_event.dart';
-import 'package:locainfo/services/post_bloc/post_bloc.dart';
-import 'package:locainfo/services/post_bloc/post_event.dart';
-import 'package:locainfo/services/post_bloc/post_state.dart';
+import 'package:locainfo/services/post/post_bloc.dart';
+import 'package:locainfo/services/post/post_event.dart';
+import 'package:locainfo/services/post/post_state.dart';
 import 'package:locainfo/utilities/dialog/error_dialog.dart';
 import 'package:locainfo/utilities/dialog/logout_dialog.dart';
 import 'package:locainfo/utilities/toast_message.dart';
@@ -24,7 +24,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  AppUser? user;
+  CurrentUser? user;
   @override
   void initState() {
     context.read<PostBloc>().add(const PostEventInitialiseProfile());
@@ -150,7 +150,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
-                              "Hello, ${state.user.username}",
+                              "Hello, ${state.user.userName}",
                               style: TextStyle(
                                   fontSize: 26,
                                   fontWeight: FontWeight.w500,

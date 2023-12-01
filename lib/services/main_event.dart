@@ -31,6 +31,6 @@ class MainEventInitialiseProfilePage extends MainEvent {
 }
 
 class MainEventEditProfile extends MainEvent {
-  final AppUser user;
+  final CurrentUser user;
   const MainEventEditProfile(this.user);
 }

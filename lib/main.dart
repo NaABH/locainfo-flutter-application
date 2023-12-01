@@ -13,7 +13,7 @@ import 'package:locainfo/services/cloud_storage/cloudstorage_provider.dart';
 import 'package:locainfo/services/firestore/firestore_provider.dart';
 import 'package:locainfo/services/location/location_provider.dart';
 import 'package:locainfo/services/main_bloc.dart';
-import 'package:locainfo/services/post_bloc/post_bloc.dart';
+import 'package:locainfo/services/post/post_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

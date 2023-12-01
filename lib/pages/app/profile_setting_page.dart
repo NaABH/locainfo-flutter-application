@@ -13,7 +13,7 @@ import 'package:locainfo/utilities/dialog/change_profile_picture_dialog.dart';
 import 'package:locainfo/utilities/dialog/update_username_dialog.dart';
 
 class UpdateProfilePage extends StatefulWidget {
-  final AppUser user;
+  final CurrentUser user;
   const UpdateProfilePage({super.key, required this.user});
 
   @override
@@ -21,7 +21,7 @@ class UpdateProfilePage extends StatefulWidget {
 }
 
 class _UpdateProfilePageState extends State<UpdateProfilePage> {
-  late AppUser _user;
+  late CurrentUser _user;
   late final TextEditingController _usernameController;
 
   @override

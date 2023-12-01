@@ -8,9 +8,9 @@ import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/categories.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/services/firestore/post.dart';
-import 'package:locainfo/services/post_bloc/post_bloc.dart';
-import 'package:locainfo/services/post_bloc/post_event.dart';
-import 'package:locainfo/services/post_bloc/post_state.dart';
+import 'package:locainfo/services/post/post_bloc.dart';
+import 'package:locainfo/services/post/post_event.dart';
+import 'package:locainfo/services/post/post_state.dart';
 import 'package:locainfo/utilities/dialog/error_dialog.dart';
 import 'package:locainfo/utilities/loading_screen/loading_screen.dart';
 
@@ -36,7 +36,7 @@ class _UpdatePostPageState extends State<UpdatePostPage> {
   void initState() {
     currentPost = widget.post;
     _textControllerTitle = TextEditingController(text: currentPost.title);
-    _textControllerBody = TextEditingController(text: currentPost.text);
+    _textControllerBody = TextEditingController(text: currentPost.content);
     _picker = ImagePicker();
     if (currentPost.imageUrl != null) {
       oldImage = File(currentPost.imageUrl!);
@@ -247,7 +247,7 @@ class _UpdatePostPageState extends State<UpdatePostPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          categories[currentPost.category]!,
+                          postCategories[currentPost.category]!,
                           style: TextStyle(
                               color: AppColors.grey7,
                               fontWeight: FontWeight.w400),

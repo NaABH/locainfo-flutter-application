@@ -5,9 +5,9 @@ import 'package:locainfo/components/my_button.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/services/firestore/post.dart';
-import 'package:locainfo/services/post_bloc/post_bloc.dart';
-import 'package:locainfo/services/post_bloc/post_event.dart';
-import 'package:locainfo/services/post_bloc/post_state.dart';
+import 'package:locainfo/services/post/post_bloc.dart';
+import 'package:locainfo/services/post/post_event.dart';
+import 'package:locainfo/services/post/post_state.dart';
 import 'package:locainfo/utilities/loading_screen/loading_screen.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 

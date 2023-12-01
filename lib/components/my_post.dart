@@ -10,8 +10,8 @@ import 'package:locainfo/constants/custom_datatype.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/pages/app/update_post_page.dart';
 import 'package:locainfo/services/firestore/post.dart';
-import 'package:locainfo/services/post_bloc/post_bloc.dart';
-import 'package:locainfo/services/post_bloc/post_event.dart';
+import 'package:locainfo/services/post/post_bloc.dart';
+import 'package:locainfo/services/post/post_event.dart';
 import 'package:locainfo/utilities/dialog/delete_dialog.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -271,7 +271,7 @@ class MyPost extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Text(
-        post.text,
+        post.content,
         style: CustomFontStyles.postContentText,
         textAlign: TextAlign.start,
         maxLines: 3,
@@ -301,7 +301,7 @@ class MyPost extends StatelessWidget {
       children: [
         IconButton(
           onPressed: () async {
-            await Share.share('${post.title}\n${post.text}');
+            await Share.share('${post.title}\n${post.content}');
           },
           splashRadius: 1,
           icon: const Icon(Icons.share, size: 20),

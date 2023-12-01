@@ -14,6 +14,7 @@ const likedByFieldName = 'liked_by';
 const dislikedByFieldName = 'disliked_by';
 
 // Field name for the fields for users collection
+const userCollectionName = 'users';
 const usernameFieldName = 'user_displayName';
 const emailAddressFieldName = 'email_address';
 const registerDateFieldName = 'register_date';
@@ -21,6 +22,7 @@ const bookmarkFieldName = 'bookmarked_post';
 const profilePictureFieldName = 'profile_picture';
 
 // Field name for the fields for report collection
+const reportCollectionName = 'reports';
 const reporterUserIdFieldName = 'user_id';
 const reportPostIdFieldName = 'post_id';
 const reasonFieldName = 'reason';

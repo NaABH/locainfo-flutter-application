@@ -6,9 +6,9 @@ import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/custom_datatype.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/pages/app/post_detail_page.dart';
-import 'package:locainfo/services/post_bloc/post_bloc.dart';
-import 'package:locainfo/services/post_bloc/post_event.dart';
-import 'package:locainfo/services/post_bloc/post_state.dart';
+import 'package:locainfo/services/post/post_bloc.dart';
+import 'package:locainfo/services/post/post_event.dart';
+import 'package:locainfo/services/post/post_state.dart';
 import 'package:locainfo/utilities/dialog/clear_all_bookmark_dialog.dart';
 import 'package:locainfo/utilities/dialog/error_dialog.dart';
 

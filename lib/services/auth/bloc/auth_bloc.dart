@@ -1,5 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:locainfo/services/auth/auth_exceptions.dart';
 import 'package:locainfo/services/auth/auth_provider.dart';
 import 'package:locainfo/services/auth/bloc/auth_event.dart';
@@ -110,12 +109,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             email: email,
             password: password,
           );
-          Timestamp currentDateTime = Timestamp.fromDate(DateTime.now());
           await databaseProvider.createNewUser(
-              userId: authProvider.currentUser!.id,
-              username: username,
-              emailAddress: email,
-              registerDate: currentDateTime);
+            userId: authProvider.currentUser!.id,
+            username: username,
+            emailAddress: email,
+          );
           await authProvider.sendEmailVerification();
           emit(const AuthStateNeedsVerification(isLoading: false));
         }
@@ -143,12 +141,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final email = event.email;
       final password = event.password;
       try {
-        print('trying to login');
         final user = await authProvider.logIn(
           email: email,
           password: password,
         );
-        print('start checking');
         if (!user.isEmailVerified) {
           // user  have not verify email
           emit(
@@ -177,6 +173,34 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             isLoading: false,
           ),
         );
+      }
+    });
+
+    on<AuthEventSignInWithGoogle>((event, emit) async {
+      emit(const AuthStateLoggingInWithGoogle(
+        exception: null,
+        isLoading: true,
+        loadingText: 'Signing in with Google',
+      ));
+      try {
+        final user = await authProvider.signInGoogle();
+        await databaseProvider.createNewUser(
+          userId: authProvider.currentUser!.id,
+          username: user.displayName == null ? "Anonymous" : user.displayName!,
+          emailAddress: authProvider.currentUser!.email,
+        );
+        if (user.isEmailVerified) {
+          emit(const AuthStateLoggingInWithGoogle(
+              exception: null, isLoading: false));
+          emit(AuthStateLoggedIn(user: user, isLoading: false));
+        } else {
+          emit(const AuthStateLoggingInWithGoogle(
+              exception: null, isLoading: false));
+          await authProvider.sendEmailVerification();
+          emit(const AuthStateNeedsVerification(isLoading: false));
+        }
+      } on Exception catch (e) {
+        emit(AuthStateLoggingInWithGoogle(exception: e, isLoading: false));
       }
     });
 

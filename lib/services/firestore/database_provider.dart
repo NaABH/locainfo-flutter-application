@@ -1,16 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:locainfo/services/firestore/post.dart';
 import 'package:locainfo/services/firestore/user.dart';
 
 abstract class DatabaseProvider {
+  // User Related
+  // function to store user information when they first sign in
   Future<void> createNewUser({
     required String userId,
     required String username,
     required String emailAddress,
-    required Timestamp registerDate,
   });
 
-  // create new post
+  // Post Related
+  // function to create a new post
   Future<void> createNewPost({
     required String ownerUserId,
     required String ownerUserName,
@@ -24,32 +27,30 @@ abstract class DatabaseProvider {
     required Timestamp postedDate,
   });
 
-  // // get posts
-  // Future<Iterable<Post>> getPosts({required String ownerUserId});
-
   // get all nearby posts
-  Future<Iterable<Post>> getNearbyPosts(
-      {required double userLat,
-      required double userLng,
-      required String currentUserId});
+  Future<Iterable<Post>> getNearbyPosts({
+    required Position position,
+    required String currentUserId,
+  });
 
-  Stream<Iterable<Post>> getNearbyPostStream(
-      {required double userLat,
-      required double userLng,
-      required String currentUserId});
+  Stream<Iterable<Post>> getNearbyPostStream({
+    required double userLat,
+    required double userLng,
+    required String currentUserId,
+  });
 
   // get all posts posted by the user
   Stream<Iterable<Post>> getPostedPostStream({required String currentUserId});
 
   // update posts
-  Future<void> updatePost({
+  Future<void> updatePostTitleContent({
     required String documentId,
     required String title,
     required String text,
   });
 
-  Future<AppUser> getUser({required String currentUserId});
+  Future<CurrentUser> getUser({required String currentUserId});
 
-  // // delete posts
-  // Future<void> deletePost({required String documentId});
+  // delete posts
+  Future<void> deletePost({required String documentId});
 }
