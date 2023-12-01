@@ -105,7 +105,7 @@ class PostDetailPage extends StatelessWidget {
                       fontSize: 26),
                 ),
                 Text(
-                  'Posted by ${post.ownerUserName}, ${post.timeAgo}',
+                  'Posted by ${post.ownerUserName}, ${post.postedDate}',
                   style: const TextStyle(
                       color: Colors.grey,
                       fontWeight: FontWeight.w500,

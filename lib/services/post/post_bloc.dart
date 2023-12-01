@@ -9,6 +9,7 @@ import 'package:locainfo/services/location/location_provider.dart';
 import 'package:locainfo/services/post/post_event.dart';
 import 'package:locainfo/services/post/post_exceptions.dart';
 import 'package:locainfo/services/post/post_state.dart';
+import 'package:locainfo/utilities/input_validation.dart';
 import 'package:locainfo/utilities/post_info_helper.dart';
 
 class PostBloc extends Bloc<PostEvent, PostState> {
@@ -101,10 +102,10 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       emit(const PostStateUpdatingPosts(
           isLoading: false, loadingText: 'Updating'));
       try {
-        if (event.title.trim().isEmpty ||
-            RegExp(r'^[0-9\W_]').hasMatch(event.title)) {
+        if (!isInputValid(event.title)) {
           throw TitleCouldNotEmptyPostException();
         }
+
         if (event.body.trim().isEmpty ||
             RegExp(r'^[0-9\W_]').hasMatch(event.body)) {
           throw ContentCouldNotEmptyPostException();
@@ -112,8 +113,8 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 
         if (event.imageUpdated) {
           if (event.image != null) {
-            imageUrl = await _cloudStorageProvider
-                .uploadPostImageToFirebaseStorage(event.image!);
+            imageUrl =
+                await _cloudStorageProvider.uploadPostImage(event.image!);
           }
 
           await _databaseProvider.updatePostImage(
@@ -171,8 +172,8 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         Future.delayed(const Duration(seconds: 1), () async {
           //upload picture
           if (event.image != null) {
-            imageUrl = await _cloudStorageProvider
-                .uploadPostImageToFirebaseStorage(event.image!);
+            imageUrl =
+                await _cloudStorageProvider.uploadPostImage(event.image!);
           }
           String locationName =
               await getLocationName(position.latitude, position.longitude);

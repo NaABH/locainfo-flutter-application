@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:locainfo/services/firestore/current_user.dart';
 import 'package:locainfo/services/firestore/post.dart';
-import 'package:locainfo/services/firestore/user.dart';
 
 @immutable
 abstract class PostState {

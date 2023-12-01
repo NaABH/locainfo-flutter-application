@@ -6,7 +6,7 @@ import 'package:locainfo/components/my_back_button.dart';
 import 'package:locainfo/components/my_button.dart';
 import 'package:locainfo/components/my_divider.dart';
 import 'package:locainfo/constants/font_styles.dart';
-import 'package:locainfo/services/firestore/user.dart';
+import 'package:locainfo/services/firestore/current_user.dart';
 import 'package:locainfo/services/main_bloc.dart';
 import 'package:locainfo/services/main_event.dart';
 import 'package:locainfo/utilities/dialog/change_profile_picture_dialog.dart';

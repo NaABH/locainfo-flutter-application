@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:locainfo/constants/custom_datatype.dart';
+import 'package:locainfo/services/firestore/current_user.dart';
 import 'package:locainfo/services/firestore/database_exceptions.dart';
 import 'package:locainfo/services/firestore/database_provider.dart';
 import 'package:locainfo/services/firestore/post.dart';
-import 'package:locainfo/services/firestore/user.dart';
 
 import 'database_constants.dart';
 
@@ -19,6 +19,10 @@ class FireStoreProvider implements DatabaseProvider {
   final users = FirebaseFirestore.instance.collection(userCollectionName);
   final reports = FirebaseFirestore.instance.collection(reportCollectionName);
 
+  // Use to filter the post which is posted 3 months ago (approximate 90 days) and 300m away
+  DateTime dateFiltering = DateTime.now().subtract(const Duration(days: 90));
+  int distanceFiltering = 300;
+
   // get nearby post
   @override
   Future<Iterable<Post>> getNearbyPosts({
@@ -27,8 +31,11 @@ class FireStoreProvider implements DatabaseProvider {
   }) async {
     try {
       final bookmarkedPostIds = await getBookmarkedPostIds(currentUserId);
-      var event =
-          await posts.orderBy(postedDateFieldName, descending: true).get();
+      var event = await posts
+          .where(postedDateFieldName,
+              isGreaterThan: Timestamp.fromDate(dateFiltering))
+          .orderBy(postedDateFieldName, descending: true)
+          .get();
       return event.docs
           .map(
               (doc) => Post.fromSnapshot(doc, currentUserId, bookmarkedPostIds))
@@ -41,14 +48,15 @@ class FireStoreProvider implements DatabaseProvider {
           position.longitude,
         );
         // Keep only the posts that are within 300 meters of the user location
-        return distance <= 300;
+        return distance <= distanceFiltering;
       });
-    } catch (e) {
+    } on Exception catch (_) {
       throw CouldNotGetPostsException();
     }
   }
 
   // get posted post
+  @override
   Future<Iterable<Post>> getPostedPosts({required String currentUserId}) async {
     try {
       var querySnapshot = await posts
@@ -56,18 +64,15 @@ class FireStoreProvider implements DatabaseProvider {
             ownerUserIdFieldName,
             isEqualTo: currentUserId,
           )
+          .orderBy(postedDateFieldName, descending: true)
           .get();
       final bookmarkedPostIds = await getBookmarkedPostIds(currentUserId);
       var postsList = querySnapshot.docs
           .map(
               (doc) => Post.fromSnapshot(doc, currentUserId, bookmarkedPostIds))
           .toList();
-
-      // Order posts by postCreatedDate in descending order
-      postsList.sort((a, b) => b.postedDate.compareTo(a.postedDate));
-
       return postsList;
-    } catch (e) {
+    } on Exception catch (_) {
       throw CouldNotGetPostsException();
     }
   }
@@ -88,7 +93,7 @@ class FireStoreProvider implements DatabaseProvider {
     required Timestamp postedDate,
   }) async {
     try {
-      final post = await posts.add({
+      await posts.add({
         ownerUserIdFieldName: ownerUserId,
         ownerUserNameFieldName: ownerUserName,
         titleFieldName: title,
@@ -102,23 +107,7 @@ class FireStoreProvider implements DatabaseProvider {
         likedByFieldName: [],
         dislikedByFieldName: [],
       });
-
-      // final fetchedPost =
-      //     await post.get(); // immediately fetch back from the FireStore
-      // DateTime postedTime = postedDate.toDate();
-      // return Post(
-      //   documentId: fetchedPost.id,
-      //   ownerUserId: ownerUserId,
-      //   ownerUserName: ownerUserName,
-      //   title: title,
-      //   text: body,
-      //   category: category,
-      //   latitude: latitude,
-      //   longitude: longitude,
-      //   locationName: locationName,
-      //   postedDate: postedTime,
-      // );
-    } catch (e) {
+    } on Exception catch (_) {
       throw CouldNotCreatePostException();
     }
   }
@@ -135,12 +124,13 @@ class FireStoreProvider implements DatabaseProvider {
         titleFieldName: title,
         textFieldName: text,
       });
-    } catch (e) {
+    } on Exception catch (_) {
       throw CouldNotUpdatePostException();
     }
   }
 
   // update post: image
+  @override
   Future<void> updatePostImage({
     required String documentId,
     required String? imageUrl,
@@ -149,7 +139,7 @@ class FireStoreProvider implements DatabaseProvider {
       await posts.doc(documentId).update({
         imageLinkFieldName: imageUrl,
       });
-    } catch (e) {
+    } on Exception catch (_) {
       throw CouldNotUpdatePostException();
     }
   }
@@ -159,78 +149,77 @@ class FireStoreProvider implements DatabaseProvider {
   Future<void> deletePost({required String documentId}) async {
     try {
       posts.doc(documentId).delete();
-    } catch (e) {
+    } on Exception catch (e) {
       throw CouldNotDeletePostException();
     }
   }
 
-  // Post interaction: Like
-  Future<void> updatePostLike({
+  // update post reactions
+  @override
+  Future<void> updatePostReactions({
     required String documentId,
     required String currentUserId,
     required UserAction action,
   }) async {
-    if (action == UserAction.like) {
-      await posts.doc(documentId).update({
-        likedByFieldName: FieldValue.arrayUnion([currentUserId])
-      });
-    } else {
-      await posts.doc(documentId).update({
-        likedByFieldName: FieldValue.arrayRemove([currentUserId])
-      });
-    }
-  }
-
-  // Post interaction: DisLike
-  Future<void> updatePostDislike({
-    required String documentId,
-    required String currentUserId,
-    required UserAction action,
-  }) async {
-    if (action == UserAction.dislike) {
-      await posts.doc(documentId).update({
-        dislikedByFieldName: FieldValue.arrayUnion([currentUserId])
-      });
-    } else {
-      await posts.doc(documentId).update({
-        dislikedByFieldName: FieldValue.arrayRemove([currentUserId])
-      });
-    }
-  }
-
-  // Post interaction: bookmark
-  Future<void> updateBookmarkList({
-    required String documentId,
-    required String currentUserId,
-    required UserAction action,
-  }) async {
-    // Get the current list of bookmarked postIds
-    final currentBookmarkedPosts = await getBookmarkedPostIds(currentUserId);
-    if (action == UserAction.bookmark) {
-      // Add the new postId if it's not already in the list
-      if (!currentBookmarkedPosts.contains(documentId)) {
-        currentBookmarkedPosts.add(documentId);
+    try {
+      // user like
+      if (action == UserAction.like) {
+        await posts.doc(documentId).update({
+          likedByFieldName: FieldValue.arrayUnion([currentUserId])
+        });
       }
-      // Update the 'bookmarked_posts' field in the user's document
-      await users.doc(currentUserId).set(
-        {bookmarkFieldName: currentBookmarkedPosts},
-        SetOptions(merge: true),
-      );
-    } else if (action == UserAction.removeBookmark) {
-      await users.doc(currentUserId).update({
-        bookmarkFieldName: FieldValue.arrayRemove([documentId]),
-      });
+      // remove like
+      else if (action == UserAction.unlike) {
+        await posts.doc(documentId).update({
+          likedByFieldName: FieldValue.arrayRemove([currentUserId])
+        });
+      }
+      // dislike
+      else if (action == UserAction.dislike) {
+        await posts.doc(documentId).update({
+          dislikedByFieldName: FieldValue.arrayUnion([currentUserId])
+        });
+      }
+      // remove dislike
+      else if (action == UserAction.removeDislike) {
+        await posts.doc(documentId).update({
+          dislikedByFieldName: FieldValue.arrayRemove([currentUserId])
+        });
+      }
+      // bookmark
+      else if (action == UserAction.bookmark) {
+        final currentBookmarkedPosts =
+            await getBookmarkedPostIds(currentUserId);
+        if (!currentBookmarkedPosts.contains(documentId)) {
+          currentBookmarkedPosts.add(documentId);
+        }
+        await users.doc(currentUserId).set(
+          {bookmarkFieldName: currentBookmarkedPosts},
+          SetOptions(merge: true),
+        );
+      }
+      // remove bookmark
+      else {
+        await users.doc(currentUserId).update({
+          bookmarkFieldName: FieldValue.arrayRemove([documentId]),
+        });
+      }
+    } on Exception catch (_) {
+      throw CouldNotUpdatePostReactionsException();
     }
   }
 
   // searching function
+  @override
   Future<Iterable<Post>> getSearchPosts(
       String searchText, String currentUserId, Position position) async {
     try {
       final bookmarkedPostIds = await getBookmarkedPostIds(currentUserId);
-
-      var event =
-          await posts.orderBy(postedDateFieldName, descending: true).get();
+      var event = await posts
+          .where(postedDateFieldName,
+              isGreaterThan: Timestamp.fromDate(dateFiltering))
+          .orderBy(postedDateFieldName, descending: true)
+          .get();
       return event.docs
           .map((doc) => Post.fromSnapshot(
                 doc,
@@ -242,7 +231,6 @@ class FireStoreProvider implements DatabaseProvider {
         bool titleMatches =
             post.title.toLowerCase().contains(searchText.toLowerCase());
 
-        // Calculate the distance between the post location and the user location
         var distance = Geolocator.distanceBetween(
           post.latitude,
           post.longitude,
@@ -251,14 +239,15 @@ class FireStoreProvider implements DatabaseProvider {
         );
 
         // Keep only the posts that are within 300 meters and match the title search
-        return distance <= 300 && titleMatches;
+        return distance <= distanceFiltering && titleMatches;
       });
-    } on Exception catch (e) {
+    } on Exception catch (_) {
       throw CouldNotGetSearchedPostException();
     }
   }
 
-  // bookmark id
+  // get bookmark post ids
+  @override
   Future<List<String>> getBookmarkedPostIds(String userId) async {
     try {
       DocumentSnapshot userDoc = await users.doc(userId).get();
@@ -270,15 +259,16 @@ class FireStoreProvider implements DatabaseProvider {
             List<String>.from(userData[bookmarkFieldName]);
         return bookmarkedPostIds;
       } else {
-        // Bookmark field doesn't exist, return empty array
+        // Bookmark field does not exist, return empty array
         return [];
       }
-    } on Exception catch (e) {
+    } on Exception catch (_) {
       throw CouldNotGetBookmarkPostIdsException();
     }
   }
 
-  // post from bookmark id
+  // get post from bookmark id
+  @override
   Future<Iterable<Post>> getBookmarkedPosts(String currentUserId) async {
     try {
       final bookmarkedPostIds = await getBookmarkedPostIds(currentUserId);
@@ -295,30 +285,32 @@ class FireStoreProvider implements DatabaseProvider {
                 currentUserId,
                 bookmarkedPostIds)), // convert each document into a Post object
           );
-    } catch (e) {
+    } on Exception catch (_) {
       throw CouldNotGetBookmarkPostException();
     }
   }
 
   // Clear all bookmark
+  @override
   Future<void> clearBookmarkList({required String currentUserId}) async {
     try {
       await users.doc(currentUserId).update({
         bookmarkFieldName: [],
       });
-    } on Exception catch (e) {
-      throw CouldClearBookmarkException();
+    } on Exception catch (_) {
+      throw CouldNotClearBookmarkException();
     }
   }
 
   // ?
-  @override
   Stream<Iterable<Post>> getNearbyPostStream({
     required double userLat,
     required double userLng,
     required String currentUserId,
   }) =>
       posts
+          .where(postedDateFieldName,
+              isGreaterThan: Timestamp.fromDate(dateFiltering))
           .orderBy(postedDateFieldName, descending: true)
           .snapshots()
           .map((event) {
@@ -330,22 +322,8 @@ class FireStoreProvider implements DatabaseProvider {
             var distance = Geolocator.distanceBetween(
                 post.latitude, post.longitude, userLat, userLng);
             // Keep only the posts that are within 300 meters of the user location
-            return distance <= 300;
+            return distance <= distanceFiltering;
           });
-        } catch (e) {
-          throw CouldNotGetPostsException();
-        }
-      });
-
-  @override
-  Stream<Iterable<Post>> getPostedPostStream({required String currentUserId}) =>
-      posts.orderBy(ownerUserIdFieldName).snapshots().map((event) {
-        try {
-          return event.docs // see all changes that happen live
-              .map((doc) => Post.fromSnapshot(doc, currentUserId, []))
-              .where((post) =>
-                  post.ownerUserId ==
-                  currentUserId); // posts created by the user
         } catch (e) {
           throw CouldNotGetPostsException();
         }
@@ -362,19 +340,19 @@ class FireStoreProvider implements DatabaseProvider {
     try {
       DocumentSnapshot userDoc = await users.doc(userId).get();
       if (!userDoc.exists) {
-        Timestamp currentDateTime = Timestamp.fromDate(DateTime.now());
         await users.doc(userId).set({
           usernameFieldName: username,
           emailAddressFieldName: emailAddress,
-          registerDateFieldName: currentDateTime,
+          registerDateFieldName: Timestamp.fromDate(DateTime.now()),
         });
       }
-    } on Exception catch (e) {
+    } on Exception catch (_) {
       throw CouldNotCreateNewUserException();
     }
   }
 
   // get user
+  @override
   Future<CurrentUser> getUser({required String currentUserId}) async {
     try {
       DocumentSnapshot userDoc = await users.doc(currentUserId).get();
@@ -385,6 +363,7 @@ class FireStoreProvider implements DatabaseProvider {
   }
 
   // -----------------------------Report-------------------------------
+  @override
   Future<void> createNewReport({
     required String reporterId,
     required String postId,
@@ -398,7 +377,7 @@ class FireStoreProvider implements DatabaseProvider {
         reasonFieldName: reason,
         reportDateFieldName: reportDate,
       });
-    } on Exception catch (e) {
+    } on Exception catch (_) {
       throw CouldNotCreateReportException();
     }
   }

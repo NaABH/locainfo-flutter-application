@@ -5,7 +5,10 @@ import 'package:locainfo/services/location/geolocation_provider.dart';
 import 'package:locainfo/services/location/location_exceptions.dart';
 
 class LocationProvider implements GeoLocationProvider {
-  LocationProvider();
+  // singleton
+  static final LocationProvider _shared = LocationProvider._sharedInstance();
+  LocationProvider._sharedInstance();
+  factory LocationProvider() => _shared;
 
   // get current location
   @override
@@ -35,7 +38,7 @@ class LocationProvider implements GeoLocationProvider {
 
       return await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
-    } on Exception catch (e) {
+    } on Exception catch (_) {
       throw CouldNotGetLocationException();
     }
   }
@@ -43,17 +46,25 @@ class LocationProvider implements GeoLocationProvider {
   // get last known location (value can be null)
   @override
   Future<Position?> getLastKnownLocation() async {
-    return await Geolocator.getLastKnownPosition();
+    try {
+      return await Geolocator.getLastKnownPosition();
+    } on Exception catch (_) {
+      throw CouldNotGetLastKnownLocationException();
+    }
   }
 
   // start live location update (stream)
   @override
   Stream<Position> getLocationStream() {
-    return Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 25,
-      ),
-    );
+    try {
+      return Geolocator.getPositionStream(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 25,
+        ),
+      );
+    } on Exception catch (_) {
+      throw CouldNotGetLiveLocationException();
+    }
   }
 }

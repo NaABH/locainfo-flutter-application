@@ -1,40 +1,45 @@
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:locainfo/services/cloud_storage/cloud_storage_exceptions.dart';
+import 'package:locainfo/services/cloud_storage/storage_provider.dart';
 import 'package:uuid/uuid.dart';
 
-class CloudStorageProvider {
-  Future<String> uploadPostImageToFirebaseStorage(File imageFile) async {
-    String uniqueId = const Uuid().v4();
-    // Create a reference to the storage path with a unique name (timestamp)
-    Reference storageReference = FirebaseStorage.instance
-        .ref()
-        .child('post_images/${DateTime.now().toString()}_$uniqueId');
+class CloudStorageProvider extends StorageProvider {
+  // use for post image
+  @override
+  Future<String> uploadPostImage(File imageFile) async {
+    try {
+      String uniqueId = const Uuid().v4();
+      Reference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('post_images/${DateTime.now().toString()}_$uniqueId');
+      // Upload the file to Firebase Cloud Storage
+      UploadTask uploadTask = storageReference.putFile(imageFile);
 
-    // Upload the file to Firebase Cloud Storage
-    UploadTask uploadTask = storageReference.putFile(imageFile);
+      // Wait for the upload to complete and get the task snapshot
+      TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
 
-    // Wait for the upload to complete and get the task snapshot
-    TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
-
-    // Return the download URL of the uploaded file
-    return await taskSnapshot.ref.getDownloadURL();
+      // Return the download URL of the uploaded file
+      return await taskSnapshot.ref.getDownloadURL();
+    } on Exception catch (_) {
+      throw CouldNotUploadPostImageException();
+    }
   }
 
-  Future<String> uploadProfileImageToFirebaseStorage(File imageFile) async {
-    String uniqueId = const Uuid().v4();
-    // Create a reference to the storage path with a unique name (timestamp)
-    Reference storageReference = FirebaseStorage.instance
-        .ref()
-        .child('profile_images/${DateTime.now().toString()}_$uniqueId');
-
-    // Upload the file to Firebase Cloud Storage
-    UploadTask uploadTask = storageReference.putFile(imageFile);
-
-    // Wait for the upload to complete and get the task snapshot
-    TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
-
-    // Return the download URL of the uploaded file
-    return await taskSnapshot.ref.getDownloadURL();
+  // yse for profile picture
+  @override
+  Future<String> uploadProfileImage(File imageFile) async {
+    try {
+      String uniqueId = const Uuid().v4();
+      Reference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('profile_images/${DateTime.now().toString()}_$uniqueId');
+      UploadTask uploadTask = storageReference.putFile(imageFile);
+      TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
+      return await taskSnapshot.ref.getDownloadURL();
+    } on Exception catch (_) {
+      throw CouldNotUploadProfileImageException();
+    }
   }
 }

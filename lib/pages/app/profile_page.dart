@@ -6,7 +6,7 @@ import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
 import 'package:locainfo/services/auth/bloc/auth_event.dart';
-import 'package:locainfo/services/firestore/user.dart';
+import 'package:locainfo/services/firestore/current_user.dart';
 import 'package:locainfo/services/main_bloc.dart';
 import 'package:locainfo/services/main_event.dart';
 import 'package:locainfo/services/post/post_bloc.dart';
