@@ -20,8 +20,8 @@ class MyPostList extends StatelessWidget {
     Key? key,
     required this.posts,
     required this.onTap,
-    this.selectedCategory,
     required this.postPatternType,
+    this.selectedCategory,
     this.currentPosition,
     this.scrollController,
   }) : super(key: key);

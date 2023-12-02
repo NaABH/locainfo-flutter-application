@@ -1,9 +1,16 @@
 import 'dart:io';
 
+import 'package:geolocator/geolocator.dart';
 import 'package:locainfo/constants/custom_datatype.dart';
 
 abstract class PostEvent {
   const PostEvent();
+}
+
+// call in home page
+class PostEventLoadNearbyPostsHome extends PostEvent {
+  final Position position;
+  const PostEventLoadNearbyPostsHome(this.position);
 }
 
 // call in news page

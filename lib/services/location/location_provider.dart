@@ -3,12 +3,17 @@ import 'dart:async';
 import 'package:geolocator/geolocator.dart';
 import 'package:locainfo/services/location/geolocation_provider.dart';
 import 'package:locainfo/services/location/location_exceptions.dart';
+import 'package:locainfo/utilities/toast_message.dart';
 
 class LocationProvider implements GeoLocationProvider {
   // singleton
   static final LocationProvider _shared = LocationProvider._sharedInstance();
   LocationProvider._sharedInstance();
   factory LocationProvider() => _shared;
+
+  // constant
+  int minDistanceToUpdateOnce = 10;
+  int minTimeToUpdateOnceIfNoMove = 20;
 
   // get current location
   @override
@@ -26,6 +31,8 @@ class LocationProvider implements GeoLocationProvider {
       }
 
       if (permission == LocationPermission.deniedForever) {
+        showToastMessage(
+            'Location permissions are permanently denied, we cannot request permissions.');
         return Future.error(
             'Location permissions are permanently denied, we cannot request permissions.');
       }
@@ -58,10 +65,10 @@ class LocationProvider implements GeoLocationProvider {
   Stream<Position> getLocationStream() {
     try {
       return Geolocator.getPositionStream(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-          distanceFilter: 25,
-        ),
+        locationSettings: LocationSettings(
+            accuracy: LocationAccuracy.high,
+            distanceFilter: minDistanceToUpdateOnce,
+            timeLimit: Duration(seconds: minTimeToUpdateOnceIfNoMove)),
       );
     } on Exception catch (_) {
       throw CouldNotGetLiveLocationException();

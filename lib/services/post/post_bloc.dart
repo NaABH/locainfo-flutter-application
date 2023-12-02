@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
@@ -5,6 +7,7 @@ import 'package:locainfo/constants/categories.dart';
 import 'package:locainfo/services/auth/firebase_auth_provider.dart';
 import 'package:locainfo/services/cloud_storage/storage_provider.dart';
 import 'package:locainfo/services/firestore/database_provider.dart';
+import 'package:locainfo/services/location/bloc/location_bloc.dart';
 import 'package:locainfo/services/location/geolocation_provider.dart';
 import 'package:locainfo/services/post/post_event.dart';
 import 'package:locainfo/services/post/post_exceptions.dart';
@@ -17,16 +20,43 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   final GeoLocationProvider _locationProvider;
   final FirebaseAuthProvider _authProvider;
   final StorageProvider _cloudStorageProvider;
+  final LocationBloc _locationBloc;
+  StreamSubscription<Position>? _locationSubscription;
 
   PostBloc(
     this._databaseProvider,
     this._locationProvider,
     this._authProvider,
     this._cloudStorageProvider,
+    this._locationBloc,
   ) : super(const PostStateInitial(isLoading: false)) {
     // constant
     late PostState previousState;
     int delayTime = 400;
+
+    _locationSubscription = _locationBloc.stream.listen((position) {
+      add(PostEventLoadNearbyPostsHome(position));
+    });
+
+    // load nearby posts (home page)
+    on<PostEventLoadNearbyPostsHome>((event, emit) async {
+      try {
+        emit(const PostStateLoadingPosts(
+            isLoading: false, loadingText: 'Fetching nearby posts'));
+        final posts = await _databaseProvider.getNearbyPosts(
+          position: event.position,
+          currentUserId: _authProvider.currentUser!.id,
+        );
+        if (posts.isEmpty) {
+          emit(const PostStateNoAvailablePost(isLoading: false));
+        } else {
+          emit(PostStatePostLoaded(
+              isLoading: false, posts: posts, currentPosition: event.position));
+        }
+      } on Exception catch (e) {
+        emit(PostStateLoadError(isLoading: false, exception: e));
+      }
+    });
 
     // load nearby posts (news page)
     on<PostEventLoadNearbyPosts>((event, emit) async {

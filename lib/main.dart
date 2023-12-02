@@ -11,6 +11,7 @@ import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
 import 'package:locainfo/services/auth/firebase_auth_provider.dart';
 import 'package:locainfo/services/cloud_storage/cloudstorage_provider.dart';
 import 'package:locainfo/services/firestore/firestore_provider.dart';
+import 'package:locainfo/services/location/bloc/location_bloc.dart';
 import 'package:locainfo/services/location/location_provider.dart';
 import 'package:locainfo/services/main_bloc.dart';
 import 'package:locainfo/services/post/post_bloc.dart';
@@ -29,12 +30,16 @@ void main() async {
     BlocProvider<MainBloc>(
       create: (BuildContext context) => MainBloc(),
     ),
+    BlocProvider<LocationBloc>(
+      create: (context) => LocationBloc(LocationProvider()),
+    ),
     BlocProvider<PostBloc>(
         create: (BuildContext context) => PostBloc(
             FireStoreProvider(),
             LocationProvider(),
             FirebaseAuthProvider(),
-            CloudStorageProvider())),
+            CloudStorageProvider(),
+            context.read<LocationBloc>())),
     BlocProvider<ProfileBloc>(
         create: (BuildContext context) => ProfileBloc(FireStoreProvider(),
             FirebaseAuthProvider(), CloudStorageProvider()))

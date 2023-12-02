@@ -59,7 +59,8 @@ class MyPost extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      patternType != PostPatternType.userPosted
+                      (patternType != PostPatternType.userPosted &&
+                              patternType != PostPatternType.home)
                           ? _buildUserInfo()
                           : Container(),
                       patternType != PostPatternType.home &&
@@ -100,18 +101,21 @@ class MyPost extends StatelessWidget {
                               } else {
                                 return Center(
                                   child: SizedBox(
-                                    height: 70,
-                                    width: 70,
-                                    child: CircularProgressIndicator(
-                                      value:
-                                          loadingProgress.expectedTotalBytes !=
-                                                  null
-                                              ? loadingProgress
-                                                      .cumulativeBytesLoaded /
-                                                  (loadingProgress
-                                                          .expectedTotalBytes ??
-                                                      1)
-                                              : null,
+                                    height: 50,
+                                    width: 50,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(15),
+                                      child: CircularProgressIndicator(
+                                        value: loadingProgress
+                                                    .expectedTotalBytes !=
+                                                null
+                                            ? loadingProgress
+                                                    .cumulativeBytesLoaded /
+                                                (loadingProgress
+                                                        .expectedTotalBytes ??
+                                                    1)
+                                            : null,
+                                      ),
                                     ),
                                   ),
                                 );
