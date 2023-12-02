@@ -22,8 +22,18 @@ class PostEventClearAllBookmark extends PostEvent {
 }
 
 // call in create post page
-class PostEventCreatingPost extends PostEvent {
-  const PostEventCreatingPost();
+class PostEventInitialiseCreatePost extends PostEvent {
+  const PostEventInitialiseCreatePost();
+}
+
+// call in create post page
+class PostEventSavePreviousState extends PostEvent {
+  const PostEventSavePreviousState();
+}
+
+// call in create post page
+class PostEventBackToLastState extends PostEvent {
+  const PostEventBackToLastState();
 }
 
 // call in create post page
@@ -39,11 +49,6 @@ class PostEventCreatePost extends PostEvent {
 class PostEventSearchPostTextChanged extends PostEvent {
   final String? searchText;
   const PostEventSearchPostTextChanged(this.searchText);
-}
-
-// call in profile page when first enter
-class PostEventInitialiseProfile extends PostEvent {
-  const PostEventInitialiseProfile();
 }
 
 // call in posted post page

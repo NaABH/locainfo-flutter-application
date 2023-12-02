@@ -1,11 +1,11 @@
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:geolocator_platform_interface/src/models/position.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:locainfo/constants/categories.dart';
 import 'package:locainfo/services/auth/firebase_auth_provider.dart';
-import 'package:locainfo/services/cloud_storage/cloudstorage_provider.dart';
-import 'package:locainfo/services/firestore/firestore_provider.dart';
-import 'package:locainfo/services/location/location_provider.dart';
+import 'package:locainfo/services/cloud_storage/storage_provider.dart';
+import 'package:locainfo/services/firestore/database_provider.dart';
+import 'package:locainfo/services/location/geolocation_provider.dart';
 import 'package:locainfo/services/post/post_event.dart';
 import 'package:locainfo/services/post/post_exceptions.dart';
 import 'package:locainfo/services/post/post_state.dart';
@@ -13,10 +13,10 @@ import 'package:locainfo/utilities/input_validation.dart';
 import 'package:locainfo/utilities/post_info_helper.dart';
 
 class PostBloc extends Bloc<PostEvent, PostState> {
-  final FireStoreProvider _databaseProvider;
-  final LocationProvider _locationProvider;
+  final DatabaseProvider _databaseProvider;
+  final GeoLocationProvider _locationProvider;
   final FirebaseAuthProvider _authProvider;
-  final CloudStorageProvider _cloudStorageProvider;
+  final StorageProvider _cloudStorageProvider;
 
   PostBloc(
     this._databaseProvider,
@@ -24,26 +24,29 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     this._authProvider,
     this._cloudStorageProvider,
   ) : super(const PostStateInitial(isLoading: false)) {
+    // constant
+    late PostState previousState;
+    int delayTime = 400;
+
     // load nearby posts (news page)
     on<PostEventLoadNearbyPosts>((event, emit) async {
       try {
         emit(const PostStateLoadingPosts(
-            isLoading: true, loadingText: 'Fetching nearby posts...'));
+            isLoading: false, loadingText: 'Fetching nearby posts'));
         final position = await _locationProvider.getCurrentLocation();
         final posts = await _databaseProvider.getNearbyPosts(
           position: position,
           currentUserId: _authProvider.currentUser!.id,
         );
-        if (posts.isEmpty) {
-          emit(const PostStateLoadingPosts(isLoading: false));
-          emit(const PostStateNoAvailablePost(isLoading: false));
-        } else {
-          emit(const PostStateLoadingPosts(isLoading: false));
-          emit(PostStatePostLoaded(
-              isLoading: false, posts: posts, currentPosition: position));
-        }
+        await Future.delayed(Duration(milliseconds: delayTime), () {
+          if (posts.isEmpty) {
+            emit(const PostStateNoAvailablePost(isLoading: false));
+          } else {
+            emit(PostStatePostLoaded(
+                isLoading: false, posts: posts, currentPosition: position));
+          }
+        });
       } on Exception catch (e) {
-        emit(const PostStateLoadingPosts(isLoading: false));
         emit(PostStateLoadError(isLoading: false, exception: e));
       }
     });
@@ -52,18 +55,18 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     on<PostEventLoadBookmarkedPosts>((event, emit) async {
       try {
         emit(const PostStateLoadingPosts(
-            isLoading: true, loadingText: 'Fetching bookmarks'));
+            isLoading: false, loadingText: 'Fetching bookmarks'));
         final userId = _authProvider.currentUser!.id;
         final posts = await _databaseProvider.getBookmarkedPosts(userId);
-        if (posts.isNotEmpty) {
-          emit(const PostStateLoadingPosts(isLoading: false));
-          emit(PostStateLoadedBookmarkedPosts(posts: posts, isLoading: false));
-        } else {
-          emit(const PostStateLoadingPosts(isLoading: false));
-          emit(const PostStateNoAvailablePost(isLoading: false));
-        }
+        await Future.delayed(Duration(milliseconds: delayTime), () {
+          if (posts.isNotEmpty) {
+            emit(
+                PostStateLoadedBookmarkedPosts(posts: posts, isLoading: false));
+          } else {
+            emit(const PostStateNoAvailableBookmarkPost(isLoading: false));
+          }
+        });
       } on Exception catch (e) {
-        emit(const PostStateLoadingPosts(isLoading: false));
         emit(PostStateLoadError(isLoading: false, exception: e));
       }
     });
@@ -83,8 +86,18 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       }
     });
 
-    // initiate create post page
-    on<PostEventCreatingPost>((event, emit) async {
+    // save previous state (create post page)
+    on<PostEventSavePreviousState>((event, emit) {
+      previousState = state;
+    });
+
+    // (create post page)
+    on<PostEventBackToLastState>((event, emit) {
+      emit(previousState);
+    });
+
+    // initiate create post page (create post page)
+    on<PostEventInitialiseCreatePost>((event, emit) async {
       try {
         final position = await _locationProvider.getCurrentLocation();
         emit(PostStateCreatingPost(
@@ -102,8 +115,6 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       String? imageUrl;
       late final Position position;
       try {
-        emit(const PostStateSubmittingPost(
-            isLoading: true, loadingText: 'Submitting...'));
         position = await _locationProvider.getCurrentLocation();
         if (!isInputValid(event.title)) {
           throw TitleCouldNotEmptyPostException();
@@ -115,18 +126,21 @@ class PostBloc extends Bloc<PostEvent, PostState> {
             !postCategories.containsKey(event.category)) {
           throw InvalidCategoryPostException();
         }
-        Future.delayed(const Duration(seconds: 1), () async {
+        emit(const PostStateSubmittingPost(
+            isLoading: true, loadingText: 'Submitting...'));
+        await Future.delayed(const Duration(seconds: 2), () async {
           if (event.image != null) {
             imageUrl =
                 await _cloudStorageProvider.uploadPostImage(event.image!);
           } // CouldNotUploadPostImageException
           String locationName =
-              await getLocationName(position!.latitude, position!.longitude);
+              await getLocationName(position.latitude, position.longitude);
           Timestamp postedTimestamp = Timestamp.fromDate(DateTime.now());
           await _databaseProvider.createNewPost(
             // CouldNotCreatePostException
             ownerUserId: _authProvider.currentUser!.id,
             ownerUserName: _authProvider.currentUserName!,
+            ownerProfilePicUrl: _authProvider.currentUserProfilePicUrl,
             title: event.title,
             body: event.body,
             imageUrl: imageUrl != null ? imageUrl! : null,
@@ -166,33 +180,22 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       }
     });
 
-    // initialise profile (profile page)
-    on<PostEventInitialiseProfile>((event, emit) async {
-      try {
-        final user = await _databaseProvider.getUser(
-            currentUserId: _authProvider.currentUser!.id);
-        emit(PostStateProfileInitialised(isLoading: false, user: user));
-      } on Exception catch (_) {
-        emit(const PostStateProfileInitialiseFail(isLoading: false));
-      }
-    });
-
+    // Posted Post Page-----------------------------------------------------
     // initialise posted post page (posted post page)
     on<PostEventLoadPostedPosts>((event, emit) async {
       try {
         emit(const PostStateLoadingPosts(
-            isLoading: true, loadingText: 'Fetching posted posts'));
+            isLoading: false, loadingText: 'Fetching posted posts'));
         final posts = await _databaseProvider.getPostedPosts(
             currentUserId: _authProvider.currentUser!.id);
-        if (posts.isNotEmpty) {
-          emit(const PostStateLoadingPosts(isLoading: false));
-          emit(PostStateLoadedPostedPost(posts: posts, isLoading: false));
-        } else {
-          emit(const PostStateLoadingPosts(isLoading: false));
-          emit(const PostStateNoAvailablePostedPost(isLoading: false));
-        }
+        await Future.delayed(Duration(milliseconds: delayTime), () {
+          if (posts.isNotEmpty) {
+            emit(PostStateLoadedPostedPost(posts: posts, isLoading: false));
+          } else {
+            emit(const PostStateNoAvailablePostedPost(isLoading: false));
+          }
+        });
       } on Exception catch (e) {
-        emit(const PostStateLoadingPosts(isLoading: false));
         emit(const PostStateLoadPostedPostsError(isLoading: false));
       }
     });
@@ -200,8 +203,6 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     // update a post (update post page)
     on<PostEventUpdatePostContent>((event, emit) async {
       String? imageUrl;
-      emit(const PostStateUpdatingPosts(
-          isLoading: true, loadingText: 'Updating post'));
       try {
         if (!isInputValid(event.title)) {
           throw TitleCouldNotEmptyPostException();
@@ -209,6 +210,8 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         if (!isInputValid(event.body)) {
           throw ContentCouldNotEmptyPostException();
         }
+        emit(const PostStateUpdatingPosts(
+            isLoading: true, loadingText: 'Updating post'));
         if (event.imageUpdated) {
           if (event.image != null) {
             // got image
@@ -269,7 +272,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       }
     });
 
-    // call then deleting post ()
+    // call then deleting post ( posted post page)
     on<PostEventDeletePost>((event, emit) async {
       try {
         emit(const PostStateDeletingPost(

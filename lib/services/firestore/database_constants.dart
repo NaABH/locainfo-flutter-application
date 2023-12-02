@@ -2,6 +2,7 @@
 const postsCollectionName = 'posts';
 const ownerUserIdFieldName = 'user_id';
 const ownerUserNameFieldName = 'username';
+const ownerProfilePictureFieldName = 'userProfilePicUrl';
 const titleFieldName = 'title';
 const textFieldName = 'text';
 const imageLinkFieldName = 'imageUrl';

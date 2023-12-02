@@ -62,6 +62,7 @@ class FirebaseAuthProvider implements AuthProvider {
     }
   }
 
+  @override
   String? get currentUserName {
     final username = FirebaseAuth.instance.currentUser?.displayName;
     if (username != null) {
@@ -69,6 +70,26 @@ class FirebaseAuthProvider implements AuthProvider {
     } else {
       return null;
     }
+  }
+
+  @override
+  String? get currentUserProfilePicUrl {
+    final username = FirebaseAuth.instance.currentUser?.photoURL;
+    if (username != null) {
+      return username;
+    } else {
+      return null;
+    }
+  }
+
+  @override
+  Future<void> updateProfilePicUrl(String imageUrl) async {
+    FirebaseAuth.instance.currentUser?.updatePhotoURL(imageUrl);
+  }
+
+  @override
+  Future<void> updateDisplayName(String newName) async {
+    FirebaseAuth.instance.currentUser?.updateDisplayName(newName);
   }
 
   // return Future<AuthUser>

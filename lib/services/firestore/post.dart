@@ -9,6 +9,7 @@ class Post {
   final String documentId;
   final String ownerUserId;
   final String ownerUserName;
+  final String? ownerProfilePicUrl;
   final String title;
   final String content;
   final String? imageUrl;
@@ -27,6 +28,7 @@ class Post {
     required this.documentId,
     required this.ownerUserId,
     required this.ownerUserName,
+    required this.ownerProfilePicUrl,
     required this.title,
     required this.content,
     required this.imageUrl,
@@ -49,6 +51,8 @@ class Post {
   )   : documentId = snapshot.id,
         ownerUserId = snapshot.data()[ownerUserIdFieldName],
         ownerUserName = snapshot.data()[ownerUserNameFieldName] as String,
+        ownerProfilePicUrl =
+            snapshot.data()[ownerProfilePictureFieldName] as String?,
         title = snapshot.data()[titleFieldName] as String,
         content = snapshot.data()[textFieldName] as String,
         imageUrl = snapshot.data()[imageLinkFieldName] as String?,

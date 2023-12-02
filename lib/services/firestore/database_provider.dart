@@ -16,11 +16,24 @@ abstract class DatabaseProvider {
   // get current user
   Future<CurrentUser> getUser({required String currentUserId});
 
+  // update profile picture
+  Future<void> updateProfilePicture({
+    required String currentUserId,
+    required String imageUrl,
+  });
+
+  // update username
+  Future<void> updateUsername({
+    required String currentUserId,
+    required String newUsername,
+  });
+
   //--------------------------------Post-----------------------------------
   // function to create a new post
   Future<void> createNewPost({
     required String ownerUserId,
     required String ownerUserName,
+    required String? ownerProfilePicUrl,
     required String title,
     required String body,
     required String? imageUrl,

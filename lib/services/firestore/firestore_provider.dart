@@ -59,7 +59,7 @@ class FireStoreProvider implements DatabaseProvider {
   @override
   Future<Iterable<Post>> getPostedPosts({required String currentUserId}) async {
     try {
-      var querySnapshot = await posts
+      final event = await posts
           .where(
             ownerUserIdFieldName,
             isEqualTo: currentUserId,
@@ -67,7 +67,7 @@ class FireStoreProvider implements DatabaseProvider {
           .orderBy(postedDateFieldName, descending: true)
           .get();
       final bookmarkedPostIds = await getBookmarkedPostIds(currentUserId);
-      var postsList = querySnapshot.docs
+      final postsList = event.docs
           .map(
               (doc) => Post.fromSnapshot(doc, currentUserId, bookmarkedPostIds))
           .toList();
@@ -83,6 +83,7 @@ class FireStoreProvider implements DatabaseProvider {
   Future<void> createNewPost({
     required String ownerUserId,
     required String ownerUserName,
+    required String? ownerProfilePicUrl,
     required String title,
     required String body,
     required String? imageUrl,
@@ -96,6 +97,7 @@ class FireStoreProvider implements DatabaseProvider {
       await posts.add({
         ownerUserIdFieldName: ownerUserId,
         ownerUserNameFieldName: ownerUserName,
+        ownerProfilePictureFieldName: ownerProfilePicUrl,
         titleFieldName: title,
         textFieldName: body,
         categoryFieldName: category,
@@ -359,6 +361,57 @@ class FireStoreProvider implements DatabaseProvider {
       return CurrentUser.fromSnapshot(userDoc);
     } on Exception catch (_) {
       throw CouldNotGetUserException();
+    }
+  }
+
+  // update profile picture
+  @override
+  Future<void> updateProfilePicture({
+    required String currentUserId,
+    required String imageUrl,
+  }) async {
+    try {
+      await users.doc(currentUserId).update({
+        profilePictureFieldName: imageUrl,
+      });
+      final querySnapshot = await posts
+          .where(ownerUserIdFieldName, isEqualTo: currentUserId)
+          .get();
+
+      // Update ownerUsername in each post
+      for (final doc in querySnapshot.docs) {
+        await posts.doc(doc.id).update({
+          ownerProfilePictureFieldName: imageUrl,
+        });
+      }
+    } on Exception catch (_) {
+      throw CouldNotUpdateProfilePictureException();
+    }
+  }
+
+  // update username
+  @override
+  Future<void> updateUsername({
+    required String currentUserId,
+    required String newUsername,
+  }) async {
+    try {
+      await users.doc(currentUserId).update({
+        usernameFieldName: newUsername,
+      });
+
+      final querySnapshot = await posts
+          .where(ownerUserIdFieldName, isEqualTo: currentUserId)
+          .get();
+
+      // Update ownerUsername in each post
+      for (final doc in querySnapshot.docs) {
+        await posts.doc(doc.id).update({
+          ownerUserNameFieldName: newUsername,
+        });
+      }
+    } on Exception catch (_) {
+      throw CouldNotUpdateUsernameException();
     }
   }
 

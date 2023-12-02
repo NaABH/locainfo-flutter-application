@@ -84,9 +84,10 @@ flutter:
   assets:
      - assets/icon/icon_transparent.png
      - assets/animated_icon/loading.json
+     - assets/animated_icon/loading_gps.json
+     - assets/animated_icon/loading_bookmark.json
      - assets/image/google.png
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+     - assets/image/default-profile.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

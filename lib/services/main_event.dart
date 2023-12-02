@@ -13,3 +13,11 @@ class MainEventNavigationChanged extends MainEvent {
   final int index;
   const MainEventNavigationChanged({required this.index});
 }
+
+class MainEventSavePreviousState extends MainEvent {
+  const MainEventSavePreviousState();
+}
+
+class MainEventBackToLastState extends MainEvent {
+  const MainEventBackToLastState();
+}

@@ -14,6 +14,7 @@ import 'package:locainfo/services/firestore/firestore_provider.dart';
 import 'package:locainfo/services/location/location_provider.dart';
 import 'package:locainfo/services/main_bloc.dart';
 import 'package:locainfo/services/post/post_bloc.dart';
+import 'package:locainfo/services/profile/profile_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,8 +30,14 @@ void main() async {
       create: (BuildContext context) => MainBloc(),
     ),
     BlocProvider<PostBloc>(
-        create: (BuildContext context) => PostBloc(FireStoreProvider(),
-            LocationProvider(), FirebaseAuthProvider(), CloudStorageProvider()))
+        create: (BuildContext context) => PostBloc(
+            FireStoreProvider(),
+            LocationProvider(),
+            FirebaseAuthProvider(),
+            CloudStorageProvider())),
+    BlocProvider<ProfileBloc>(
+        create: (BuildContext context) => ProfileBloc(FireStoreProvider(),
+            FirebaseAuthProvider(), CloudStorageProvider()))
   ], child: const MyApp()));
 }
 
@@ -50,7 +57,6 @@ class MyApp extends StatelessWidget {
         createPostRoute: (context) => const CreatePostPage(),
         searchPostRoute: (context) => const SearchingPage(),
         postedPostRoute: (context) => const PostedPostsPage(),
-        // updateProfileRoute: (context) => const UpdateProfilePage(),
       },
     );
   }

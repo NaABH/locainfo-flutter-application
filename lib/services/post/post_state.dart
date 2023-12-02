@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:locainfo/services/firestore/current_user.dart';
 import 'package:locainfo/services/firestore/post.dart';
 
 @immutable
@@ -16,6 +15,7 @@ class PostStateInitial extends PostState {
       : super(isLoading: isLoading);
 }
 
+// News page----------------------------------------------------------------
 // loading post
 class PostStateLoadingPosts extends PostState {
   const PostStateLoadingPosts({
@@ -48,6 +48,7 @@ class PostStateLoadError extends PostState {
       : super(isLoading: isLoading);
 }
 
+// Bookmark page----------------------------------------------------------------
 // emitted if bookmark post fetched successfully
 class PostStateLoadedBookmarkedPosts extends PostState {
   final Iterable<Post> posts;
@@ -83,6 +84,7 @@ class PostStateClearBookmarkError extends PostState {
       : super(isLoading: isLoading);
 }
 
+// Create post page------------------------------------------------------------
 // emitted when creating post, initiate create post page
 class PostStateCreatingPost extends PostState {
   final Position? position;
@@ -124,20 +126,6 @@ class PostStateSearchLoaded extends PostState {
 // emitted when there is an error when searching
 class PostStateSearchError extends PostState {
   const PostStateSearchError({required bool isLoading})
-      : super(isLoading: isLoading);
-}
-
-// emitted when fetch current user successfully in profile page
-class PostStateProfileInitialised extends PostState {
-  final CurrentUser user;
-  const PostStateProfileInitialised(
-      {required bool isLoading, required this.user})
-      : super(isLoading: isLoading);
-}
-
-// emitted when face error when fetching user details
-class PostStateProfileInitialiseFail extends PostState {
-  const PostStateProfileInitialiseFail({required bool isLoading})
       : super(isLoading: isLoading);
 }
 
@@ -211,16 +199,19 @@ class PostStateCreateReportError extends PostState {
   }) : super(isLoading: isLoading);
 }
 
+// emitted when error deleting post
 class PostStateDeleteError extends PostState {
   const PostStateDeleteError({required bool isLoading})
       : super(isLoading: isLoading);
 }
 
+// emitted when deleting post
 class PostStateDeletingPost extends PostState {
   const PostStateDeletingPost({required bool isLoading, String? loadingText})
       : super(isLoading: isLoading, loadingText: loadingText);
 }
 
+// emitted when delete post successfully
 class PostStateDeletePostSuccessful extends PostState {
   const PostStateDeletePostSuccessful({required bool isLoading})
       : super(isLoading: isLoading);

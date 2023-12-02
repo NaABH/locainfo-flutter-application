@@ -10,6 +10,11 @@ abstract class AuthProvider {
     required String password,
   });
 
+  String? get currentUserName;
+  Future<void> updateDisplayName(String newName);
+  String? get currentUserProfilePicUrl;
+  Future<void> updateProfilePicUrl(String imageUrl);
+
   Future<AuthUser> createUser({
     required String username,
     required String email,

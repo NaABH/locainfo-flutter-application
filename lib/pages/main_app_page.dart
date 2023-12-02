@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/components/my_bottom_navigation_bar.dart';
 import 'package:locainfo/constants/app_colors.dart';
+import 'package:locainfo/constants/routes.dart';
 import 'package:locainfo/pages/app/bookmark_page.dart';
-import 'package:locainfo/pages/app/create_post_page.dart';
+import 'package:locainfo/pages/app/home_page.dart';
 import 'package:locainfo/pages/app/news_page.dart';
 import 'package:locainfo/pages/app/profile_page.dart';
 import 'package:locainfo/services/main_bloc.dart';
@@ -22,7 +23,7 @@ class MainAppPage extends StatelessWidget {
       body: BlocBuilder<MainBloc, MainState>(
         builder: (context, state) {
           if (state is MainStateHome) {
-            return const ProfilePage();
+            return const HomePage();
           } else if (state is MainStateNews) {
             return const NewsPage();
           } else if (state is MainStateBookmark) {
@@ -41,12 +42,7 @@ class MainAppPage extends StatelessWidget {
         width: 60,
         child: FloatingActionButton(
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const CreatePostPage(),
-              ),
-            );
+            Navigator.of(context).pushNamed(createPostRoute);
           },
           tooltip: 'Create Post',
           backgroundColor: AppColors.darkerBlue,

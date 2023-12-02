@@ -13,9 +13,8 @@ import 'package:locainfo/services/firestore/post.dart';
 import 'package:locainfo/services/post/post_bloc.dart';
 import 'package:locainfo/services/post/post_event.dart';
 import 'package:locainfo/utilities/dialog/delete_dialog.dart';
+import 'package:locainfo/utilities/post_info_helper.dart';
 import 'package:share_plus/share_plus.dart';
-
-import '../utilities/post_info_helper.dart';
 
 class MyPost extends StatelessWidget {
   final Position? currentPosition;
@@ -212,10 +211,15 @@ class MyPost extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.person,
-            size: 18,
-          ),
+          post.ownerProfilePicUrl == null
+              ? const Icon(
+                  Icons.person,
+                  size: 18,
+                )
+              : CircleAvatar(
+                  radius: 9,
+                  backgroundImage: NetworkImage(post.ownerProfilePicUrl!),
+                ),
           const SizedBox(width: 8),
           Text(
             post.ownerUserName,

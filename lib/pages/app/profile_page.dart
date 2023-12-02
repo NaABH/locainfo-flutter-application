@@ -4,14 +4,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/components/my_profile_listtile.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/font_styles.dart';
-import 'package:locainfo/pages/app/posted_posts_page.dart';
+import 'package:locainfo/constants/routes.dart';
 import 'package:locainfo/pages/app/profile_setting_page.dart';
 import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
 import 'package:locainfo/services/auth/bloc/auth_event.dart';
 import 'package:locainfo/services/firestore/current_user.dart';
 import 'package:locainfo/services/post/post_bloc.dart';
-import 'package:locainfo/services/post/post_event.dart';
 import 'package:locainfo/services/post/post_state.dart';
+import 'package:locainfo/services/profile/profile_bloc.dart';
+import 'package:locainfo/services/profile/profile_event.dart';
+import 'package:locainfo/services/profile/profile_state.dart';
 import 'package:locainfo/utilities/dialog/logout_dialog.dart';
 import 'package:locainfo/utilities/toast_message.dart';
 
@@ -24,9 +26,10 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   CurrentUser? user;
+
   @override
   void initState() {
-    context.read<PostBloc>().add(const PostEventInitialiseProfile());
+    context.read<ProfileBloc>().add(const ProfileEventInitialiseProfile());
     super.initState();
   }
 
@@ -34,7 +37,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return BlocListener<PostBloc, PostState>(
       listener: (context, state) {
-        if (state is PostStateProfileInitialiseFail) {
+        if (state is ProfileStateProfileInitialiseFail) {
           showToastMessage('Cannot fetch your detail at the moment');
         }
       },
@@ -91,9 +94,9 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               padding: const EdgeInsets.all(10),
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: BlocBuilder<PostBloc, PostState>(
+              child: BlocBuilder<ProfileBloc, ProfileState>(
                 builder: (context, state) {
-                  if (state is PostStateProfileInitialised) {
+                  if (state is ProfileStateProfileInitialised) {
                     user = state.user;
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -180,23 +183,10 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             child: const Icon(
                               Icons.person,
-                              size: 30,
+                              size: 50,
                             )),
                         const SizedBox(
-                          height: 15,
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Hello, User",
-                              style: TextStyle(
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.grey2),
-                            ),
-                          ],
+                          height: 60,
                         ),
                       ],
                     );
@@ -227,12 +217,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     padding: const EdgeInsets.symmetric(vertical: 12.0),
                     child: MyProfileListTile(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const PostedPostsPage(),
-                            ),
-                          );
+                          Navigator.of(context).pushNamed(postedPostRoute);
                         },
                         leadingIcon: Icons.article,
                         trailingIcon: Icons.arrow_right,

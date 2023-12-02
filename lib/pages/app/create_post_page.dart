@@ -12,6 +12,8 @@ import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/services/cloud_storage/cloud_storage_exceptions.dart';
 import 'package:locainfo/services/firestore/database_exceptions.dart';
 import 'package:locainfo/services/location/location_exceptions.dart';
+import 'package:locainfo/services/main_bloc.dart';
+import 'package:locainfo/services/main_event.dart';
 import 'package:locainfo/services/post/post_bloc.dart';
 import 'package:locainfo/services/post/post_event.dart';
 import 'package:locainfo/services/post/post_exceptions.dart';
@@ -40,6 +42,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
     _textControllerTitle = TextEditingController();
     _textControllerBody = TextEditingController();
     _picker = ImagePicker();
+    context.read<PostBloc>().add(const PostEventSavePreviousState());
+    context.read<MainBloc>().add(const MainEventSavePreviousState());
+    context.read<PostBloc>().add(const PostEventInitialiseCreatePost());
     super.initState();
   }
 
@@ -58,7 +63,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   @override
   Widget build(BuildContext context) {
-    context.read<PostBloc>().add(const PostEventCreatingPost());
     return BlocListener<PostBloc, PostState>(
       listener: (context, state) async {
         if (state is PostStateSubmittingPost) {
@@ -94,7 +98,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
           }
         } else if (state is PostStateCreatePostSuccessful) {
           showToastMessage('Your post is created successfully');
-          Navigator.pop(context);
+          context
+              .read<MainBloc>()
+              .add(const MainEventNavigationChanged(index: 1));
+          context.read<PostBloc>().add(const PostEventLoadNearbyPosts());
+          Navigator.of(context).pop();
         }
       },
       child: Scaffold(
@@ -103,6 +111,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
           leading: MyBackButton(
             onPressed: () {
               Navigator.of(context).pop();
+              context.read<MainBloc>().add(const MainEventBackToLastState());
+              context.read<PostBloc>().add(const PostEventBackToLastState());
             },
           ),
           title: Row(

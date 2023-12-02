@@ -69,8 +69,9 @@ class _UpdatePostPageState extends State<UpdatePostPage> {
             LoadingScreen().hide();
           }
         } else if (state is PostStateUpdatePostSuccessfully) {
-          showToastMessage('Post is updated');
           Navigator.of(context).pop();
+          showToastMessage('Post is updated');
+          context.read<PostBloc>().add(const PostEventLoadPostedPosts());
         } else if (state is PostStateUpdatePostError) {
           if (state.exception is TitleCouldNotEmptyPostException) {
             await showErrorDialog(

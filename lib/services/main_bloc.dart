@@ -5,6 +5,8 @@ import 'package:locainfo/services/main_state.dart';
 // the main bloc is used for navigation between different main pages of the application
 class MainBloc extends Bloc<MainEvent, MainState> {
   MainBloc() : super(const MainStateHome()) {
+    late MainState previousState;
+
     on<MainEventInitialise>((event, emit) => emit(const MainStateHome()));
 
     on<MainEventNavigationChanged>((event, emit) {
@@ -22,6 +24,16 @@ class MainBloc extends Bloc<MainEvent, MainState> {
           emit(const MainStateProfile());
           break;
       }
+    });
+
+    // save previous state
+    on<MainEventSavePreviousState>((event, emit) {
+      previousState = state;
+    });
+
+    // go back to previous state
+    on<MainEventBackToLastState>((event, emit) {
+      emit(previousState);
     });
   }
 }

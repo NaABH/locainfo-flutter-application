@@ -12,8 +12,9 @@ class MyPostList extends StatelessWidget {
   final Position? currentPosition;
   final Iterable<Post> posts;
   final PostCallBack onTap;
-  final String? selectedCategory; // New parameter for selected category
+  final String? selectedCategory;
   final PostPatternType postPatternType;
+  final ScrollController? scrollController;
 
   const MyPostList({
     Key? key,
@@ -21,7 +22,8 @@ class MyPostList extends StatelessWidget {
     required this.onTap,
     this.selectedCategory,
     required this.postPatternType,
-    this.currentPosition, // Provide a default value if needed
+    this.currentPosition,
+    this.scrollController,
   }) : super(key: key);
 
   @override
@@ -34,6 +36,7 @@ class MyPostList extends StatelessWidget {
     return filteredPosts.isEmpty
         ? _buildEmptyState()
         : ListView.builder(
+            controller: scrollController,
             key: key,
             itemCount: filteredPosts.length,
             itemBuilder: (context, index) {

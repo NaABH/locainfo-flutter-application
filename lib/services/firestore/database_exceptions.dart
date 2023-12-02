@@ -40,3 +40,9 @@ class CouldNotCreateNewUserException extends DatabaseException {}
 
 // reading user (to get its id, name, email, profile picture link)
 class CouldNotGetUserException extends DatabaseException {}
+
+// updating user profile picture
+class CouldNotUpdateProfilePictureException extends DatabaseException {}
+
+// updating user name
+class CouldNotUpdateUsernameException extends DatabaseException {}
