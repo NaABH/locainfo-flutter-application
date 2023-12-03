@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:locainfo/components/my_post_list.dart';
+import 'package:locainfo/components/my_post.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/custom_datatype.dart';
 import 'package:locainfo/constants/routes.dart';
@@ -174,52 +174,63 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            SliverFillRemaining(child: BlocBuilder<PostBloc, PostState>(
+            BlocBuilder<PostBloc, PostState>(
               builder: (context, state) {
                 if (state is PostStateLoadingPosts) {
-                  return AnimatedLoadingScreen(
-                    imagePath: 'assets/animated_icon/loading_gps.json',
-                    text: 'Refreshing',
-                    imageSize: MediaQuery.of(context).size.width / 10,
+                  return SliverFillRemaining(
+                    child: AnimatedLoadingScreen(
+                      imagePath: 'assets/animated_icon/loading_gps.json',
+                      text: 'Refreshing',
+                      imageSize: MediaQuery.of(context).size.width / 10,
+                    ),
                   );
                 } else if (state is PostStatePostLoaded) {
                   final nearbyPosts = state.posts;
-                  return MyPostList(
-                    currentPosition: state.currentPosition,
-                    posts: nearbyPosts,
-                    onTap: (post) {},
-                    postPatternType: PostPatternType.home,
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                        (BuildContext context, int index) {
+                      return MyPost(
+                        post: nearbyPosts.elementAt(index),
+                        currentPosition: state.currentPosition,
+                        onTap: (post) {},
+                        patternType: PostPatternType.home,
+                      );
+                    }, childCount: state.posts.length),
                   );
                 } else if (state is PostStateNoAvailablePost) {
-                  return const Center(
-                    child: Text(
-                        'Sorry. There is no post available for your current location'),
+                  return const SliverFillRemaining(
+                    child: Center(
+                      child: Text(
+                          'Sorry. There is no post available for your current location'),
+                    ),
                   );
                 } else {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text(
-                            'Some error occurred. \nPlease check your Internet connection and GPS service.',
-                            textAlign: TextAlign.center,
+                  return SliverFillRemaining(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              'Some error occurred. \nPlease check your Internet connection and GPS service.',
+                              textAlign: TextAlign.center,
+                            ),
                           ),
-                        ),
-                        IconButton(
-                            onPressed: () async {
-                              context
-                                  .read<PostBloc>()
-                                  .add(const PostEventLoadNearbyPosts());
-                            },
-                            icon: const Icon(Icons.refresh)),
-                      ],
+                          IconButton(
+                              onPressed: () async {
+                                context
+                                    .read<PostBloc>()
+                                    .add(const PostEventLoadNearbyPosts());
+                              },
+                              icon: const Icon(Icons.refresh)),
+                        ],
+                      ),
                     ),
                   );
                 }
               },
-            )),
+            ),
           ],
         ),
       ),

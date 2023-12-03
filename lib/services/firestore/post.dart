@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:locainfo/services/firestore/database_constants.dart';
 import 'package:locainfo/utilities/post_info_helper.dart';
 
@@ -16,6 +17,7 @@ class Post {
   final String category;
   final double latitude;
   final double longitude;
+  final int? distance;
   final String locationName;
   final DateTime postedDate;
   final bool isLiked;
@@ -35,6 +37,7 @@ class Post {
     required this.category,
     required this.latitude,
     required this.longitude,
+    this.distance,
     required this.locationName,
     required this.postedDate,
     required this.isLiked,
@@ -48,6 +51,7 @@ class Post {
     QueryDocumentSnapshot<Map<String, dynamic>> snapshot,
     String currentUserId,
     List<String> bookmarkedPostIds,
+    Position? position,
   )   : documentId = snapshot.id,
         ownerUserId = snapshot.data()[ownerUserIdFieldName],
         ownerUserName = snapshot.data()[ownerUserNameFieldName] as String,
@@ -59,6 +63,14 @@ class Post {
         category = snapshot.data()[categoryFieldName] as String,
         latitude = snapshot.data()[latitudeFieldName] as double,
         longitude = snapshot.data()[longitudeFieldName] as double,
+        distance = position == null
+            ? null
+            : Geolocator.distanceBetween(
+                snapshot.data()[latitudeFieldName],
+                snapshot.data()[longitudeFieldName],
+                position.latitude,
+                position.longitude,
+              ).toInt(),
         locationName = snapshot.data()[locationNameFieldName] as String,
         postedDate =
             (snapshot.data()[postedDateFieldName] as Timestamp).toDate(),

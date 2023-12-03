@@ -25,6 +25,7 @@ class NewsPage extends StatefulWidget {
 class _NewsPageState extends State<NewsPage> {
   late final ScrollController _scrollController;
   String? selectedCategory; // Default category is All
+  String selectedSortBy = 'Nearest';
 
   @override
   void initState() {
@@ -64,6 +65,7 @@ class _NewsPageState extends State<NewsPage> {
           title: 'News',
           needNotification: true,
           scrollController: _scrollController,
+          action: _mySortByDropDown(),
         ),
         body: RefreshIndicator(
           onRefresh: () async {
@@ -87,6 +89,7 @@ class _NewsPageState extends State<NewsPage> {
                         posts: allNearbyPosts,
                         postPatternType: PostPatternType.news,
                         selectedCategory: selectedCategory,
+                        selectedSortBy: selectedSortBy,
                         currentPosition: state.currentPosition,
                         onTap: (post) {
                           Navigator.push(
@@ -186,6 +189,42 @@ class _NewsPageState extends State<NewsPage> {
                   ),
                 ),
               ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
+  Widget _mySortByDropDown() {
+    return Container(
+      height: 35,
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      decoration: BoxDecoration(
+        color: AppColors.grey3,
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          borderRadius: BorderRadius.circular(12),
+          underline: Container(),
+          value: selectedSortBy,
+          icon: const Icon(Icons.arrow_drop_down),
+          iconSize: 22,
+          elevation: 16,
+          style: const TextStyle(color: AppColors.black),
+          onChanged: (String? newValue) {
+            if (newValue != null) {
+              setState(() {
+                selectedSortBy = newValue;
+              });
+            }
+          },
+          items: <String>['Nearest', 'Newest', 'Popular']
+              .map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
             );
           }).toList(),
         ),

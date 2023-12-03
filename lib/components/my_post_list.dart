@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:locainfo/components/my_post.dart';
 import 'package:locainfo/constants/custom_datatype.dart';
 import 'package:locainfo/services/firestore/post.dart';
+import 'package:locainfo/utilities/post_sorter.dart';
 
 // call when user press the post
 typedef PostCallBack = void Function(Post post);
@@ -13,6 +14,7 @@ class MyPostList extends StatelessWidget {
   final Iterable<Post> posts;
   final PostCallBack onTap;
   final String? selectedCategory;
+  final String? selectedSortBy;
   final PostPatternType postPatternType;
   final ScrollController? scrollController;
 
@@ -22,16 +24,20 @@ class MyPostList extends StatelessWidget {
     required this.onTap,
     required this.postPatternType,
     this.selectedCategory,
+    this.selectedSortBy,
     this.currentPosition,
     this.scrollController,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // sort the posts
+    final sortedPosts = sortPosts(posts, selectedSortBy);
+
     // Filter posts based on the selected category
     final filteredPosts = selectedCategory != null
-        ? posts.where((post) => post.category == selectedCategory)
-        : posts.toList();
+        ? sortedPosts.where((post) => post.category == selectedCategory)
+        : sortedPosts.toList();
 
     return filteredPosts.isEmpty
         ? _buildEmptyState()
@@ -40,8 +46,10 @@ class MyPostList extends StatelessWidget {
             key: key,
             itemCount: filteredPosts.length,
             itemBuilder: (context, index) {
-              final post = filteredPosts.elementAt(index);
+              final post = sortedPosts.elementAt(index);
               return MyPost(
+                key: ValueKey(
+                    post.documentId), // Provide a unique key for each post
                 post: post,
                 currentPosition: currentPosition,
                 onTap: onTap,

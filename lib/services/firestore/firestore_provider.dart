@@ -23,7 +23,7 @@ class FireStoreProvider implements DatabaseProvider {
   DateTime dateFiltering = DateTime.now().subtract(const Duration(days: 90));
   int distanceFiltering = 300;
 
-  // get nearby post
+  // get nearby post (sort by distance)
   @override
   Future<Iterable<Post>> getNearbyPosts({
     required Position position,
@@ -34,28 +34,24 @@ class FireStoreProvider implements DatabaseProvider {
       var event = await posts
           .where(postedDateFieldName,
               isGreaterThan: Timestamp.fromDate(dateFiltering))
-          .orderBy(postedDateFieldName, descending: true)
           .get();
       return event.docs
-          .map(
-              (doc) => Post.fromSnapshot(doc, currentUserId, bookmarkedPostIds))
+          .map((doc) => Post.fromSnapshot(
+              doc, currentUserId, bookmarkedPostIds, position))
           .where((post) {
-        // Calculate the distance between the post location and the user location
-        var distance = Geolocator.distanceBetween(
-          post.latitude,
-          post.longitude,
-          position.latitude,
-          position.longitude,
-        );
-        // Keep only the posts that are within 300 meters of the user location
-        return distance <= distanceFiltering;
-      });
+        // distance filtering
+        return post.distance! <= distanceFiltering;
+      }).toList()
+        ..sort((a, b) {
+          // sort by distance
+          return a.distance!.compareTo(b.distance!);
+        });
     } on Exception catch (_) {
       throw CouldNotGetPostsException();
     }
   }
 
-  // get posted post
+  // get posted post (sort by posted date (newer first))
   @override
   Future<Iterable<Post>> getPostedPosts({required String currentUserId}) async {
     try {
@@ -68,8 +64,8 @@ class FireStoreProvider implements DatabaseProvider {
           .get();
       final bookmarkedPostIds = await getBookmarkedPostIds(currentUserId);
       final postsList = event.docs
-          .map(
-              (doc) => Post.fromSnapshot(doc, currentUserId, bookmarkedPostIds))
+          .map((doc) =>
+              Post.fromSnapshot(doc, currentUserId, bookmarkedPostIds, null))
           .toList();
       return postsList;
     } on Exception catch (_) {
@@ -227,6 +223,7 @@ class FireStoreProvider implements DatabaseProvider {
                 doc,
                 currentUserId,
                 bookmarkedPostIds,
+                null,
               ))
           .where((post) {
         // Check if the post title contains the searchText
@@ -285,7 +282,8 @@ class FireStoreProvider implements DatabaseProvider {
             (value) => value.docs.map((doc) => Post.fromSnapshot(
                 doc,
                 currentUserId,
-                bookmarkedPostIds)), // convert each document into a Post object
+                bookmarkedPostIds,
+                null)), // convert each document into a Post object
           );
     } on Exception catch (_) {
       throw CouldNotGetBookmarkPostException();
@@ -303,33 +301,6 @@ class FireStoreProvider implements DatabaseProvider {
       throw CouldNotClearBookmarkException();
     }
   }
-
-  // ?
-  Stream<Iterable<Post>> getNearbyPostStream({
-    required double userLat,
-    required double userLng,
-    required String currentUserId,
-  }) =>
-      posts
-          .where(postedDateFieldName,
-              isGreaterThan: Timestamp.fromDate(dateFiltering))
-          .orderBy(postedDateFieldName, descending: true)
-          .snapshots()
-          .map((event) {
-        try {
-          return event.docs
-              .map((doc) => Post.fromSnapshot(doc, currentUserId, []))
-              .where((post) {
-            // Calculate the distance between the post location and the user location
-            var distance = Geolocator.distanceBetween(
-                post.latitude, post.longitude, userLat, userLng);
-            // Keep only the posts that are within 300 meters of the user location
-            return distance <= distanceFiltering;
-          });
-        } catch (e) {
-          throw CouldNotGetPostsException();
-        }
-      });
 
   // -----------------------------User---------------------------------
   // create user

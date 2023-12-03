@@ -7,12 +7,15 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool needNotification;
   final ScrollController? scrollController;
   final Widget? leading;
-  const MyAppBar(
-      {super.key,
-      required this.title,
-      required this.needNotification,
-      this.scrollController,
-      this.leading});
+  final Widget? action;
+  const MyAppBar({
+    super.key,
+    required this.title,
+    required this.needNotification,
+    this.scrollController,
+    this.leading,
+    this.action,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +24,8 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       backgroundColor: AppColors.white,
       title: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           GestureDetector(
             onTap: () {
@@ -37,6 +42,10 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
               style: CustomFontStyles.appBarTitle,
             ),
           ),
+          SizedBox(
+            width: 20,
+          ),
+          action ?? Container(),
         ],
       ),
       actions: [
