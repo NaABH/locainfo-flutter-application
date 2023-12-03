@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/components/my_appbar.dart';
 import 'package:locainfo/components/my_post_list.dart';
+import 'package:locainfo/components/my_snackbar.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/categories.dart';
 import 'package:locainfo/constants/custom_datatype.dart';
@@ -13,7 +14,6 @@ import 'package:locainfo/services/post/post_event.dart';
 import 'package:locainfo/services/post/post_state.dart';
 import 'package:locainfo/utilities/dialog/error_dialog.dart';
 import 'package:locainfo/utilities/loading_screen/animeated_loading_screen.dart';
-import 'package:locainfo/utilities/toast_message.dart';
 
 class NewsPage extends StatefulWidget {
   const NewsPage({super.key});
@@ -33,7 +33,8 @@ class _NewsPageState extends State<NewsPage> {
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
-        showToastMessage('You are at the bottom.');
+        ScaffoldMessenger.of(context)
+            .showSnackBar(mySnackBar(message: 'You have reach the bottom'));
       }
     });
     context.read<PostBloc>().add(const PostEventLoadNearbyPosts());

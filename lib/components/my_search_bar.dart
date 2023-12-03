@@ -4,17 +4,20 @@ import 'package:locainfo/constants/app_colors.dart';
 class MySearchBar extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
+  final FocusNode? focusNode;
   final Function(String) onChanged;
   const MySearchBar(
       {super.key,
       required this.controller,
       required this.hintText,
-      required this.onChanged});
+      required this.onChanged,
+      this.focusNode});
 
   @override
   Widget build(BuildContext context) {
     return Stack(alignment: Alignment.centerRight, children: [
       TextField(
+        focusNode: focusNode,
         controller: controller,
         obscureText: false,
         enableSuggestions: true,

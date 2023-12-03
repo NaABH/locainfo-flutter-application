@@ -1,13 +1,16 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:locainfo/components/my_post.dart';
+import 'package:locainfo/components/my_snackbar.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/custom_datatype.dart';
 import 'package:locainfo/constants/routes.dart';
+import 'package:locainfo/services/firestore/post.dart';
 import 'package:locainfo/services/location/bloc/location_bloc.dart';
 import 'package:locainfo/services/location/bloc/location_event.dart';
 import 'package:locainfo/services/post/post_bloc.dart';
@@ -24,7 +27,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   GoogleMapController? _mapController; // google map controller
+  late final ScrollController _scrollController;
+  late Position currentPosition;
   Set<Marker> markers = {}; // market on map
+  int pageShowPostLimit = 15;
 
   // assign controller to map
   Future<void> _onMapCreated(GoogleMapController controller) async {
@@ -42,15 +48,43 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // update the markers
+  void updateMarkers(Iterable<Post> posts) {
+    markers = Set.from(
+      posts.map((post) {
+        final offset = Random().nextDouble() * 0.0001 - 0.00005;
+        return Marker(
+          markerId: MarkerId(post.title),
+          position: LatLng(post.latitude + offset, post.longitude + offset),
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueBlue,
+          ),
+          infoWindow: InfoWindow(
+            title: post.title,
+          ),
+        );
+      }),
+    );
+  }
+
   @override
   void initState() {
     context.read<LocationBloc>().add(LocationEventStartTracking());
+    _scrollController = ScrollController();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(mySnackBar(message: 'Go News Page to view more...'));
+      }
+    });
     super.initState();
   }
 
   @override
   void dispose() {
     context.read<LocationBloc>().add(LocationEventStopTracking());
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -59,6 +93,7 @@ class _HomePageState extends State<HomePage> {
     return SafeArea(
       child: Scaffold(
         body: CustomScrollView(
+          controller: _scrollController,
           slivers: [
             SliverAppBar(
               expandedHeight: MediaQuery.of(context).size.height * 3 / 5,
@@ -68,7 +103,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   BlocBuilder<LocationBloc, Position>(
                     builder: (context, position) {
-                      final currentPosition = position;
+                      currentPosition = position;
                       _animateToLocation(currentPosition);
                       return GoogleMap(
                         initialCameraPosition: CameraPosition(
@@ -76,7 +111,8 @@ class _HomePageState extends State<HomePage> {
                                 LatLng(position.latitude, position.longitude),
                             zoom: 16),
                         markers: markers,
-                        zoomControlsEnabled: false,
+                        zoomControlsEnabled: true,
+                        zoomGesturesEnabled: true,
                         mapType: MapType.normal,
                         onMapCreated: _onMapCreated,
                         myLocationEnabled: true,
@@ -86,6 +122,7 @@ class _HomePageState extends State<HomePage> {
                     },
                   ),
                   Padding(
+                    // search button
                     padding: const EdgeInsets.only(right: 10, top: 10),
                     child: Align(
                       alignment: Alignment.topRight,
@@ -104,6 +141,32 @@ class _HomePageState extends State<HomePage> {
                             ),
                             child: const Icon(
                               Icons.search,
+                              size: 32,
+                              color: AppColors.white,
+                            ),
+                          )),
+                    ),
+                  ),
+                  Padding(
+                    // my location button
+                    padding: const EdgeInsets.only(right: 10, top: 70),
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: InkWell(
+                          onTap: () {
+                            _animateToLocation(currentPosition);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppColors.lighterBlue,
+                              borderRadius: BorderRadius.circular(18),
+                              boxShadow: const [
+                                BoxShadow(color: Colors.black38, blurRadius: 4)
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.my_location,
                               size: 32,
                               color: AppColors.white,
                             ),
@@ -186,6 +249,7 @@ class _HomePageState extends State<HomePage> {
                   );
                 } else if (state is PostStatePostLoaded) {
                   final nearbyPosts = state.posts;
+                  updateMarkers(nearbyPosts);
                   return SliverList(
                     delegate: SliverChildBuilderDelegate(
                         (BuildContext context, int index) {
@@ -195,7 +259,10 @@ class _HomePageState extends State<HomePage> {
                         onTap: (post) {},
                         patternType: PostPatternType.home,
                       );
-                    }, childCount: state.posts.length),
+                    },
+                        childCount: state.posts.length >= pageShowPostLimit
+                            ? pageShowPostLimit
+                            : state.posts.length),
                   );
                 } else if (state is PostStateNoAvailablePost) {
                   return const SliverFillRemaining(

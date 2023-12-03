@@ -31,6 +31,7 @@ class _SearchingPageState extends State<SearchingPage> {
       appBar: AppBar(
         centerTitle: true,
         title: MySearchBar(
+          focusNode: _searchFocusNode,
           controller: _searchController,
           hintText: 'Search posts',
           onChanged: (value) {

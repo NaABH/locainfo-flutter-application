@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/components/my_appbar.dart';
 import 'package:locainfo/components/my_post_list.dart';
 import 'package:locainfo/components/my_pressableText.dart';
+import 'package:locainfo/components/my_snackbar.dart';
 import 'package:locainfo/constants/custom_datatype.dart';
 import 'package:locainfo/pages/app/post_detail_page.dart';
 import 'package:locainfo/services/firestore/database_exceptions.dart';
@@ -12,7 +13,6 @@ import 'package:locainfo/services/post/post_state.dart';
 import 'package:locainfo/utilities/dialog/clear_all_bookmark_dialog.dart';
 import 'package:locainfo/utilities/dialog/error_dialog.dart';
 import 'package:locainfo/utilities/loading_screen/animeated_loading_screen.dart';
-import 'package:locainfo/utilities/toast_message.dart';
 
 class BookMarkPage extends StatefulWidget {
   const BookMarkPage({super.key});
@@ -30,7 +30,8 @@ class _BookMarkPageState extends State<BookMarkPage> {
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
-        showToastMessage('You are at the bottom.');
+        ScaffoldMessenger.of(context)
+            .showSnackBar(mySnackBar(message: 'You have reach the bottom'));
       }
     });
     context.read<PostBloc>().add(const PostEventLoadBookmarkedPosts());
