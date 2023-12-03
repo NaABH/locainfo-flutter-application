@@ -17,7 +17,7 @@ class MainAppPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // default to home page
-    context.read<MainBloc>().add(const MainEventNavigationChanged(index: 0));
+    context.read<MainBloc>().add(const MainEventInitialise());
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: BlocBuilder<MainBloc, MainState>(

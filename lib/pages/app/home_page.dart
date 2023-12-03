@@ -13,6 +13,8 @@ import 'package:locainfo/constants/routes.dart';
 import 'package:locainfo/services/firestore/post.dart';
 import 'package:locainfo/services/location/bloc/location_bloc.dart';
 import 'package:locainfo/services/location/bloc/location_event.dart';
+import 'package:locainfo/services/main_bloc.dart';
+import 'package:locainfo/services/main_state.dart';
 import 'package:locainfo/services/post/post_bloc.dart';
 import 'package:locainfo/services/post/post_event.dart';
 import 'package:locainfo/services/post/post_state.dart';
@@ -29,6 +31,8 @@ class _HomePageState extends State<HomePage> {
   GoogleMapController? _mapController; // google map controller
   late final ScrollController _scrollController;
   late Position currentPosition;
+  late final String weatherInformation;
+  final Map<String, int> _postIndices = {};
   Set<Marker> markers = {}; // market on map
   int pageShowPostLimit = 15;
 
@@ -49,19 +53,30 @@ class _HomePageState extends State<HomePage> {
   }
 
   // update the markers
-  void updateMarkers(Iterable<Post> posts) {
+  void updateMarkers(List<Post> posts) {
+    markers.clear();
+    _postIndices.clear();
     markers = Set.from(
-      posts.map((post) {
+      posts.asMap().entries.map((entry) {
+        final post = entry.value;
+        final index = entry.key;
+        _postIndices[post.documentId] = index;
         final offset = Random().nextDouble() * 0.0001 - 0.00005;
         return Marker(
-          markerId: MarkerId(post.title),
+          markerId: MarkerId(post.documentId),
           position: LatLng(post.latitude + offset, post.longitude + offset),
           icon: BitmapDescriptor.defaultMarkerWithHue(
             BitmapDescriptor.hueBlue,
           ),
-          infoWindow: InfoWindow(
-            title: post.title,
-          ),
+          infoWindow: InfoWindow(title: post.title),
+          onTap: () {
+            _scrollController.animateTo(
+              _postIndices[post.documentId]! *
+                  300, // Replace 56.0 with your ListTile height
+              duration: const Duration(seconds: 1),
+              curve: Curves.easeInOut,
+            );
+          },
         );
       }),
     );
@@ -153,33 +168,34 @@ class _HomePageState extends State<HomePage> {
                     child: Align(
                       alignment: Alignment.topRight,
                       child: InkWell(
-                          onTap: () {
-                            _animateToLocation(currentPosition);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: AppColors.lighterBlue,
-                              borderRadius: BorderRadius.circular(18),
-                              boxShadow: const [
-                                BoxShadow(color: Colors.black38, blurRadius: 4)
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.my_location,
-                              size: 32,
-                              color: AppColors.white,
-                            ),
-                          )),
+                        onTap: () {
+                          _animateToLocation(currentPosition);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: AppColors.lighterBlue,
+                            borderRadius: BorderRadius.circular(18),
+                            boxShadow: const [
+                              BoxShadow(color: Colors.black38, blurRadius: 4)
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.my_location,
+                            size: 32,
+                            color: AppColors.white,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                   Positioned(
-                    // search button
+                    // weather information
                     top: 14,
-                    left: 0,
+                    left: 10,
                     right: 0,
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Container(
                           decoration: BoxDecoration(
@@ -187,26 +203,28 @@ class _HomePageState extends State<HomePage> {
                               borderRadius: BorderRadius.circular(18)),
                           padding: const EdgeInsets.symmetric(
                               vertical: 8, horizontal: 12),
-                          child: const Row(
-                            children: [
-                              Icon(
-                                Icons.my_location,
-                                size: 20,
-                                color: AppColors.white,
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Text(
-                                'Current Location',
-                                style: TextStyle(
-                                  fontSize: 18,
+                          child: BlocBuilder<MainBloc, MainState>(
+                              builder: (context, state) {
+                            if (state is MainStateHome) {
+                              return Text(
+                                state.weatherInformation,
+                                style: const TextStyle(
+                                  fontSize: 16,
                                   fontWeight: FontWeight.w400,
                                   color: AppColors.white,
                                 ),
-                              ),
-                            ],
-                          ),
+                              );
+                            } else {
+                              return const Text(
+                                'Unknown',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.white,
+                                ),
+                              );
+                            }
+                          }),
                         ),
                       ],
                     ),
@@ -249,7 +267,7 @@ class _HomePageState extends State<HomePage> {
                   );
                 } else if (state is PostStatePostLoaded) {
                   final nearbyPosts = state.posts;
-                  updateMarkers(nearbyPosts);
+                  updateMarkers(nearbyPosts.toList());
                   return SliverList(
                     delegate: SliverChildBuilderDelegate(
                         (BuildContext context, int index) {

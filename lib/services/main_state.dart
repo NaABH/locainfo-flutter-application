@@ -6,8 +6,16 @@ abstract class MainState extends Equatable {
   const MainState();
 }
 
+class MainStateInitialised extends MainState {
+  const MainStateInitialised();
+
+  @override
+  List<Object?> get props => [];
+}
+
 class MainStateHome extends MainState {
-  const MainStateHome();
+  final String weatherInformation;
+  const MainStateHome(this.weatherInformation);
 
   @override
   List<Object?> get props => [];
