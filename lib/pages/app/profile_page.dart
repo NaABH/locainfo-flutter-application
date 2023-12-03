@@ -54,22 +54,6 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ],
           ),
-          actions: [
-            IconButton(
-                onPressed: () async {
-                  final shouldLogout = await showLogOutDialog(context);
-                  if (shouldLogout) {
-                    context.read<AuthBloc>().add(
-                          const AuthEventLogOut(),
-                        );
-                  }
-                },
-                icon: const Icon(
-                  Icons.logout,
-                  color: AppColors.darkerBlue,
-                  size: 26,
-                )),
-          ],
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

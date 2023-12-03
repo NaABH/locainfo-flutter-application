@@ -21,11 +21,11 @@ class FireStoreProvider implements DatabaseProvider {
 
   // Use to filter the post which is posted 3 months ago (approximate 90 days) and 300m away
   DateTime dateFiltering = DateTime.now().subtract(const Duration(days: 90));
-  int distanceFiltering = 300;
+  int distanceFiltering = 400;
 
   // get nearby post (sort by distance)
   @override
-  Future<Iterable<Post>> getNearbyPosts({
+  Future<List<Post>> getNearbyPosts({
     required Position position,
     required String currentUserId,
   }) async {
@@ -53,7 +53,7 @@ class FireStoreProvider implements DatabaseProvider {
 
   // get posted post (sort by posted date (newer first))
   @override
-  Future<Iterable<Post>> getPostedPosts({required String currentUserId}) async {
+  Future<List<Post>> getPostedPosts({required String currentUserId}) async {
     try {
       final event = await posts
           .where(
@@ -209,7 +209,7 @@ class FireStoreProvider implements DatabaseProvider {
 
   // searching function
   @override
-  Future<Iterable<Post>> getSearchPosts(
+  Future<List<Post>> getSearchPosts(
       String searchText, String currentUserId, Position position) async {
     try {
       final bookmarkedPostIds = await getBookmarkedPostIds(currentUserId);
@@ -239,7 +239,7 @@ class FireStoreProvider implements DatabaseProvider {
 
         // Keep only the posts that are within 300 meters and match the title search
         return distance <= distanceFiltering && titleMatches;
-      });
+      }).toList();
     } on Exception catch (_) {
       throw CouldNotGetSearchedPostException();
     }
@@ -268,7 +268,7 @@ class FireStoreProvider implements DatabaseProvider {
 
   // get post from bookmark id
   @override
-  Future<Iterable<Post>> getBookmarkedPosts(String currentUserId) async {
+  Future<List<Post>> getBookmarkedPosts(String currentUserId) async {
     try {
       final bookmarkedPostIds = await getBookmarkedPostIds(currentUserId);
 
@@ -279,11 +279,10 @@ class FireStoreProvider implements DatabaseProvider {
           .where(FieldPath.documentId, whereIn: bookmarkedPostIds)
           .get()
           .then(
-            (value) => value.docs.map((doc) => Post.fromSnapshot(
-                doc,
-                currentUserId,
-                bookmarkedPostIds,
-                null)), // convert each document into a Post object
+            (value) => value.docs
+                .map((doc) => Post.fromSnapshot(
+                    doc, currentUserId, bookmarkedPostIds, null))
+                .toList(), // convert each document into a Post object
           );
     } on Exception catch (_) {
       throw CouldNotGetBookmarkPostException();

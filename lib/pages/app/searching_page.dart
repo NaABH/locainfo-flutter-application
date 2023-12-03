@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:locainfo/components/my_back_button.dart';
 import 'package:locainfo/components/my_search_bar.dart';
 import 'package:locainfo/pages/app/post_detail_page.dart';
 import 'package:locainfo/services/post/post_bloc.dart';
@@ -22,6 +23,7 @@ class _SearchingPageState extends State<SearchingPage> {
     _searchController = TextEditingController();
     _searchFocusNode = FocusNode();
     _searchFocusNode.requestFocus();
+    context.read<PostBloc>().add(const PostEventSavePreviousState());
     super.initState();
   }
 
@@ -29,6 +31,12 @@ class _SearchingPageState extends State<SearchingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: MyBackButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            context.read<PostBloc>().add(const PostEventBackToLastState());
+          },
+        ),
         centerTitle: true,
         title: MySearchBar(
           focusNode: _searchFocusNode,
@@ -79,7 +87,9 @@ class _SearchingPageState extends State<SearchingPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => PostDetailPage(post: post),
+                              builder: (context) => PostDetailPage(
+                                post: post,
+                              ),
                             ),
                           );
                         },

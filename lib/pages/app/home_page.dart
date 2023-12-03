@@ -10,6 +10,7 @@ import 'package:locainfo/components/my_snackbar.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/custom_datatype.dart';
 import 'package:locainfo/constants/routes.dart';
+import 'package:locainfo/pages/app/post_detail_page.dart';
 import 'package:locainfo/services/firestore/post.dart';
 import 'package:locainfo/services/location/bloc/location_bloc.dart';
 import 'package:locainfo/services/location/bloc/location_event.dart';
@@ -126,13 +127,22 @@ class _HomePageState extends State<HomePage> {
                                 LatLng(position.latitude, position.longitude),
                             zoom: 16),
                         markers: markers,
-                        zoomControlsEnabled: true,
+                        zoomControlsEnabled: false,
                         zoomGesturesEnabled: true,
                         mapType: MapType.normal,
                         onMapCreated: _onMapCreated,
                         myLocationEnabled: true,
                         myLocationButtonEnabled: false,
                         padding: const EdgeInsets.only(bottom: 10),
+                        circles: {
+                          Circle(
+                              circleId: const CircleId("currentLocation"),
+                              center: LatLng(currentPosition.latitude,
+                                  currentPosition.longitude),
+                              radius: 400,
+                              strokeWidth: 0,
+                              fillColor: Colors.blueGrey.withOpacity(0.1))
+                        },
                       );
                     },
                   ),
@@ -274,7 +284,16 @@ class _HomePageState extends State<HomePage> {
                       return MyPost(
                         post: nearbyPosts.elementAt(index),
                         currentPosition: state.currentPosition,
-                        onTap: (post) {},
+                        onTap: (post) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PostDetailPage(
+                                post: post,
+                              ),
+                            ),
+                          );
+                        },
                         patternType: PostPatternType.home,
                       );
                     },

@@ -11,7 +11,7 @@ typedef PostCallBack = void Function(Post post);
 // generate a list view of post
 class MyPostList extends StatelessWidget {
   final Position? currentPosition;
-  final Iterable<Post> posts;
+  final List<Post> posts;
   final PostCallBack onTap;
   final String? selectedCategory;
   final String? selectedSortBy;
@@ -36,17 +36,18 @@ class MyPostList extends StatelessWidget {
 
     // Filter posts based on the selected category
     final filteredPosts = selectedCategory != null
-        ? sortedPosts.where((post) => post.category == selectedCategory)
-        : sortedPosts.toList();
+        ? filterPostsByCategory(sortedPosts, selectedCategory!)
+        : sortedPosts;
 
     return filteredPosts.isEmpty
         ? _buildEmptyState()
         : ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
             controller: scrollController,
             key: key,
             itemCount: filteredPosts.length,
             itemBuilder: (context, index) {
-              final post = sortedPosts.elementAt(index);
+              final post = filteredPosts.elementAt(index);
               return MyPost(
                 key: ValueKey(
                     post.documentId), // Provide a unique key for each post

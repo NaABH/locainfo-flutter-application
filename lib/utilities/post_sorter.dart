@@ -1,7 +1,7 @@
 import 'package:locainfo/services/firestore/post.dart';
 
 // sort post
-Iterable<Post> sortPosts(Iterable<Post> posts, String? selectedSortBy) {
+List<Post> sortPosts(List<Post> posts, String? selectedSortBy) {
   switch (selectedSortBy) {
     case 'Newest':
       return sortPostsByDate(posts);
@@ -15,7 +15,7 @@ Iterable<Post> sortPosts(Iterable<Post> posts, String? selectedSortBy) {
 }
 
 // ascending order of distances from current location (nearer first)
-Iterable<Post> sortPostsByDistance(Iterable<Post> posts) {
+List<Post> sortPostsByDistance(List<Post> posts) {
   return posts.toList()
     ..sort((a, b) {
       int compare = a.distance!.compareTo(b.distance!);
@@ -30,12 +30,17 @@ Iterable<Post> sortPostsByDistance(Iterable<Post> posts) {
 }
 
 // descending order of number of likes (more like first)
-Iterable<Post> sortPostsByLikes(Iterable<Post> posts) {
+List<Post> sortPostsByLikes(List<Post> posts) {
   return posts.toList()
     ..sort((a, b) => b.numberOfLikes.compareTo(a.numberOfLikes));
 }
 
 // descending order of posted date (newer first)
-Iterable<Post> sortPostsByDate(Iterable<Post> posts) {
+List<Post> sortPostsByDate(List<Post> posts) {
   return posts.toList()..sort((a, b) => b.postedDate.compareTo(a.postedDate));
+}
+
+// filter post based on category
+List<Post> filterPostsByCategory(List<Post> posts, String category) {
+  return posts.where((post) => post.category == category).toList();
 }

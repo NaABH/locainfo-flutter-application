@@ -45,23 +45,23 @@ abstract class DatabaseProvider {
   });
 
   // get all nearby posts
-  Future<Iterable<Post>> getNearbyPosts({
+  Future<List<Post>> getNearbyPosts({
     required Position position,
     required String currentUserId,
   });
 
   // get all posted posts
-  Future<Iterable<Post>> getPostedPosts({required String currentUserId});
+  Future<List<Post>> getPostedPosts({required String currentUserId});
 
   // get post from text title (searching function)
-  Future<Iterable<Post>> getSearchPosts(
+  Future<List<Post>> getSearchPosts(
       String searchText, String currentUserId, Position position);
 
   // get bookmark post ids
   Future<List<String>> getBookmarkedPostIds(String userId);
 
   // get post from bookmark ids
-  Future<Iterable<Post>> getBookmarkedPosts(String currentUserId);
+  Future<List<Post>> getBookmarkedPosts(String currentUserId);
 
   // update post title and content
   Future<void> updatePostTitleContent({

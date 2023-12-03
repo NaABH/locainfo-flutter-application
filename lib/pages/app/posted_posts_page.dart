@@ -60,7 +60,7 @@ class _PostedPostsPageState extends State<PostedPostsPage> {
             Navigator.of(context).pop();
           }),
           title: 'Posted Posts',
-          needNotification: false,
+          needSearch: false,
           scrollController: _scrollController,
         ),
         body: BlocBuilder<PostBloc, PostState>(
@@ -68,7 +68,7 @@ class _PostedPostsPageState extends State<PostedPostsPage> {
             if (state is PostStateLoadingPosts) {
               return AnimatedLoadingScreen(
                   imagePath: 'assets/animated_icon/loading.json',
-                  text: 'Fetching nearby news..',
+                  text: 'Fetching posted posts..',
                   imageSize: MediaQuery.of(context).size.width * 0.4);
             }
             if (state is PostStateLoadedPostedPost) {
@@ -86,7 +86,9 @@ class _PostedPostsPageState extends State<PostedPostsPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => PostDetailPage(post: post),
+                        builder: (context) => PostDetailPage(
+                          post: post,
+                        ),
                       ),
                     );
                   },

@@ -16,12 +16,11 @@ import 'package:locainfo/utilities/dialog/delete_dialog.dart';
 import 'package:locainfo/utilities/post_info_helper.dart';
 import 'package:share_plus/share_plus.dart';
 
-class MyPost extends StatelessWidget {
+class MyPost extends StatefulWidget {
   final Position? currentPosition;
   final Post post;
   final PostCallBack onTap;
   final PostPatternType patternType;
-
   const MyPost({
     Key? key,
     required this.post,
@@ -29,6 +28,25 @@ class MyPost extends StatelessWidget {
     required this.patternType,
     required this.currentPosition,
   }) : super(key: key);
+
+  @override
+  State<MyPost> createState() => _MyPostState();
+}
+
+class _MyPostState extends State<MyPost> {
+  late Post currentPost;
+
+  @override
+  void initState() {
+    currentPost = widget.post;
+    super.initState();
+  }
+
+  void updatePostState(Post updatedPost) {
+    setState(() {
+      currentPost = updatedPost;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +63,7 @@ class MyPost extends StatelessWidget {
         children: [
           GestureDetector(
               onTap: () {
-                onTap(post);
+                widget.onTap(currentPost);
               },
               child: _buildPostTitle()),
           Row(
@@ -53,18 +71,18 @@ class MyPost extends StatelessWidget {
               Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    onTap(post);
+                    widget.onTap(currentPost);
                   },
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      (patternType != PostPatternType.userPosted &&
-                              patternType != PostPatternType.home)
+                      (widget.patternType != PostPatternType.userPosted &&
+                              widget.patternType != PostPatternType.home)
                           ? _buildUserInfo()
                           : Container(),
-                      patternType != PostPatternType.home &&
-                              patternType != PostPatternType.news
+                      widget.patternType != PostPatternType.home &&
+                              widget.patternType != PostPatternType.news
                           ? _buildLocationAndDate()
                           : _buildDistanceAndDate(),
                       _buildPostContent(),
@@ -72,7 +90,7 @@ class MyPost extends StatelessWidget {
                   ),
                 ),
               ),
-              post.imageUrl != null
+              currentPost.imageUrl != null
                   ? Padding(
                       padding: const EdgeInsets.only(
                           top: 10, left: 10, bottom: 10, right: 20),
@@ -81,7 +99,7 @@ class MyPost extends StatelessWidget {
                         child: GestureDetector(
                           onTap: () {
                             final imageProvider =
-                                Image.network(post.imageUrl!).image;
+                                Image.network(currentPost.imageUrl!).image;
                             showImageViewer(
                               context,
                               imageProvider,
@@ -90,7 +108,7 @@ class MyPost extends StatelessWidget {
                             );
                           },
                           child: Image.network(
-                            post.imageUrl!,
+                            currentPost.imageUrl!,
                             height: 70,
                             width: 70,
                             fit: BoxFit.fill,
@@ -101,8 +119,8 @@ class MyPost extends StatelessWidget {
                               } else {
                                 return Center(
                                   child: SizedBox(
-                                    height: 50,
-                                    width: 50,
+                                    height: 60,
+                                    width: 60,
                                     child: Padding(
                                       padding: const EdgeInsets.all(15),
                                       child: CircularProgressIndicator(
@@ -152,7 +170,7 @@ class MyPost extends StatelessWidget {
                 Row(
                   children: [
                     _buildShareAndBookmark(),
-                    patternType == PostPatternType.userPosted
+                    widget.patternType == PostPatternType.userPosted
                         ? Row(
                             children: [
                               Material(
@@ -163,7 +181,8 @@ class MyPost extends StatelessWidget {
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                UpdatePostPage(post: post),
+                                                UpdatePostPage(
+                                                    post: currentPost),
                                           ),
                                         );
                                       },
@@ -183,7 +202,7 @@ class MyPost extends StatelessWidget {
                                       if (wantDelete) {
                                         context.read<PostBloc>().add(
                                             PostEventDeletePost(
-                                                post.documentId));
+                                                currentPost.documentId));
                                       }
                                     },
                                     borderRadius: BorderRadius.circular(30.0),
@@ -215,18 +234,19 @@ class MyPost extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          post.ownerProfilePicUrl == null
+          currentPost.ownerProfilePicUrl == null
               ? const Icon(
                   Icons.person,
                   size: 18,
                 )
               : CircleAvatar(
                   radius: 9,
-                  backgroundImage: NetworkImage(post.ownerProfilePicUrl!),
+                  backgroundImage:
+                      NetworkImage(currentPost.ownerProfilePicUrl!),
                 ),
           const SizedBox(width: 8),
           Text(
-            post.ownerUserName,
+            currentPost.ownerUserName,
             style: CustomFontStyles.postUsernameLabel,
           ),
         ],
@@ -238,7 +258,7 @@ class MyPost extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Text(
-        '${post.locationName}, ${post.timeAgo}',
+        '${currentPost.locationName}, ${currentPost.timeAgo}',
         style: CustomFontStyles.postLocationDateLabel,
         maxLines: 1,
         softWrap: true,
@@ -251,7 +271,7 @@ class MyPost extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Text(
-        '${getDistanceText(currentPosition!, post.latitude, post.longitude)}, ${post.timeAgo}',
+        '${getDistanceText(widget.currentPosition!, currentPost.latitude, currentPost.longitude)}, ${currentPost.timeAgo}',
         style: CustomFontStyles.postLocationDateLabel,
         maxLines: 1,
         softWrap: true,
@@ -264,7 +284,7 @@ class MyPost extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(right: 10, left: 10, top: 2),
       child: Text(
-        post.title,
+        currentPost.title,
         style: CustomFontStyles.postTitleLabel,
         maxLines: 2,
         softWrap: true,
@@ -277,7 +297,7 @@ class MyPost extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Text(
-        post.content,
+        currentPost.content,
         style: CustomFontStyles.postContentText,
         textAlign: TextAlign.start,
         maxLines: 3,
@@ -292,11 +312,8 @@ class MyPost extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         MyLikeDislikeButton(
-          postId: post.documentId,
-          isLiked: post.isLiked,
-          numberOfLikes: post.numberOfLikes,
-          isDisliked: post.isDisliked,
-          numberOfDislikes: post.numberOfDislikes,
+          post: currentPost,
+          onUpdatePostState: updatePostState,
         ),
       ],
     );
@@ -307,7 +324,7 @@ class MyPost extends StatelessWidget {
       children: [
         IconButton(
           onPressed: () async {
-            await Share.share('${post.title}\n${post.content}');
+            await Share.share('${currentPost.title}\n${currentPost.content}');
           },
           splashRadius: 1,
           icon: const Icon(Icons.share, size: 20),
@@ -315,8 +332,8 @@ class MyPost extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(right: 8.0),
           child: MyBookmarkButton(
-            postId: post.documentId,
-            isBookmarked: post.isBookmarked,
+            post: currentPost,
+            onUpdatePostState: updatePostState,
           ),
         ),
       ],

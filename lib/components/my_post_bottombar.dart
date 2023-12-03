@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/custom_datatype.dart';
 import 'package:locainfo/pages/app/report_page.dart';
 import 'package:locainfo/services/firestore/post.dart';
@@ -9,9 +10,11 @@ import 'package:share_plus/share_plus.dart';
 
 class MyPostBottomBar extends StatefulWidget {
   final Post post;
+  final Function(Post) onUpdatePostState;
   const MyPostBottomBar({
     super.key,
     required this.post,
+    required this.onUpdatePostState,
   });
 
   @override
@@ -48,9 +51,13 @@ class _MyPostBottomBarState extends State<MyPostBottomBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10.0),
+      margin: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        color: AppColors.grey3,
+      ),
       height: 50,
-      color: Colors.grey[200],
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -67,6 +74,28 @@ class _MyPostBottomBarState extends State<MyPostBottomBar> {
 
                 // remove the disliked if it is enabled
                 _removeDisliked();
+
+                widget.onUpdatePostState(
+                  Post(
+                    documentId: widget.post.documentId,
+                    ownerUserId: widget.post.ownerUserId,
+                    ownerUserName: widget.post.ownerUserName,
+                    ownerProfilePicUrl: widget.post.ownerProfilePicUrl,
+                    title: widget.post.title,
+                    content: widget.post.content,
+                    imageUrl: widget.post.imageUrl,
+                    category: widget.post.category,
+                    postedDate: widget.post.postedDate,
+                    latitude: widget.post.latitude,
+                    longitude: widget.post.longitude,
+                    locationName: widget.post.locationName,
+                    isLiked: isLiked,
+                    isDisliked: isDisliked,
+                    numberOfLikes: numberOfLikes,
+                    numberOfDislikes: numberOfDislikes,
+                    isBookmarked: isBookmarked,
+                  ),
+                );
               });
             },
             child: Row(
@@ -94,6 +123,28 @@ class _MyPostBottomBarState extends State<MyPostBottomBar> {
 
                 // remove like if enabled
                 _removeLiked();
+
+                widget.onUpdatePostState(
+                  Post(
+                    documentId: widget.post.documentId,
+                    ownerUserId: widget.post.ownerUserId,
+                    ownerUserName: widget.post.ownerUserName,
+                    ownerProfilePicUrl: widget.post.ownerProfilePicUrl,
+                    title: widget.post.title,
+                    content: widget.post.content,
+                    imageUrl: widget.post.imageUrl,
+                    category: widget.post.category,
+                    postedDate: widget.post.postedDate,
+                    latitude: widget.post.latitude,
+                    longitude: widget.post.longitude,
+                    locationName: widget.post.locationName,
+                    isLiked: isLiked,
+                    isDisliked: isDisliked,
+                    numberOfLikes: numberOfLikes,
+                    numberOfDislikes: numberOfDislikes,
+                    isBookmarked: isBookmarked,
+                  ),
+                );
               });
             },
             child: Row(
@@ -136,6 +187,28 @@ class _MyPostBottomBarState extends State<MyPostBottomBar> {
                   context.read<PostBloc>().add(PostEventUpdatePostReactions(
                       post.documentId, UserAction.removeBookmark));
                 }
+
+                widget.onUpdatePostState(
+                  Post(
+                    documentId: widget.post.documentId,
+                    ownerUserId: widget.post.ownerUserId,
+                    ownerUserName: widget.post.ownerUserName,
+                    ownerProfilePicUrl: widget.post.ownerProfilePicUrl,
+                    title: widget.post.title,
+                    content: widget.post.content,
+                    imageUrl: widget.post.imageUrl,
+                    category: widget.post.category,
+                    postedDate: widget.post.postedDate,
+                    latitude: widget.post.latitude,
+                    longitude: widget.post.longitude,
+                    locationName: widget.post.locationName,
+                    isLiked: isLiked,
+                    isDisliked: isDisliked,
+                    numberOfLikes: numberOfLikes,
+                    numberOfDislikes: numberOfDislikes,
+                    isBookmarked: isBookmarked,
+                  ),
+                );
               });
             },
             child: isBookmarked

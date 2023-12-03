@@ -27,7 +27,7 @@ class PostStateLoadingPosts extends PostState {
 // after load required posts
 class PostStatePostLoaded extends PostState {
   final Position currentPosition;
-  final Iterable<Post> posts;
+  final List<Post> posts;
   const PostStatePostLoaded({
     required bool isLoading,
     required this.currentPosition,
@@ -51,7 +51,7 @@ class PostStateLoadError extends PostState {
 // Bookmark page----------------------------------------------------------------
 // emitted if bookmark post fetched successfully
 class PostStateLoadedBookmarkedPosts extends PostState {
-  final Iterable<Post> posts;
+  final List<Post> posts;
   const PostStateLoadedBookmarkedPosts({
     required bool isLoading,
     required this.posts,
@@ -116,7 +116,7 @@ class PostStateSearchLoading extends PostState {
 
 // emitted when search result are ready
 class PostStateSearchLoaded extends PostState {
-  final Iterable<Post> filteredPosts;
+  final List<Post> filteredPosts;
   const PostStateSearchLoaded({
     required bool isLoading,
     required this.filteredPosts,
@@ -131,7 +131,7 @@ class PostStateSearchError extends PostState {
 
 // emitted when loaded the posted posts
 class PostStateLoadedPostedPost extends PostState {
-  final Iterable<Post> posts;
+  final List<Post> posts;
   const PostStateLoadedPostedPost({
     required bool isLoading,
     required this.posts,

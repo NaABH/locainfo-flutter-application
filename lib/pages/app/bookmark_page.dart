@@ -63,7 +63,7 @@ class _BookMarkPageState extends State<BookMarkPage> {
       },
       child: Scaffold(
         appBar: MyAppBar(
-          needNotification: true,
+          needSearch: false,
           title: 'Bookmark',
           scrollController: _scrollController,
         ),
@@ -109,7 +109,9 @@ class _BookMarkPageState extends State<BookMarkPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => PostDetailPage(post: post),
+                              builder: (context) => PostDetailPage(
+                                post: post,
+                              ),
                             ),
                           );
                         },

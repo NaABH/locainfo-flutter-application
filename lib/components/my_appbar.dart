@@ -4,14 +4,16 @@ import 'package:locainfo/constants/font_styles.dart';
 
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
-  final bool needNotification;
+  final bool needSearch;
+  final VoidCallback? onPressed;
   final ScrollController? scrollController;
   final Widget? leading;
   final Widget? action;
   const MyAppBar({
     super.key,
     required this.title,
-    required this.needNotification,
+    required this.needSearch,
+    this.onPressed,
     this.scrollController,
     this.leading,
     this.action,
@@ -42,21 +44,24 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
               style: CustomFontStyles.appBarTitle,
             ),
           ),
-          SizedBox(
+          const SizedBox(
             width: 20,
           ),
           action ?? Container(),
         ],
       ),
       actions: [
-        needNotification
-            ? IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.notifications,
-                  color: AppColors.darkerBlue,
-                  size: 26,
-                ))
+        needSearch
+            ? Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: IconButton(
+                    onPressed: onPressed,
+                    icon: const Icon(
+                      Icons.search,
+                      color: AppColors.darkerBlue,
+                      size: 30,
+                    )),
+              )
             : Container(),
       ],
     );

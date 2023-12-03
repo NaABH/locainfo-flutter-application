@@ -3,15 +3,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:like_button/like_button.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/custom_datatype.dart';
+import 'package:locainfo/services/firestore/post.dart';
 import 'package:locainfo/services/post/post_bloc.dart';
 import 'package:locainfo/services/post/post_event.dart';
 
 // custom book mark button using like_button package
 class MyBookmarkButton extends StatefulWidget {
-  final String postId;
-  final bool isBookmarked;
-  const MyBookmarkButton(
-      {super.key, required this.postId, required this.isBookmarked});
+  final Post post;
+  final Function(Post) onUpdatePostState;
+  const MyBookmarkButton({
+    super.key,
+    required this.post,
+    required this.onUpdatePostState,
+  });
 
   @override
   State<MyBookmarkButton> createState() => _MyBookmarkButtonState();
@@ -23,8 +27,8 @@ class _MyBookmarkButtonState extends State<MyBookmarkButton> {
 
   @override
   void initState() {
-    postId = widget.postId;
-    isBookmarked = widget.isBookmarked;
+    postId = widget.post.documentId;
+    isBookmarked = widget.post.isBookmarked;
     super.initState();
   }
 
@@ -43,6 +47,29 @@ class _MyBookmarkButtonState extends State<MyBookmarkButton> {
             PostEventUpdatePostReactions(postId, UserAction.removeBookmark));
       }
     });
+
+    widget.onUpdatePostState(
+      Post(
+        documentId: postId,
+        ownerUserId: widget.post.ownerUserId,
+        ownerUserName: widget.post.ownerUserName,
+        ownerProfilePicUrl: widget.post.ownerProfilePicUrl,
+        title: widget.post.title,
+        content: widget.post.content,
+        imageUrl: widget.post.imageUrl,
+        category: widget.post.category,
+        postedDate: widget.post.postedDate,
+        latitude: widget.post.latitude,
+        longitude: widget.post.longitude,
+        locationName: widget.post.locationName,
+        isLiked: widget.post.isLiked,
+        isDisliked: widget.post.isDisliked,
+        numberOfLikes: widget.post.numberOfLikes,
+        numberOfDislikes: widget.post.numberOfDislikes,
+        isBookmarked: this.isBookmarked,
+      ),
+    );
+
     return this.isBookmarked;
   }
 

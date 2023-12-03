@@ -4,24 +4,19 @@ import 'package:like_button/like_button.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/custom_datatype.dart';
 import 'package:locainfo/constants/font_styles.dart';
+import 'package:locainfo/services/firestore/post.dart';
 import 'package:locainfo/services/post/post_bloc.dart';
 import 'package:locainfo/services/post/post_event.dart';
 
 // custom like button using like_button package for animation
 class MyLikeDislikeButton extends StatefulWidget {
-  final String postId;
-  final bool isLiked;
-  final int numberOfLikes;
-  final bool isDisliked;
-  final int numberOfDislikes;
+  final Post post;
+  final Function(Post) onUpdatePostState;
 
   const MyLikeDislikeButton({
     Key? key,
-    required this.postId,
-    required this.isLiked,
-    required this.numberOfLikes,
-    required this.isDisliked,
-    required this.numberOfDislikes,
+    required this.post,
+    required this.onUpdatePostState,
   }) : super(key: key);
 
   @override
@@ -37,11 +32,11 @@ class _MyLikeDislikeButtonState extends State<MyLikeDislikeButton> {
 
   @override
   void initState() {
-    postId = widget.postId;
-    isLiked = widget.isLiked;
-    numberOfLikes = widget.numberOfLikes;
-    isDisliked = widget.isDisliked;
-    numberOfDislikes = widget.numberOfDislikes;
+    postId = widget.post.documentId;
+    isLiked = widget.post.isLiked;
+    numberOfLikes = widget.post.numberOfLikes;
+    isDisliked = widget.post.isDisliked;
+    numberOfDislikes = widget.post.numberOfDislikes;
     super.initState();
   }
 
@@ -56,6 +51,29 @@ class _MyLikeDislikeButtonState extends State<MyLikeDislikeButton> {
       // remove the disliked if it is enabled
       _removeDisliked();
     });
+
+    widget.onUpdatePostState(
+      Post(
+        documentId: postId,
+        ownerUserId: widget.post.ownerUserId,
+        ownerUserName: widget.post.ownerUserName,
+        ownerProfilePicUrl: widget.post.ownerProfilePicUrl,
+        title: widget.post.title,
+        content: widget.post.content,
+        imageUrl: widget.post.imageUrl,
+        category: widget.post.category,
+        postedDate: widget.post.postedDate,
+        latitude: widget.post.latitude,
+        longitude: widget.post.longitude,
+        locationName: widget.post.locationName,
+        isLiked: this.isLiked,
+        isDisliked: isDisliked,
+        numberOfLikes: numberOfLikes,
+        numberOfDislikes: numberOfDislikes,
+        isBookmarked: widget.post.isBookmarked,
+      ),
+    );
+
     return this.isLiked;
   }
 
@@ -83,6 +101,29 @@ class _MyLikeDislikeButtonState extends State<MyLikeDislikeButton> {
       // remove like if enabled
       _removeLiked();
     });
+
+    widget.onUpdatePostState(
+      Post(
+        documentId: postId,
+        ownerUserId: widget.post.ownerUserId,
+        ownerUserName: widget.post.ownerUserName,
+        ownerProfilePicUrl: widget.post.ownerProfilePicUrl,
+        title: widget.post.title,
+        content: widget.post.content,
+        imageUrl: widget.post.imageUrl,
+        category: widget.post.category,
+        postedDate: widget.post.postedDate,
+        latitude: widget.post.latitude,
+        longitude: widget.post.longitude,
+        locationName: widget.post.locationName,
+        isLiked: isLiked,
+        isDisliked: this.isDisliked,
+        numberOfLikes: numberOfLikes,
+        numberOfDislikes: numberOfDislikes,
+        isBookmarked: widget.post.isBookmarked,
+      ),
+    );
+
     return this.isDisliked;
   }
 

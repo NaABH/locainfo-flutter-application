@@ -6,6 +6,7 @@ import 'package:locainfo/components/my_snackbar.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/categories.dart';
 import 'package:locainfo/constants/custom_datatype.dart';
+import 'package:locainfo/constants/routes.dart';
 import 'package:locainfo/pages/app/post_detail_page.dart';
 import 'package:locainfo/services/firestore/database_exceptions.dart';
 import 'package:locainfo/services/location/location_exceptions.dart';
@@ -64,7 +65,10 @@ class _NewsPageState extends State<NewsPage> {
       child: Scaffold(
         appBar: MyAppBar(
           title: 'News',
-          needNotification: true,
+          needSearch: true,
+          onPressed: () {
+            Navigator.of(context).pushNamed(searchPostRoute);
+          },
           scrollController: _scrollController,
           action: _mySortByDropDown(),
         ),
@@ -96,7 +100,9 @@ class _NewsPageState extends State<NewsPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => PostDetailPage(post: post),
+                              builder: (context) => PostDetailPage(
+                                post: post,
+                              ),
                             ),
                           );
                         },
@@ -126,14 +132,16 @@ class _NewsPageState extends State<NewsPage> {
                 );
               } else {
                 // PostStateLoadError
+                print(state.toString());
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 8.0),
                         child: Text(
-                            'Some error occurred. Please check your Internet connection and GPS service.'),
+                            'Some error occurred. \nPlease check your Internet connection and GPS service.'),
                       ),
                       IconButton(
                           onPressed: () async {
@@ -155,7 +163,7 @@ class _NewsPageState extends State<NewsPage> {
 
   Widget _myCategoryButtons() {
     // All as the default category
-    final List<String> categoryKeys = ['All', ...postCategories.keys.toList()];
+    final List<String?> categoryKeys = [null, ...postCategories.keys.toList()];
 
     return Padding(
       padding: const EdgeInsets.only(left: 4.0),
@@ -172,15 +180,13 @@ class _NewsPageState extends State<NewsPage> {
                 onPressed: () {
                   // Update the selected category when a button is pressed
                   setState(() {
-                    selectedCategory =
-                        categoryKey == 'All' ? null : categoryKey;
+                    selectedCategory = categoryKey;
+                    print(selectedCategory);
                   });
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: selectedCategory == categoryKey ||
-                          (selectedCategory == null && categoryKey == 'All')
-                      ? AppColors
-                          .grey5 // Change the color for the selected category
+                  backgroundColor: selectedCategory == categoryKey
+                      ? AppColors.grey5
                       : AppColors.grey2,
                 ),
                 child: Text(
