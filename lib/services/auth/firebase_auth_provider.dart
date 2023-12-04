@@ -9,6 +9,7 @@ import 'package:locainfo/services/auth/auth_exceptions.dart';
 import 'package:locainfo/services/auth/auth_provider.dart';
 import 'package:locainfo/services/auth/auth_user.dart';
 
+// implementation of auth provider
 class FirebaseAuthProvider implements AuthProvider {
   // implement FireStoreProvider as a singleton
   static final FirebaseAuthProvider _shared =
@@ -47,8 +48,6 @@ class FirebaseAuthProvider implements AuthProvider {
       } else {
         throw GenericAuthException();
       }
-    } catch (_) {
-      throw GenericAuthException();
     }
   }
 

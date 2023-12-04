@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 // class to store custom app colors
 class AppColors {
+  static const Color transparent = Colors.transparent;
+  static const Color blueGrey = Colors.blueGrey;
   static const Color white = Colors.white;
   // like and dislike button
   static const Color black = Colors.black;

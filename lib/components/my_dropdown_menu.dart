@@ -3,7 +3,7 @@ import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/categories.dart';
 import 'package:locainfo/constants/font_styles.dart';
 
-// custom drop down menu for category in creating new post
+// a drop down menu to be used when creating a new post (select category)
 class MyDropdownMenu extends StatefulWidget {
   final Function(String) onValueChange;
 
@@ -51,7 +51,7 @@ class _MyDropdownMenuState extends State<MyDropdownMenu> {
   }
 
   List<DropdownMenuItem<String>> _buildDropdownItems() {
-    return postCategories.entries.map<DropdownMenuItem<String>>((entry) {
+    return postCategories.entries.map((entry) {
       return DropdownMenuItem<String>(
         value: entry.key,
         child: Text(entry.value),

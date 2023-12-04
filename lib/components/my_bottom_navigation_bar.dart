@@ -8,7 +8,8 @@ import 'package:locainfo/services/main_bloc.dart';
 import 'package:locainfo/services/main_event.dart';
 import 'package:locainfo/services/main_state.dart';
 
-// custom bottom navigation bar
+// custom bottom navigation bar to used in the main interface
+// used animated bottom navigation bar package for animation
 class MyBottomNavigationBar extends StatefulWidget {
   const MyBottomNavigationBar({Key? key}) : super(key: key);
 

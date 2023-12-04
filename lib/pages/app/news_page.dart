@@ -63,14 +63,15 @@ class _NewsPageState extends State<NewsPage> {
         }
       },
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: MyAppBar(
           title: 'News',
           needSearch: true,
-          onPressed: () {
+          onSearchPressed: () {
             Navigator.of(context).pushNamed(searchPostRoute);
           },
           scrollController: _scrollController,
-          action: _mySortByDropDown(),
+          afterTitle: _mySortByDropDown(),
         ),
         body: RefreshIndicator(
           onRefresh: () async {
@@ -132,7 +133,7 @@ class _NewsPageState extends State<NewsPage> {
                 );
               } else {
                 // PostStateLoadError
-                print(state.toString());
+
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -161,6 +162,7 @@ class _NewsPageState extends State<NewsPage> {
     );
   }
 
+  // category butttons
   Widget _myCategoryButtons() {
     // All as the default category
     final List<String?> categoryKeys = [null, ...postCategories.keys.toList()];
@@ -181,7 +183,6 @@ class _NewsPageState extends State<NewsPage> {
                   // Update the selected category when a button is pressed
                   setState(() {
                     selectedCategory = categoryKey;
-                    print(selectedCategory);
                   });
                 },
                 style: ElevatedButton.styleFrom(
@@ -203,6 +204,7 @@ class _NewsPageState extends State<NewsPage> {
     );
   }
 
+  // sort by drop down button at the app bar
   Widget _mySortByDropDown() {
     return Container(
       height: 35,

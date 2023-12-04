@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:locainfo/constants/app_colors.dart';
 
+// custom snack bar design
 SnackBar mySnackBar({
   required String message,
   Color backgroundColor = AppColors.lighterBlue,

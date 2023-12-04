@@ -11,6 +11,7 @@ import 'package:locainfo/services/auth/bloc/auth_state.dart';
 import 'package:locainfo/utilities/dialog/error_dialog.dart';
 import 'package:locainfo/utilities/toast_message.dart';
 
+// page for user to reset their password
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
 
@@ -45,6 +46,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 context, 'The email entered has not been registered');
           } else if (state.exception is GenericAuthException) {
             await showErrorDialog(context, 'Unknown error');
+          }
+          if (state.hasSentEmail == true) {
+            showToastMessage('Reset link is sent to email');
           }
         }
       },
@@ -92,7 +96,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 const SizedBox(height: 45),
                 MyButton(
                     onPressed: () {
-                      showToastMessage('Reset link is sent to email');
                       final email = _email.text;
                       context.read<AuthBloc>().add(
                             AuthEventForgotPassword(email: email),

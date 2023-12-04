@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:locainfo/components/my_bookmark_button.dart';
-import 'package:locainfo/components/my_home_post_list.dart';
 import 'package:locainfo/components/my_likedislike_button.dart';
 import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/constants/custom_datatype.dart';
@@ -16,11 +15,15 @@ import 'package:locainfo/utilities/dialog/delete_dialog.dart';
 import 'package:locainfo/utilities/post_info_helper.dart';
 import 'package:share_plus/share_plus.dart';
 
+typedef PostCallBack = void Function(Post post);
+
+// custom post widget with design pattern
 class MyPost extends StatefulWidget {
   final Position? currentPosition;
   final Post post;
   final PostCallBack onTap;
   final PostPatternType patternType;
+
   const MyPost({
     Key? key,
     required this.post,
@@ -62,103 +65,37 @@ class _MyPostState extends State<MyPost> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           GestureDetector(
-              onTap: () {
-                widget.onTap(currentPost);
-              },
-              child: _buildPostTitle()),
+            onTap: () => widget.onTap(currentPost),
+            child: _buildPostTitle(),
+          ),
           Row(
             children: [
               Expanded(
                 child: GestureDetector(
-                  onTap: () {
-                    widget.onTap(currentPost);
-                  },
+                  onTap: () => widget.onTap(currentPost),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      (widget.patternType != PostPatternType.userPosted &&
-                              widget.patternType != PostPatternType.home)
-                          ? _buildUserInfo()
-                          : Container(),
-                      widget.patternType != PostPatternType.home &&
-                              widget.patternType != PostPatternType.news
-                          ? _buildLocationAndDate()
-                          : _buildDistanceAndDate(),
+                      if (widget.patternType != PostPatternType.userPosted &&
+                          widget.patternType != PostPatternType.home)
+                        _buildUserInfo(),
+                      if (widget.patternType != PostPatternType.home &&
+                          widget.patternType != PostPatternType.news)
+                        _buildLocationAndDate()
+                      else
+                        _buildDistanceAndDate(),
                       _buildPostContent(),
                     ],
                   ),
                 ),
               ),
-              currentPost.imageUrl != null
-                  ? Padding(
-                      padding: const EdgeInsets.only(
-                          top: 10, left: 10, bottom: 10, right: 20),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10.0),
-                        child: GestureDetector(
-                          onTap: () {
-                            final imageProvider =
-                                Image.network(currentPost.imageUrl!).image;
-                            showImageViewer(
-                              context,
-                              imageProvider,
-                              swipeDismissible: true,
-                              doubleTapZoomable: true,
-                            );
-                          },
-                          child: Image.network(
-                            currentPost.imageUrl!,
-                            height: 70,
-                            width: 70,
-                            fit: BoxFit.fill,
-                            loadingBuilder: (BuildContext context, Widget child,
-                                ImageChunkEvent? loadingProgress) {
-                              if (loadingProgress == null) {
-                                return child;
-                              } else {
-                                return Center(
-                                  child: SizedBox(
-                                    height: 60,
-                                    width: 60,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(15),
-                                      child: CircularProgressIndicator(
-                                        value: loadingProgress
-                                                    .expectedTotalBytes !=
-                                                null
-                                            ? loadingProgress
-                                                    .cumulativeBytesLoaded /
-                                                (loadingProgress
-                                                        .expectedTotalBytes ??
-                                                    1)
-                                            : null,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }
-                            },
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                  padding: const EdgeInsets.all(4),
-                                  width: 70,
-                                  height: 70,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: AppColors.grey5,
-                                  ),
-                                  child: const Center(
-                                      child: Text(
-                                    'Unavailable',
-                                    style: TextStyle(fontSize: 11),
-                                  )));
-                            },
-                          ),
-                        ),
-                      ),
-                    )
-                  : Container(),
+              if (currentPost.imageUrl != null)
+                Padding(
+                  padding: const EdgeInsets.only(
+                      top: 10, left: 10, bottom: 10, right: 20),
+                  child: _buildImage(),
+                ),
             ],
           ),
           Padding(
@@ -170,53 +107,8 @@ class _MyPostState extends State<MyPost> {
                 Row(
                   children: [
                     _buildShareAndBookmark(),
-                    widget.patternType == PostPatternType.userPosted
-                        ? Row(
-                            children: [
-                              Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                UpdatePostPage(
-                                                    post: currentPost),
-                                          ),
-                                        );
-                                      },
-                                      borderRadius: BorderRadius.circular(30.0),
-                                      child: const Padding(
-                                        padding: EdgeInsets.all(5.0),
-                                        child: Icon(Icons.edit, size: 20),
-                                      ))),
-                              Padding(
-                                padding: const EdgeInsets.only(right: 10),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: () async {
-                                      final wantDelete =
-                                          await showDeleteDialog(context);
-                                      if (wantDelete) {
-                                        context.read<PostBloc>().add(
-                                            PostEventDeletePost(
-                                                currentPost.documentId));
-                                      }
-                                    },
-                                    borderRadius: BorderRadius.circular(30.0),
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(5),
-                                      child:
-                                          Icon(Icons.delete_forever, size: 20),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
-                        : Container(),
+                    if (widget.patternType == PostPatternType.userPosted)
+                      _buildEditAndDeleteButtons(),
                   ],
                 ),
               ],
@@ -307,6 +199,65 @@ class _MyPostState extends State<MyPost> {
     );
   }
 
+  Widget _buildImage() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10.0),
+      child: GestureDetector(
+        onTap: () => showImageViewer(
+          context,
+          Image.network(currentPost.imageUrl!).image,
+          swipeDismissible: true,
+          doubleTapZoomable: true,
+        ),
+        child: Image.network(
+          currentPost.imageUrl!,
+          height: 70,
+          width: 70,
+          fit: BoxFit.fill,
+          loadingBuilder: (BuildContext context, Widget child,
+              ImageChunkEvent? loadingProgress) {
+            if (loadingProgress == null) {
+              return child;
+            } else {
+              return Center(
+                child: SizedBox(
+                  height: 60,
+                  width: 60,
+                  child: Padding(
+                    padding: const EdgeInsets.all(15),
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              (loadingProgress.expectedTotalBytes ?? 1)
+                          : null,
+                    ),
+                  ),
+                ),
+              );
+            }
+          },
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              padding: const EdgeInsets.all(4),
+              width: 70,
+              height: 70,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: AppColors.grey5,
+              ),
+              child: const Center(
+                child: Text(
+                  'Unavailable',
+                  style: TextStyle(fontSize: 11),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   Widget _buildLikeDislikeButton() {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -324,7 +275,7 @@ class _MyPostState extends State<MyPost> {
       children: [
         IconButton(
           onPressed: () async {
-            await Share.share('${currentPost.title}\n${currentPost.content}');
+            await Share.share('${currentPost.title}\n${currentPost.content}\n');
           },
           splashRadius: 1,
           icon: const Icon(Icons.share, size: 20),
@@ -338,5 +289,61 @@ class _MyPostState extends State<MyPost> {
         ),
       ],
     );
+  }
+
+  Widget _buildEditAndDeleteButtons() {
+    return Row(
+      children: [
+        _buildEditButton(),
+        Padding(
+          padding: const EdgeInsets.only(right: 10),
+          child: _buildDeleteButton(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEditButton() {
+    return Material(
+      color: AppColors.transparent,
+      child: InkWell(
+        onTap: () => _navigateToUpdatePostPage(),
+        borderRadius: BorderRadius.circular(30.0),
+        child: const Padding(
+          padding: EdgeInsets.all(5.0),
+          child: Icon(Icons.edit, size: 20),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDeleteButton() {
+    return Material(
+      color: AppColors.transparent,
+      child: InkWell(
+        onTap: () => _confirmDeletePost(),
+        borderRadius: BorderRadius.circular(30.0),
+        child: const Padding(
+          padding: EdgeInsets.all(5),
+          child: Icon(Icons.delete_forever, size: 20),
+        ),
+      ),
+    );
+  }
+
+  void _navigateToUpdatePostPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UpdatePostPage(post: currentPost),
+      ),
+    );
+  }
+
+  Future<void> _confirmDeletePost() async {
+    final wantDelete = await showDeleteDialog(context);
+    if (wantDelete) {
+      context.read<PostBloc>().add(PostEventDeletePost(currentPost.documentId));
+    }
   }
 }

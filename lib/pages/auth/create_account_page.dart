@@ -13,6 +13,7 @@ import 'package:locainfo/services/firestore/database_exceptions.dart';
 import 'package:locainfo/utilities/dialog/error_dialog.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
+// page for user to create account
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({super.key});
 
@@ -58,6 +59,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             await showErrorDialog(context, 'Invalid email entered');
           } else if (state.exception is CouldNotCreateNewUserException) {
             await showErrorDialog(context, 'Failed to save username');
+          } else if (state.exception is InvalidPasswordAuthException) {
+            await showErrorDialog(context, 'Password cannot be empty!');
           } else if (state.exception is GenericAuthException) {
             await showErrorDialog(context, 'Failed to register');
           }

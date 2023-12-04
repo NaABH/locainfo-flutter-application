@@ -11,6 +11,7 @@ import 'package:locainfo/services/auth/bloc/auth_event.dart';
 import 'package:locainfo/services/auth/bloc/auth_state.dart';
 import 'package:locainfo/utilities/dialog/error_dialog.dart';
 
+// page for user to login their account
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -44,6 +45,8 @@ class _LoginPageState extends State<LoginPage> {
           if (state.exception is UserNotFoundAuthException) {
             await showErrorDialog(
                 context, 'Cannot find a user with the entered credentials');
+          } else if (state.exception is InvalidPasswordAuthException) {
+            await showErrorDialog(context, 'Password cannot be empty!');
           } else if (state.exception is WrongPasswordAuthException) {
             await showErrorDialog(context,
                 'There is something wrong with your email or password');

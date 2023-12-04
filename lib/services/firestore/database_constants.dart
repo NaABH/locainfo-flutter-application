@@ -6,6 +6,7 @@ const ownerProfilePictureFieldName = 'userProfilePicUrl';
 const titleFieldName = 'title';
 const textFieldName = 'text';
 const imageLinkFieldName = 'imageUrl';
+const contactFieldName = 'contactNumber';
 const categoryFieldName = 'category';
 const latitudeFieldName = 'latitude';
 const longitudeFieldName = 'longitude';

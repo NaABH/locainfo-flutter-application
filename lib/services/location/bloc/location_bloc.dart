@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:locainfo/services/location/bloc/location_event.dart';
 import 'package:locainfo/services/location/geolocation_provider.dart';
 
+// bloc to control the location service
 class LocationBloc extends Bloc<LocationEvent, Position> {
   final GeoLocationProvider _locationProvider;
   StreamSubscription<Position>? _positionStreamSubscription;
@@ -24,7 +25,9 @@ class LocationBloc extends Bloc<LocationEvent, Position> {
             speedAccuracy: 0,
           ),
         ) {
+    // start live location tracking (used in home page)
     on<LocationEventStartTracking>((event, emit) async {
+      _locationProvider.getCurrentLocation();
       _positionStreamSubscription?.cancel();
       _positionStreamSubscription =
           _locationProvider.getLocationStream().listen(
@@ -34,11 +37,13 @@ class LocationBloc extends Bloc<LocationEvent, Position> {
       );
     });
 
+    // stop live location tracking (after home page dispose)
     on<LocationEventStopTracking>((event, emit) {
       _positionStreamSubscription?.cancel();
       _positionStreamSubscription = null;
     });
 
+    // update the position
     on<LocationEventUpdatePosition>((event, emit) {
       emit(event.position);
     });

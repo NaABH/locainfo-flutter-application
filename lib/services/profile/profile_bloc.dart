@@ -7,6 +7,7 @@ import 'package:locainfo/services/profile/profile_exceptions.dart';
 import 'package:locainfo/services/profile/profile_state.dart';
 import 'package:locainfo/utilities/input_validation.dart';
 
+// bloc to control profile data
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final DatabaseProvider _databaseProvider;
   final FirebaseAuthProvider _authProvider;

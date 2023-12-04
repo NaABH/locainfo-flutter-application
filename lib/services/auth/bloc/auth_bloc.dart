@@ -4,7 +4,9 @@ import 'package:locainfo/services/auth/auth_provider.dart';
 import 'package:locainfo/services/auth/bloc/auth_event.dart';
 import 'package:locainfo/services/auth/bloc/auth_state.dart';
 import 'package:locainfo/services/firestore/database_provider.dart';
+import 'package:locainfo/utilities/input_validation.dart';
 
+// bloc to control the entire authentication process
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthProvider authProvider;
   final DatabaseProvider databaseProvider;
@@ -97,26 +99,28 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         isLoading: true,
       ));
       try {
-        if (username.trim().isEmpty ||
-            RegExp(r'^[0-9\W_]').hasMatch(username)) {
-          emit(AuthStateRegistering(
-            exception: InvalidUsernameAuthException(),
-            isLoading: false,
-          ));
-        } else {
-          await authProvider.createUser(
-            username: username,
-            email: email,
-            password: password,
-          );
-          await databaseProvider.createNewUser(
-            userId: authProvider.currentUser!.id,
-            username: username,
-            emailAddress: email,
-          );
-          await authProvider.sendEmailVerification();
-          emit(const AuthStateNeedsVerification(isLoading: false));
+        if (!isInputValid(username)) {
+          throw InvalidUsernameAuthException();
         }
+        if (!isInputValid(email)) {
+          throw InvalidEmailAuthException();
+        }
+        if (!isInputValid(password)) {
+          throw InvalidPasswordAuthException();
+        }
+
+        await authProvider.createUser(
+          username: username,
+          email: email,
+          password: password,
+        );
+        await databaseProvider.createNewUser(
+          userId: authProvider.currentUser!.id,
+          username: username,
+          emailAddress: email,
+        );
+        await authProvider.sendEmailVerification();
+        emit(const AuthStateNeedsVerification(isLoading: false));
       } on Exception catch (e) {
         emit(AuthStateRegistering(
           // same state but with exception
@@ -140,7 +144,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       final email = event.email;
       final password = event.password;
+
       try {
+        if (!isInputValid(email)) {
+          throw InvalidEmailAuthException();
+        }
+        if (!isInputValid(password)) {
+          throw InvalidPasswordAuthException();
+        }
+
         final user = await authProvider.logIn(
           email: email,
           password: password,

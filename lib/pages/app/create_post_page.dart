@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:locainfo/components/my_appbar.dart';
 import 'package:locainfo/components/my_back_button.dart';
 import 'package:locainfo/components/my_button.dart';
 import 'package:locainfo/components/my_dropdown_menu.dart';
 import 'package:locainfo/constants/app_colors.dart';
-import 'package:locainfo/constants/font_styles.dart';
 import 'package:locainfo/services/cloud_storage/cloud_storage_exceptions.dart';
 import 'package:locainfo/services/firestore/database_exceptions.dart';
 import 'package:locainfo/services/location/location_exceptions.dart';
@@ -22,8 +22,9 @@ import 'package:locainfo/utilities/dialog/error_dialog.dart';
 import 'package:locainfo/utilities/loading_screen/loading_screen.dart';
 import 'package:locainfo/utilities/toast_message.dart';
 
+// a page to enable user to create post
 class CreatePostPage extends StatefulWidget {
-  const CreatePostPage({super.key});
+  const CreatePostPage({Key? key}) : super(key: key);
 
   @override
   State<CreatePostPage> createState() => _CreatePostPageState();
@@ -32,7 +33,8 @@ class CreatePostPage extends StatefulWidget {
 class _CreatePostPageState extends State<CreatePostPage> {
   late final TextEditingController _textControllerTitle;
   late final TextEditingController _textControllerBody;
-  late final ImagePicker _picker;
+  late final TextEditingController _textControllerContact;
+  late final ImagePicker _picker; // from image picker package
   Position? currentPosition;
   String? selectedCategory;
   File? image;
@@ -41,6 +43,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
   void initState() {
     _textControllerTitle = TextEditingController();
     _textControllerBody = TextEditingController();
+    _textControllerContact = TextEditingController();
     _picker = ImagePicker();
     context.read<PostBloc>().add(const PostEventSavePreviousState());
     context.read<MainBloc>().add(const MainEventSavePreviousState());
@@ -52,13 +55,45 @@ class _CreatePostPageState extends State<CreatePostPage> {
   void dispose() {
     _textControllerTitle.dispose();
     _textControllerBody.dispose();
+    _textControllerContact.dispose();
     super.dispose();
   }
 
+  // change of category value
   void handleValueChange(String value) {
     setState(() {
       selectedCategory = value;
     });
+  }
+
+  // let user select image
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedImage = await _picker.pickImage(source: source);
+    if (pickedImage != null) {
+      setState(() {
+        image = File(pickedImage.path);
+      });
+    }
+  }
+
+  // when user remove the image by click the cancel button
+  void _onImageCancel() {
+    setState(() {
+      image = null;
+    });
+  }
+
+  // create a create post event
+  Future<void> _createPost() async {
+    context.read<PostBloc>().add(PostEventCreatePost(
+          _textControllerTitle.text,
+          _textControllerBody.text,
+          image,
+          selectedCategory,
+          _textControllerContact.text.isNotEmpty
+              ? _textControllerContact.text
+              : null,
+        ));
   }
 
   @override
@@ -95,6 +130,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
           } else if (state.exception is CouldNotUploadPostImageException) {
             await showErrorDialog(
                 context, 'Error occurred when saving the attached image!');
+          } else if (state.exception is InvalidContactPostException) {
+            await showErrorDialog(context, 'Invalid contact number!');
           }
         } else if (state is PostStateCreatePostSuccessful) {
           showToastMessage('Your post is created successfully');
@@ -107,7 +144,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
       },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        appBar: AppBar(
+        appBar: MyAppBar(
+          needSearch: false,
           leading: MyBackButton(
             onPressed: () {
               Navigator.of(context).pop();
@@ -115,31 +153,17 @@ class _CreatePostPageState extends State<CreatePostPage> {
               context.read<PostBloc>().add(const PostEventBackToLastState());
             },
           ),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Create Post',
-                style: CustomFontStyles.appBarTitle,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: MyButton(
-                    onPressed: () {
-                      context.read<PostBloc>().add(PostEventCreatePost(
-                            _textControllerTitle.text,
-                            _textControllerBody.text,
-                            image,
-                            selectedCategory,
-                          ));
-                    },
-                    text: 'Post'),
-              ),
-            ],
+          title: 'Create Post',
+          action: Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: MyButton(
+              onPressed: _createPost,
+              text: 'Post',
+            ),
           ),
         ),
         body: Container(
-          color: Colors.white,
+          color: AppColors.white,
           padding: const EdgeInsets.all(20),
           child: Center(
             child: Column(
@@ -147,8 +171,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(10.0)),
+                    color: AppColors.grey2,
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
                   child: Column(
                     children: [
                       TextField(
@@ -193,14 +218,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                             ),
                           ),
                           GestureDetector(
-                            onTap: () async {
-                              final image = await ImagePicker()
-                                  .pickImage(source: ImageSource.gallery);
-                              if (image != null) {
-                                final imageTemp = File(image.path);
-                                setState(() => this.image = imageTemp);
-                              }
-                            },
+                            onTap: () async => _pickImage(ImageSource.gallery),
                             child: Padding(
                               padding:
                                   const EdgeInsets.only(bottom: 12, left: 12),
@@ -212,14 +230,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                             ),
                           ),
                           GestureDetector(
-                            onTap: () async {
-                              final image = await ImagePicker()
-                                  .pickImage(source: ImageSource.camera);
-                              if (image != null) {
-                                final imageTemp = File(image.path);
-                                setState(() => this.image = imageTemp);
-                              }
-                            },
+                            onTap: () async => _pickImage(ImageSource.camera),
                             child: Padding(
                               padding:
                                   const EdgeInsets.only(bottom: 12, left: 56),
@@ -235,41 +246,57 @@ class _CreatePostPageState extends State<CreatePostPage> {
                     ],
                   ),
                 ),
-                image == null
-                    ? const SizedBox(
-                        height: 10,
-                      )
-                    : Container(
-                        padding: const EdgeInsets.all(10),
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        decoration: BoxDecoration(
-                            color: AppColors.grey2,
-                            borderRadius: BorderRadius.circular(10.0)),
-                        child: Stack(children: [
-                          Center(
-                            child: Image.file(
-                              image!,
-                              height: 120,
+                if (image != null)
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: AppColors.grey2,
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: Stack(
+                      children: [
+                        Center(
+                          child: Image.file(
+                            image!,
+                            height: 120,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: _onImageCancel,
+                          child: const Align(
+                            alignment: Alignment.topRight,
+                            child: Icon(
+                              Icons.cancel,
+                              color: AppColors.red,
+                              size: 20,
                             ),
                           ),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                image = null;
-                              });
-                            },
-                            child: const Align(
-                              alignment: Alignment.topRight,
-                              child: Icon(
-                                Icons.cancel,
-                                color: AppColors.red,
-                                size: 20,
-                              ),
-                            ),
-                          ),
-                        ]),
-                      ),
+                        ),
+                      ],
+                    ),
+                  ),
+                const SizedBox(height: 10),
                 MyDropdownMenu(onValueChange: handleValueChange),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _textControllerContact,
+                  obscureText: false,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  keyboardType: TextInputType.phone,
+                  maxLines: 1,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    fillColor: AppColors.grey2,
+                    filled: true,
+                    hintText: "Contact (Optional) e.g. 0123456789",
+                    hintStyle: TextStyle(color: AppColors.grey5),
+                  ),
+                ),
                 const SizedBox(height: 5),
                 Text(
                   (currentPosition == null)

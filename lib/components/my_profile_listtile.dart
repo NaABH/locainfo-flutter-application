@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:locainfo/constants/app_colors.dart';
 
+// custom widget to form the list tile in the profile page
 class MyProfileListTile extends StatelessWidget {
   final Function() onTap;
   final IconData leadingIcon;
@@ -19,7 +20,7 @@ class MyProfileListTile extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
       ),
-      color: Colors.white,
+      color: AppColors.white,
       child: Container(
         height: 70,
         width: MediaQuery.of(context).size.width * 0.9,

@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
+import 'package:locainfo/utilities/weather/weather.dart';
 
 @immutable
 abstract class MainState extends Equatable {
@@ -14,7 +15,7 @@ class MainStateInitialised extends MainState {
 }
 
 class MainStateHome extends MainState {
-  final String weatherInformation;
+  final Weather weatherInformation;
   const MainStateHome(this.weatherInformation);
 
   @override

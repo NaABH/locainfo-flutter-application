@@ -13,7 +13,7 @@ class CouldNotSignInWithGoogleException implements Exception {}
 // login: not logged in
 class UserNotLoggedInAuthException implements Exception {}
 
-// login: invalid email format
+// login: invalid email format or empty
 class InvalidEmailAuthException implements Exception {}
 
 // login: Account disabled
@@ -27,3 +27,6 @@ class EmailAlreadyInUseAuthException implements Exception {}
 
 // signup: username is empty
 class InvalidUsernameAuthException implements Exception {}
+
+// signup: password empty
+class InvalidPasswordAuthException implements Exception {}

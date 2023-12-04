@@ -22,6 +22,7 @@ import 'package:locainfo/utilities/dialog/update_username_dialog.dart';
 import 'package:locainfo/utilities/loading_screen/loading_screen.dart';
 import 'package:locainfo/utilities/toast_message.dart';
 
+// page for user to edit their profile picture and username
 class UpdateProfilePage extends StatefulWidget {
   final CurrentUser user;
   const UpdateProfilePage({super.key, required this.user});
@@ -146,7 +147,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                       right: 40,
                       child: Icon(
                         Icons.camera_alt,
-                        color: Colors.black,
+                        color: AppColors.black,
                         size: 70,
                       ),
                     ),
@@ -156,6 +157,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                 const MyDivider(),
                 const SizedBox(height: 25),
                 MyAuthTextField(
+                  // text field to fill username
                   focusNode: _textFieldFocusNode,
                   controller: _usernameController,
                   hintText: 'New Username',
@@ -163,6 +165,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                 ),
                 const SizedBox(height: 25),
                 MyButton(
+                    // change name button
                     onPressed: () async {
                       _textFieldFocusNode.unfocus();
                       final shouldChange =

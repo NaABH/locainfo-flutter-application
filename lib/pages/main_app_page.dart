@@ -11,6 +11,8 @@ import 'package:locainfo/services/main_bloc.dart';
 import 'package:locainfo/services/main_event.dart';
 import 'package:locainfo/services/main_state.dart';
 
+// main interface that control the display of other pages
+// including home, news, create post, bookmark and profile
 class MainAppPage extends StatelessWidget {
   const MainAppPage({super.key});
 

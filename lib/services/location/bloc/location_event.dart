@@ -1,5 +1,6 @@
 import 'package:geolocator/geolocator.dart';
 
+// location event that may happen within the application
 abstract class LocationEvent {}
 
 class LocationEventStartTracking extends LocationEvent {}

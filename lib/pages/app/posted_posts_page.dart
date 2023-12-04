@@ -12,6 +12,7 @@ import 'package:locainfo/services/post/post_state.dart';
 import 'package:locainfo/utilities/loading_screen/animeated_loading_screen.dart';
 import 'package:locainfo/utilities/toast_message.dart';
 
+// page for user to view their posted posts
 class PostedPostsPage extends StatefulWidget {
   const PostedPostsPage({super.key});
 
@@ -55,6 +56,7 @@ class _PostedPostsPageState extends State<PostedPostsPage> {
         }
       },
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: MyAppBar(
           leading: MyBackButton(onPressed: () {
             Navigator.of(context).pop();

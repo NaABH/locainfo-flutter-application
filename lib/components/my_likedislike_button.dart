@@ -9,6 +9,7 @@ import 'package:locainfo/services/post/post_bloc.dart';
 import 'package:locainfo/services/post/post_event.dart';
 
 // custom like button using like_button package for animation
+// used for post
 class MyLikeDislikeButton extends StatefulWidget {
   final Post post;
   final Function(Post) onUpdatePostState;
@@ -61,10 +62,12 @@ class _MyLikeDislikeButtonState extends State<MyLikeDislikeButton> {
         title: widget.post.title,
         content: widget.post.content,
         imageUrl: widget.post.imageUrl,
+        contact: widget.post.contact,
         category: widget.post.category,
         postedDate: widget.post.postedDate,
         latitude: widget.post.latitude,
         longitude: widget.post.longitude,
+        distance: widget.post.distance,
         locationName: widget.post.locationName,
         isLiked: this.isLiked,
         isDisliked: isDisliked,
@@ -111,10 +114,12 @@ class _MyLikeDislikeButtonState extends State<MyLikeDislikeButton> {
         title: widget.post.title,
         content: widget.post.content,
         imageUrl: widget.post.imageUrl,
+        contact: widget.post.contact,
         category: widget.post.category,
         postedDate: widget.post.postedDate,
         latitude: widget.post.latitude,
         longitude: widget.post.longitude,
+        distance: widget.post.distance,
         locationName: widget.post.locationName,
         isLiked: isLiked,
         isDisliked: this.isDisliked,

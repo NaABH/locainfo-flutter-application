@@ -16,6 +16,13 @@ import 'package:locainfo/services/location/location_provider.dart';
 import 'package:locainfo/services/main_bloc.dart';
 import 'package:locainfo/services/post/post_bloc.dart';
 import 'package:locainfo/services/profile/profile_bloc.dart';
+/*
+  Author: Na Hang Wei 19114479
+  University: Sunway University
+  Project title: Location Awareness Public Information Posting
+  Date: 4 December 2023
+  Description: This Dart file contains the main entry point of the application.
+*/
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,9 +31,10 @@ void main() async {
   );
   runApp(MultiBlocProvider(providers: [
     BlocProvider<AuthBloc>(
-      create: (BuildContext context) =>
-          AuthBloc(FirebaseAuthProvider(), FireStoreProvider()),
-    ),
+        create: (BuildContext context) => AuthBloc(
+              FirebaseAuthProvider(),
+              FireStoreProvider(),
+            )),
     BlocProvider<MainBloc>(
       create: (BuildContext context) => MainBloc(),
     ),
@@ -35,14 +43,18 @@ void main() async {
     ),
     BlocProvider<PostBloc>(
         create: (BuildContext context) => PostBloc(
-            FireStoreProvider(),
-            LocationProvider(),
-            FirebaseAuthProvider(),
-            CloudStorageProvider(),
-            context.read<LocationBloc>())),
+              FireStoreProvider(),
+              LocationProvider(),
+              FirebaseAuthProvider(),
+              CloudStorageProvider(),
+              context.read<LocationBloc>(),
+            )),
     BlocProvider<ProfileBloc>(
-        create: (BuildContext context) => ProfileBloc(FireStoreProvider(),
-            FirebaseAuthProvider(), CloudStorageProvider()))
+        create: (BuildContext context) => ProfileBloc(
+              FireStoreProvider(),
+              FirebaseAuthProvider(),
+              CloudStorageProvider(),
+            ))
   ], child: const MyApp()));
 }
 

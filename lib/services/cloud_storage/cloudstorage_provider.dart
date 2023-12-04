@@ -5,8 +5,9 @@ import 'package:locainfo/services/cloud_storage/cloud_storage_exceptions.dart';
 import 'package:locainfo/services/cloud_storage/storage_provider.dart';
 import 'package:uuid/uuid.dart';
 
+// implementation for storagge provider
 class CloudStorageProvider extends StorageProvider {
-  // use for post image
+  // use for saving post image
   @override
   Future<String> uploadPostImage(File imageFile) async {
     try {
@@ -27,7 +28,7 @@ class CloudStorageProvider extends StorageProvider {
     }
   }
 
-  // yse for profile picture
+  // use for saving profile picture
   @override
   Future<String> uploadProfileImage(File imageFile) async {
     try {

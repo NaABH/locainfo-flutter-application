@@ -37,6 +37,7 @@ abstract class DatabaseProvider {
     required String title,
     required String body,
     required String? imageUrl,
+    required String? contact,
     required String category,
     required double latitude,
     required double longitude,
@@ -68,6 +69,7 @@ abstract class DatabaseProvider {
     required String documentId,
     required String title,
     required String text,
+    required String? contact,
   });
 
   // update post image

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:locainfo/components/my_appbar.dart';
 import 'package:locainfo/components/my_back_button.dart';
 import 'package:locainfo/components/my_button.dart';
 import 'package:locainfo/constants/app_colors.dart';
@@ -13,8 +14,8 @@ import 'package:locainfo/services/post/post_state.dart';
 import 'package:locainfo/utilities/dialog/error_dialog.dart';
 import 'package:locainfo/utilities/loading_screen/loading_screen.dart';
 import 'package:locainfo/utilities/toast_message.dart';
-import 'package:simple_gradient_text/simple_gradient_text.dart';
 
+// page for user to report a post
 class ReportPage extends StatefulWidget {
   final Post post;
 
@@ -65,16 +66,14 @@ class _ReportPageState extends State<ReportPage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
+        resizeToAvoidBottomInset: false,
+        appBar: MyAppBar(
+          title: 'Report',
+          needSearch: false,
           leading: MyBackButton(
             onPressed: () {
               Navigator.pop(context);
             },
-          ),
-          title: GradientText(
-            'Report',
-            style: CustomFontStyles.appBarTitle,
-            colors: const [AppColors.lighterBlue, AppColors.darkestBlue],
           ),
         ),
         body: Container(
@@ -111,10 +110,10 @@ class _ReportPageState extends State<ReportPage> {
                       borderRadius: BorderRadius.circular(10.0),
                       borderSide: BorderSide.none,
                     ),
-                    fillColor: Colors.grey.shade200,
+                    fillColor: AppColors.grey2,
                     filled: true,
                     hintText: "Reason...",
-                    hintStyle: TextStyle(color: Colors.grey.shade500),
+                    hintStyle: TextStyle(color: AppColors.grey5),
                   ),
                 ),
                 const SizedBox(height: 45),

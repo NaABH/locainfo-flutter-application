@@ -8,20 +8,21 @@ import 'package:locainfo/services/post/post_bloc.dart';
 import 'package:locainfo/services/post/post_event.dart';
 import 'package:share_plus/share_plus.dart';
 
-class MyPostBottomBar extends StatefulWidget {
+// A custom bottom bar to be used in the post detail page
+class MyBottomBar extends StatefulWidget {
   final Post post;
   final Function(Post) onUpdatePostState;
-  const MyPostBottomBar({
+  const MyBottomBar({
     super.key,
     required this.post,
     required this.onUpdatePostState,
   });
 
   @override
-  State<MyPostBottomBar> createState() => _MyPostBottomBarState();
+  State<MyBottomBar> createState() => _MyBottomBarState();
 }
 
-class _MyPostBottomBarState extends State<MyPostBottomBar> {
+class _MyBottomBarState extends State<MyBottomBar> {
   late final Post post = widget.post;
   late bool isBookmarked = widget.post.isBookmarked;
   late bool isLiked = widget.post.isLiked;
@@ -84,10 +85,12 @@ class _MyPostBottomBarState extends State<MyPostBottomBar> {
                     title: widget.post.title,
                     content: widget.post.content,
                     imageUrl: widget.post.imageUrl,
+                    contact: widget.post.contact,
                     category: widget.post.category,
                     postedDate: widget.post.postedDate,
                     latitude: widget.post.latitude,
                     longitude: widget.post.longitude,
+                    distance: widget.post.distance,
                     locationName: widget.post.locationName,
                     isLiked: isLiked,
                     isDisliked: isDisliked,
@@ -133,10 +136,12 @@ class _MyPostBottomBarState extends State<MyPostBottomBar> {
                     title: widget.post.title,
                     content: widget.post.content,
                     imageUrl: widget.post.imageUrl,
+                    contact: widget.post.contact,
                     category: widget.post.category,
                     postedDate: widget.post.postedDate,
                     latitude: widget.post.latitude,
                     longitude: widget.post.longitude,
+                    distance: widget.post.distance,
                     locationName: widget.post.locationName,
                     isLiked: isLiked,
                     isDisliked: isDisliked,
@@ -197,10 +202,12 @@ class _MyPostBottomBarState extends State<MyPostBottomBar> {
                     title: widget.post.title,
                     content: widget.post.content,
                     imageUrl: widget.post.imageUrl,
+                    contact: widget.post.contact,
                     category: widget.post.category,
                     postedDate: widget.post.postedDate,
                     latitude: widget.post.latitude,
                     longitude: widget.post.longitude,
+                    distance: widget.post.distance,
                     locationName: widget.post.locationName,
                     isLiked: isLiked,
                     isDisliked: isDisliked,

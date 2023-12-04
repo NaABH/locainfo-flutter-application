@@ -1,15 +1,17 @@
 import 'package:bloc/bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:locainfo/services/main_event.dart';
 import 'package:locainfo/services/main_state.dart';
-import 'package:locainfo/utilities/weather_data.dart';
+import 'package:locainfo/utilities/weather/weather.dart';
 
 // the main bloc is used for navigation between different main pages of the application
 class MainBloc extends Bloc<MainEvent, MainState> {
   MainBloc() : super(const MainStateInitialised()) {
     late MainState previousState;
-    late String weather;
+    late Weather weather;
 
     on<MainEventInitialise>((event, emit) async {
+      await Geolocator.getCurrentPosition();
       weather = await fetchWeatherData();
       emit(MainStateHome(weather));
     });

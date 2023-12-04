@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:locainfo/constants/app_colors.dart';
 
-// custom back button
+// custom back button to be used in the app bar
 class MyBackButton extends StatelessWidget {
   final Function()? onPressed;
 

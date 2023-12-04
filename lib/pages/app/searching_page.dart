@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locainfo/components/my_back_button.dart';
 import 'package:locainfo/components/my_search_bar.dart';
+import 'package:locainfo/constants/app_colors.dart';
 import 'package:locainfo/pages/app/post_detail_page.dart';
 import 'package:locainfo/services/post/post_bloc.dart';
 import 'package:locainfo/services/post/post_event.dart';
 import 'package:locainfo/services/post/post_state.dart';
 
+// page after clicking search bar
 class SearchingPage extends StatefulWidget {
   const SearchingPage({super.key});
 
@@ -30,6 +32,7 @@ class _SearchingPageState extends State<SearchingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         leading: MyBackButton(
           onPressed: () {
@@ -68,7 +71,7 @@ class _SearchingPageState extends State<SearchingPage> {
                           horizontal: 12, vertical: 1),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                          color: Colors.grey.shade100),
+                          color: AppColors.grey1),
                       child: ListTile(
                         leading: const Icon(Icons.search),
                         title: Text(
@@ -100,7 +103,8 @@ class _SearchingPageState extends State<SearchingPage> {
         } else if (state is PostStateSearchError) {
           return const Center(child: Text('There is an error when searching'));
         } else {
-          return const Center(child: Text('Search post by title...'));
+          return const Center(
+              child: Text('You can search nearby post by title...'));
         }
       }),
     );

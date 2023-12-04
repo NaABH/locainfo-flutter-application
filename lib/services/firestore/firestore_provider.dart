@@ -8,6 +8,7 @@ import 'package:locainfo/services/firestore/post.dart';
 
 import 'database_constants.dart';
 
+// implementation of database provider
 class FireStoreProvider implements DatabaseProvider {
   // implement FireStoreProvider as a singleton
   static final FireStoreProvider _shared = FireStoreProvider._sharedInstance();
@@ -83,6 +84,7 @@ class FireStoreProvider implements DatabaseProvider {
     required String title,
     required String body,
     required String? imageUrl,
+    required String? contact,
     required String category,
     required double latitude,
     required double longitude,
@@ -98,6 +100,7 @@ class FireStoreProvider implements DatabaseProvider {
         textFieldName: body,
         categoryFieldName: category,
         imageLinkFieldName: imageUrl,
+        contactFieldName: contact,
         latitudeFieldName: latitude,
         longitudeFieldName: longitude,
         locationNameFieldName: locationName,
@@ -116,11 +119,13 @@ class FireStoreProvider implements DatabaseProvider {
     required String documentId,
     required String title,
     required String text,
+    required String? contact,
   }) async {
     try {
       await posts.doc(documentId).update({
         titleFieldName: title,
         textFieldName: text,
+        contactFieldName: contact,
       });
     } on Exception catch (_) {
       throw CouldNotUpdatePostException();

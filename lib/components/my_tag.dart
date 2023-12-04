@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+// custom tag
+// used for the displaying category, contact, and direct me to location
 class MyTag extends StatelessWidget {
   final List<Widget> children;
   final Color backgroundColor;

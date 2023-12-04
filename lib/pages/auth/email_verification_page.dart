@@ -7,6 +7,7 @@ import 'package:locainfo/services/auth/bloc/auth_bloc.dart';
 import 'package:locainfo/services/auth/bloc/auth_event.dart';
 import 'package:locainfo/utilities/toast_message.dart';
 
+// page for user to verify their email
 class EmailVerificationPage extends StatefulWidget {
   const EmailVerificationPage({super.key});
 
@@ -18,6 +19,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         leading: MyBackButton(
           onPressed: () {

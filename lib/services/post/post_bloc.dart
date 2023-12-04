@@ -15,6 +15,7 @@ import 'package:locainfo/services/post/post_state.dart';
 import 'package:locainfo/utilities/input_validation.dart';
 import 'package:locainfo/utilities/post_info_helper.dart';
 
+// bloc to control all the flow for post data
 class PostBloc extends Bloc<PostEvent, PostState> {
   final DatabaseProvider _databaseProvider;
   final GeoLocationProvider _locationProvider;
@@ -135,7 +136,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
           position: position,
           exception: null,
         ));
-      } on Exception catch (e) {
+      } on Exception catch (_) {
         emit(const PostStateCreatingPost(position: null, isLoading: false));
       }
     });
@@ -156,6 +157,13 @@ class PostBloc extends Bloc<PostEvent, PostState> {
             !postCategories.containsKey(event.category)) {
           throw InvalidCategoryPostException();
         }
+
+        if (event.contact != null) {
+          if (!isValidMalaysianPhoneNumber(event.contact!)) {
+            throw InvalidContactPostException();
+          }
+        }
+
         emit(const PostStateSubmittingPost(
             isLoading: true, loadingText: 'Submitting...'));
         await Future.delayed(const Duration(seconds: 2), () async {
@@ -174,6 +182,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
             title: event.title,
             body: event.body,
             imageUrl: imageUrl != null ? imageUrl! : null,
+            contact: event.contact,
             category: event.category!,
             latitude: position.latitude,
             longitude: position.longitude,
@@ -225,7 +234,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
             emit(const PostStateNoAvailablePostedPost(isLoading: false));
           }
         });
-      } on Exception catch (e) {
+      } on Exception catch (_) {
         emit(const PostStateLoadPostedPostsError(isLoading: false));
       }
     });
@@ -240,6 +249,13 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         if (!isInputValid(event.body)) {
           throw ContentCouldNotEmptyPostException();
         }
+
+        if (event.newContact != null) {
+          if (!isValidMalaysianPhoneNumber(event.newContact!)) {
+            throw InvalidContactPostException();
+          }
+        }
+
         emit(const PostStateUpdatingPosts(
             isLoading: true, loadingText: 'Updating post'));
         if (event.imageUpdated) {
@@ -255,6 +271,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
           documentId: event.postId,
           title: event.title,
           text: event.body,
+          contact: event.newContact,
         );
         emit(const PostStateUpdatingPosts(isLoading: false));
         emit(const PostStateUpdatePostSuccessfully(isLoading: false));
@@ -309,7 +326,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
             isLoading: true, loadingText: 'Deleting'));
         await _databaseProvider.deletePost(documentId: event.documentId);
         emit(const PostStateDeletePostSuccessful(isLoading: false));
-      } on Exception catch (e) {
+      } on Exception catch (_) {
         emit(const PostStateDeleteError(isLoading: false));
       }
     });

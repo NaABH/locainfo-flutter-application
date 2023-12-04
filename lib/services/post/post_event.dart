@@ -49,7 +49,9 @@ class PostEventCreatePost extends PostEvent {
   final String body;
   final File? image;
   final String? category;
-  const PostEventCreatePost(this.title, this.body, this.image, this.category);
+  final String? contact;
+  const PostEventCreatePost(
+      this.title, this.body, this.image, this.category, this.contact);
 }
 
 // call in search page when the text changed
@@ -70,8 +72,9 @@ class PostEventUpdatePostContent extends PostEvent {
   final String body;
   final File? image;
   final bool imageUpdated;
-  const PostEventUpdatePostContent(
-      this.postId, this.title, this.body, this.image, this.imageUpdated);
+  final String? newContact;
+  const PostEventUpdatePostContent(this.postId, this.title, this.body,
+      this.image, this.imageUpdated, this.newContact);
 }
 
 // call when want update post reactions

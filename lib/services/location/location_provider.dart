@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:locainfo/services/location/geolocation_provider.dart';
 import 'package:locainfo/services/location/location_exceptions.dart';
 import 'package:locainfo/utilities/toast_message.dart';
 
+// implementation of geo location provider
 class LocationProvider implements GeoLocationProvider {
   // singleton
   static final LocationProvider _shared = LocationProvider._sharedInstance();
@@ -26,13 +28,14 @@ class LocationProvider implements GeoLocationProvider {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
+          showToastMessage('Please enable location permission.');
           return Future.error('Location permissions are denied');
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        showToastMessage(
-            'Location permissions are permanently denied, we cannot request permissions.');
+        showToastMessage('Application quiting...');
+        SystemNavigator.pop(); // Exit the app
         return Future.error(
             'Location permissions are permanently denied, we cannot request permissions.');
       }

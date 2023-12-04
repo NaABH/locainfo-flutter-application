@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:locainfo/constants/app_colors.dart';
 
+// custom search bar design
 class MySearchBar extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
@@ -39,7 +40,7 @@ class MySearchBar extends StatelessWidget {
           fillColor: AppColors.grey3,
           filled: true,
           hintText: hintText,
-          hintStyle: TextStyle(color: Colors.grey.shade500),
+          hintStyle: TextStyle(color: AppColors.grey5),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
           ),

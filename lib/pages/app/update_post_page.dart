@@ -18,6 +18,7 @@ import 'package:locainfo/utilities/dialog/error_dialog.dart';
 import 'package:locainfo/utilities/loading_screen/loading_screen.dart';
 import 'package:locainfo/utilities/toast_message.dart';
 
+// page for user to edit their posted posts
 class UpdatePostPage extends StatefulWidget {
   final Post post;
 
@@ -30,6 +31,7 @@ class UpdatePostPage extends StatefulWidget {
 class _UpdatePostPageState extends State<UpdatePostPage> {
   late final TextEditingController _textControllerTitle;
   late final TextEditingController _textControllerBody;
+  late final TextEditingController _textControllerContact;
   late final ImagePicker _picker;
   late final Post currentPost;
   File? newImage;
@@ -41,6 +43,7 @@ class _UpdatePostPageState extends State<UpdatePostPage> {
     currentPost = widget.post;
     _textControllerTitle = TextEditingController(text: currentPost.title);
     _textControllerBody = TextEditingController(text: currentPost.content);
+    _textControllerContact = TextEditingController(text: currentPost.contact);
     _picker = ImagePicker();
     if (currentPost.imageUrl != null) {
       oldImage = File(currentPost.imageUrl!);
@@ -52,6 +55,7 @@ class _UpdatePostPageState extends State<UpdatePostPage> {
   void dispose() {
     _textControllerTitle.dispose();
     _textControllerBody.dispose();
+    _textControllerContact.dispose();
     super.dispose();
   }
 
@@ -79,6 +83,8 @@ class _UpdatePostPageState extends State<UpdatePostPage> {
           } else if (state.exception is ContentCouldNotEmptyPostException) {
             await showErrorDialog(
                 context, 'Content cannot be empty or start with symbol.');
+          } else if (state.exception is InvalidContactPostException) {
+            await showErrorDialog(context, 'Invalid contact number!');
           } else if (state.exception is CouldNotUploadPostImageException) {
             await showErrorDialog(
                 context, 'An error occurred when updating the new image.');
@@ -108,6 +114,9 @@ class _UpdatePostPageState extends State<UpdatePostPage> {
                             _textControllerBody.text,
                             newImage,
                             imageUpdated,
+                            _textControllerContact.text.isNotEmpty
+                                ? _textControllerContact.text
+                                : null,
                           ));
                       // Navigator.of(context).pop(); // to be debug
                     },
@@ -117,7 +126,7 @@ class _UpdatePostPageState extends State<UpdatePostPage> {
           ),
         ),
         body: Container(
-          color: Colors.white,
+          color: AppColors.white,
           padding: const EdgeInsets.all(20),
           child: Center(
             child: Column(
@@ -125,7 +134,7 @@ class _UpdatePostPageState extends State<UpdatePostPage> {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
+                      color: AppColors.grey2,
                       borderRadius: BorderRadius.circular(10.0)),
                   child: Column(
                     children: [
@@ -142,10 +151,10 @@ class _UpdatePostPageState extends State<UpdatePostPage> {
                             borderRadius: BorderRadius.circular(10.0),
                             borderSide: BorderSide.none,
                           ),
-                          fillColor: Colors.grey.shade200,
+                          fillColor: AppColors.grey2,
                           filled: true,
                           hintText: "Title",
-                          hintStyle: TextStyle(color: Colors.grey.shade700),
+                          hintStyle: TextStyle(color: AppColors.grey7),
                         ),
                       ),
                       Stack(
@@ -164,10 +173,10 @@ class _UpdatePostPageState extends State<UpdatePostPage> {
                                 borderRadius: BorderRadius.circular(10.0),
                                 borderSide: BorderSide.none,
                               ),
-                              fillColor: Colors.grey.shade200,
+                              fillColor: AppColors.grey2,
                               filled: true,
                               hintText: "Description / body text",
-                              hintStyle: TextStyle(color: Colors.grey.shade500),
+                              hintStyle: TextStyle(color: AppColors.grey5),
                             ),
                           ),
                           GestureDetector(
@@ -227,7 +236,7 @@ class _UpdatePostPageState extends State<UpdatePostPage> {
                         padding: const EdgeInsets.all(10),
                         margin: const EdgeInsets.symmetric(vertical: 8),
                         decoration: BoxDecoration(
-                            color: Colors.grey.shade200,
+                            color: AppColors.grey2,
                             borderRadius: BorderRadius.circular(10.0)),
                         child: Stack(children: [
                           Center(
@@ -253,7 +262,7 @@ class _UpdatePostPageState extends State<UpdatePostPage> {
                               alignment: Alignment.topRight,
                               child: Icon(
                                 Icons.cancel,
-                                color: Colors.red,
+                                color: AppColors.red,
                                 size: 20,
                               ),
                             ),
@@ -283,12 +292,31 @@ class _UpdatePostPageState extends State<UpdatePostPage> {
                         ),
                       ],
                     )),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _textControllerContact,
+                  obscureText: false,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  keyboardType: TextInputType.phone,
+                  maxLines: 1,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    fillColor: AppColors.grey2,
+                    filled: true,
+                    hintText: "Contact (Optional) e.g. 0123456789",
+                    hintStyle: TextStyle(color: AppColors.grey5),
+                  ),
+                ),
                 const SizedBox(height: 5),
                 Text(
-                  'Current Location: ${currentPost.latitude}, ${currentPost.longitude}',
+                  'Posted Location: ${currentPost.latitude}, ${currentPost.longitude}',
                   style: TextStyle(
                     fontStyle: FontStyle.italic,
-                    color: Colors.grey.shade500,
+                    color: AppColors.grey5,
                   ),
                 ),
               ],

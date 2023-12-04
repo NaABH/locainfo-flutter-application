@@ -7,15 +7,17 @@ import 'package:locainfo/services/firestore/post.dart';
 import 'package:locainfo/services/post/post_bloc.dart';
 import 'package:locainfo/services/post/post_event.dart';
 
-// custom book mark button using like_button package
+// custom bookmark button that use the like_button package for animation
 class MyBookmarkButton extends StatefulWidget {
   final Post post;
-  final Function(Post) onUpdatePostState;
+  final Function(Post)
+      onUpdatePostState; // call back when clicked to update the post state
+
   const MyBookmarkButton({
-    super.key,
+    Key? key,
     required this.post,
     required this.onUpdatePostState,
-  });
+  }) : super(key: key);
 
   @override
   State<MyBookmarkButton> createState() => _MyBookmarkButtonState();
@@ -35,15 +37,12 @@ class _MyBookmarkButtonState extends State<MyBookmarkButton> {
   Future<bool?> onBookmarkButtonTapped(bool isBookmarked) async {
     setState(() {
       this.isBookmarked = !this.isBookmarked;
+      final postBloc = context.read<PostBloc>();
 
-      // update the database, add bookmark
       if (this.isBookmarked) {
-        context
-            .read<PostBloc>()
-            .add(PostEventUpdatePostReactions(postId, UserAction.bookmark));
+        postBloc.add(PostEventUpdatePostReactions(postId, UserAction.bookmark));
       } else {
-        // update the database, remove bookmark
-        context.read<PostBloc>().add(
+        postBloc.add(
             PostEventUpdatePostReactions(postId, UserAction.removeBookmark));
       }
     });
@@ -57,10 +56,12 @@ class _MyBookmarkButtonState extends State<MyBookmarkButton> {
         title: widget.post.title,
         content: widget.post.content,
         imageUrl: widget.post.imageUrl,
+        contact: widget.post.contact,
         category: widget.post.category,
         postedDate: widget.post.postedDate,
         latitude: widget.post.latitude,
         longitude: widget.post.longitude,
+        distance: widget.post.distance,
         locationName: widget.post.locationName,
         isLiked: widget.post.isLiked,
         isDisliked: widget.post.isDisliked,
@@ -78,7 +79,9 @@ class _MyBookmarkButtonState extends State<MyBookmarkButton> {
     return LikeButton(
       size: 22,
       circleColor: const CircleColor(
-          start: Color(0xff00ddff), end: AppColors.darkerBlue),
+        start: Color(0xff00ddff),
+        end: AppColors.darkerBlue,
+      ),
       bubblesColor: const BubblesColor(
         dotPrimaryColor: AppColors.darkerBlue,
         dotSecondaryColor: AppColors.lighterBlue,

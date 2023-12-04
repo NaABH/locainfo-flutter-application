@@ -11,6 +11,7 @@ import 'package:locainfo/services/auth/bloc/auth_state.dart';
 import 'package:locainfo/utilities/dialog/error_dialog.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
+// onboarding page when user first enter the application
 class OnBoardingPage extends StatefulWidget {
   const OnBoardingPage({super.key});
 
@@ -121,7 +122,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
           borderRadius: BorderRadius.circular(36),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.shade900.withOpacity(0.2),
+              color: AppColors.grey9.withOpacity(0.2),
               spreadRadius: 2,
               blurRadius: 5,
               offset: const Offset(2, 2),

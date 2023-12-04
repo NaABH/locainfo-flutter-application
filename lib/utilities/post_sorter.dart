@@ -16,7 +16,7 @@ List<Post> sortPosts(List<Post> posts, String? selectedSortBy) {
 
 // ascending order of distances from current location (nearer first)
 List<Post> sortPostsByDistance(List<Post> posts) {
-  return posts.toList()
+  return posts
     ..sort((a, b) {
       int compare = a.distance!.compareTo(b.distance!);
       if (compare != 0) {
@@ -31,8 +31,7 @@ List<Post> sortPostsByDistance(List<Post> posts) {
 
 // descending order of number of likes (more like first)
 List<Post> sortPostsByLikes(List<Post> posts) {
-  return posts.toList()
-    ..sort((a, b) => b.numberOfLikes.compareTo(a.numberOfLikes));
+  return posts..sort((a, b) => b.numberOfLikes.compareTo(a.numberOfLikes));
 }
 
 // descending order of posted date (newer first)
