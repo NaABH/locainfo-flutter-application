@@ -24,7 +24,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) async {
-        if (state is AuthStateLoggingInWithGoogle) {
+        if (state is AuthStateLoggedOut) {
           if (state.exception is CouldNotSignInWithGoogleException) {
             await showErrorDialog(
                 context, 'Some error occurred when signing in with Google.');

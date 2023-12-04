@@ -51,8 +51,10 @@ class MainLoginPage extends StatelessWidget {
           // password reset go forgot password page
           return const ForgotPasswordPage();
         } else {
-          return const Scaffold(
-            body: CircularProgressIndicator(),
+          return const Center(
+            child: Scaffold(
+              body: CircularProgressIndicator(),
+            ),
           );
         }
       },

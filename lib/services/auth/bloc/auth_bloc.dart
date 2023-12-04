@@ -212,7 +212,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           emit(const AuthStateNeedsVerification(isLoading: false));
         }
       } on Exception catch (e) {
-        emit(AuthStateLoggingInWithGoogle(exception: e, isLoading: false));
+        emit(AuthStateLoggedOut(exception: e, isLoading: false));
       }
     });
 
