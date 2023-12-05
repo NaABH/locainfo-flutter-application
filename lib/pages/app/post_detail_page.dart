@@ -271,10 +271,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
             target: LatLng(currentPost.latitude, currentPost.longitude),
             zoom: 16,
           ),
-          zoomControlsEnabled: false,
+          zoomControlsEnabled: true,
           myLocationEnabled: true,
           myLocationButtonEnabled: true,
           mapToolbarEnabled: false,
+          zoomGesturesEnabled: true,
+          tiltGesturesEnabled: true,
+          rotateGesturesEnabled: true,
+          scrollGesturesEnabled: true,
           markers: <Marker>{
             Marker(
               markerId: MarkerId(currentPost.documentId),
