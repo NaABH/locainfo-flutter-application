@@ -149,7 +149,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         if (!isInputValid(email)) {
           throw InvalidEmailAuthException();
         }
-        if (!isInputValid(password)) {
+        if (password.trim().isEmpty) {
           throw InvalidPasswordAuthException();
         }
 
