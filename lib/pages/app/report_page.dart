@@ -53,7 +53,7 @@ class _ReportPageState extends State<ReportPage> {
           } else {
             LoadingScreen().hide();
           }
-        } else if (state is PostStateCreatePostSuccessful) {
+        } else if (state is PostStateCreateReportSuccessful) {
           showToastMessage('Report submitted successfully');
           Navigator.pop(context);
         } else if (state is PostStateCreateReportError) {
