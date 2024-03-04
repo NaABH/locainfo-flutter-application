@@ -1,16 +1,29 @@
-# locainfo
+# LocaInfo (FYP)
+An ease-of-use mobile application to find relevant public information based on current location
 
-A new Flutter project.
+# Features
 
-## Getting Started
+## Authentication
+- Email/Google
 
-This project is a starting point for a Flutter application.
+## User Account Management
+- Email Verification
+- Password Recovery
+- Change Username and Profile Picture
 
-A few resources to get you started if this is your first Flutter project:
+## Content Display and Navigation
+- Location-Based Content
+- Search by Title
+- In-App Map
+- Bookmarking
+- Category-Based Post Filtering
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Post Management
+- Create New Post
+- Image and Link Attachment
+- Report Post
+- Edit/Delete Post
+- Post History
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Accessibility and Convenience
+- Text-to-Speech Integration
